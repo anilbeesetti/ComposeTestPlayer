@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">NextPlayer</string>
+    <string name="title_activity_next_player">NextPlayerActivity</string>
 </resources>
