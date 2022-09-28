@@ -23,9 +23,14 @@ import java.io.File
 
 
 @Composable
-fun ShowVideoFiles(videoFiles: List<File>) {
+fun ShowVideoFiles(
+    videoFiles: List<File>,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
-    LazyColumn {
+    LazyColumn(
+        modifier = modifier
+    ) {
         item {
             Spacer(modifier = Modifier.height(5.dp))
         }
