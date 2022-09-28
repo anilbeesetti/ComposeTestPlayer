@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -43,7 +44,16 @@ class NextPlayerActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    PlayerScreen(exoPlayer = player, mediaPath = videoFilePath)
+                    PlayerScreen(
+                        mediaPath = videoFilePath,
+                        exoPlayer = player,
+                        onVisibilityChange = { visibility ->
+                            when(visibility) {
+                                View.VISIBLE -> showSystemBars()
+                                View.GONE -> hideSystemBars()
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -53,8 +63,9 @@ class NextPlayerActivity : ComponentActivity() {
 
 @Composable
 fun PlayerScreen(
+    mediaPath: String,
     exoPlayer: ExoPlayer,
-    mediaPath: String
+    onVisibilityChange: (visibility: Int) -> Unit
 ) {
 
     LaunchedEffect(exoPlayer) {
@@ -71,7 +82,7 @@ fun PlayerScreen(
                     playerView = StyledPlayerView(context).apply {
                     player = exoPlayer
                     setControllerVisibilityListener(
-                        StyledPlayerView.ControllerVisibilityListener {}
+                        StyledPlayerView.ControllerVisibilityListener { onVisibilityChange(it) }
                     )
                     showController()
                     hideController()
