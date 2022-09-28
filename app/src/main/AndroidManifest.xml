@@ -18,6 +18,7 @@
         tools:targetApi="31">
         <activity
             android:name=".player.NextPlayerActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode|keyboard|keyboardHidden|navigation"
             android:exported="false"
             android:label="@string/title_activity_next_player"
             android:theme="@style/Theme.NextPlayer">

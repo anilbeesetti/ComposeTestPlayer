@@ -85,7 +85,6 @@ fun PlayerScreen(
                         StyledPlayerView.ControllerVisibilityListener { onVisibilityChange(it) }
                     )
                     showController()
-                    hideController()
                 }
                 playerView
             },
