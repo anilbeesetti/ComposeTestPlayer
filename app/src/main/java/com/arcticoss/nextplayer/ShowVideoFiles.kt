@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.Placeholder
@@ -26,14 +27,14 @@ fun ShowVideoFiles(videoFiles: List<File>) {
     val context = LocalContext.current
     LazyColumn {
         item {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(5.dp))
         }
         items(videoFiles) { video ->
             VideoFileItem(
                 videoFile = video,
-                modifier = Modifier.padding(top = 0.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
                 onClick = { startPlayerActivity(context, video.path) }
             )
+//            Spacer(modifier = Modifier.height(5.dp))
         }
     }
 }
@@ -55,6 +56,7 @@ fun VideoFileItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
+            .padding(horizontal = 10.dp, vertical = 5.dp)
     ) {
         Box(
             modifier = Modifier
