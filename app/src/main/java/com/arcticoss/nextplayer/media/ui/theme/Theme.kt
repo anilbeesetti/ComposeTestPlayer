@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.ui.theme
+package com.arcticoss.nextplayer.media.ui.theme
 
 import android.app.Activity
 import android.os.Build

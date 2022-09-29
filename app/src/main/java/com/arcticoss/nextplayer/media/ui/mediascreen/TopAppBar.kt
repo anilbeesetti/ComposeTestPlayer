@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer
+package com.arcticoss.nextplayer.media.ui.mediascreen
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert

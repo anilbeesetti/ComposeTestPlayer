@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer
+package com.arcticoss.nextplayer.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

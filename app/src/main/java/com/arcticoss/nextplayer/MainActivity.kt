@@ -4,21 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.arcticoss.nextplayer.ui.theme.NextPlayerTheme
-import java.io.File
+import com.arcticoss.nextplayer.media.ui.mediascreen.MediaScreen
+import com.arcticoss.nextplayer.media.ui.theme.NextPlayerTheme
 
 
 private const val TAG = "MainActivity"
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,35 +23,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val viewModel = viewModel<VideoFilesViewModel>()
-                    val files by viewModel.videoFiles.collectAsStateWithLifecycle()
-                    MediaScreen(videoFiles = files)
+                    MediaScreen()
                 }
             }
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MediaScreen(
-    videoFiles: List<File>
-) {
-
-    val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
-        topBar = {
-            MediaLargeTopAppBar(
-                title = "NextPlayer",
-                scrollBehavior = scrollBehaviour
-            )
-        }
-    ) { innerPadding ->
-        ShowVideoFiles(
-            videoFiles = videoFiles,
-            contentPadding = innerPadding
-        )
-    }
-}
-
