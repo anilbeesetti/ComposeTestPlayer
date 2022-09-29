@@ -2,4 +2,6 @@
 <resources>
 
     <style name="Theme.NextPlayer" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.NextPlayer.Player" parent="android:Theme.Material.Light.NoActionBar.TranslucentDecor"/>
+
 </resources>

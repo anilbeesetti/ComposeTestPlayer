@@ -21,7 +21,7 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode|keyboard|keyboardHidden|navigation"
             android:exported="false"
             android:label="@string/title_activity_next_player"
-            android:theme="@style/Theme.NextPlayer">
+            android:theme="@style/Theme.NextPlayer.Player">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
