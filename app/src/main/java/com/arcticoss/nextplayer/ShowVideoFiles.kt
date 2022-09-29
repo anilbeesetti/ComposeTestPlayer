@@ -25,10 +25,12 @@ import java.io.File
 @Composable
 fun ShowVideoFiles(
     videoFiles: List<File>,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     LazyColumn(
+        contentPadding = contentPadding,
         modifier = modifier
     ) {
         item {

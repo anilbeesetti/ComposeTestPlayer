@@ -4,17 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arcticoss.nextplayer.ui.theme.NextPlayerTheme
 import java.io.File
-import java.nio.file.Files
 
 
 private const val TAG = "MainActivity"
@@ -45,9 +44,9 @@ fun MediaScreen(
     videoFiles: List<File>
 ) {
 
-    val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
-        modifier = Modifier,
+        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
             MediaLargeTopAppBar(
                 title = "NextPlayer",
@@ -57,7 +56,7 @@ fun MediaScreen(
     ) { innerPadding ->
         ShowVideoFiles(
             videoFiles = videoFiles,
-            modifier = Modifier.padding(innerPadding)
+            contentPadding = innerPadding
         )
     }
 }
