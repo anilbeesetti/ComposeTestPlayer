@@ -40,7 +40,8 @@ class NextPlayerActivity : ComponentActivity() {
                                 View.VISIBLE -> showSystemBars()
                                 View.GONE -> hideSystemBars()
                             }
-                        }
+                        },
+                        onBackPressed = { finish() }
                     )
                 }
             }

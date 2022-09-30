@@ -25,7 +25,7 @@ fun NextPlayerUI(
             .statusBarsPadding(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        PlayerUIHeader(title = file.name, onBackPressed = {})
+        PlayerUIHeader(title = file.name, onBackPressed = onBackPressed)
         PlayerUIMainControls(
             isPlaying = isPlaying,
             onPlayPauseClick = {

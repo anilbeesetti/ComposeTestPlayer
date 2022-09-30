@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.player.ui.playerscreen
+package com.arcticoss.nextplayer.player.ui.playerscreen.composables
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

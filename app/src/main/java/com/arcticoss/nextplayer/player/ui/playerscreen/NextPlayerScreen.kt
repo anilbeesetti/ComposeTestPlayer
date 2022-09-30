@@ -15,7 +15,8 @@ fun NextPlayerScreen(
     mediaPath: String,
     exoPlayer: ExoPlayer,
     viewModel: NextPlayerViewModel = viewModel(),
-    onVisibilityChange: (visibility: Int) -> Unit
+    onVisibilityChange: (visibility: Int) -> Unit,
+    onBackPressed: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -26,6 +27,6 @@ fun NextPlayerScreen(
             viewModel = viewModel,
             onVisibilityChange = onVisibilityChange
         )
-        NextPlayerUI(mediaPath, player = exoPlayer, onBackPressed = {})
+        NextPlayerUI(mediaPath, player = exoPlayer, onBackPressed = onBackPressed)
     }
 }
