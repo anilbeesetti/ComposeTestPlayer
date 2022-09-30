@@ -1,28 +1,57 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen.composables
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.arcticoss.nextplayer.player.utils.TimeUtils
 
 @Composable
-fun PlayerUIFooter() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+fun PlayerUIFooter(
+    duration: Long,
+    currentPosition: Long,
+    onSeek: (Float) -> Unit,
+    onSeekCompleted: () -> Unit
+) {
+    val context = LocalContext.current
+    var seekPosition by remember {
+        mutableStateOf(currentPosition.toFloat())
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Text(text = "00:00:00", color = Color.White)
-        Spacer(modifier = Modifier.width(5.dp))
-        Box(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Slider(value = 0F, onValueChange = {})
+            Text(
+                text = TimeUtils.formatTime(context, currentPosition),
+                style = MaterialTheme.typography.labelSmall
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                Slider(
+                    value = currentPosition.toFloat(),
+                    valueRange = 0f..duration.toFloat(),
+                    onValueChange = { onSeek(it) },
+                    onValueChangeFinished = { onSeekCompleted() }
+                )
+            }
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(text = TimeUtils.formatTime(context, duration), style = MaterialTheme.typography.labelSmall)
         }
-        Spacer(modifier = Modifier.width(5.dp))
-        Text(text = "03:00:00", color = Color.White)
+        Row(modifier = Modifier.fillMaxWidth()) {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
+            }
+        }
     }
 }

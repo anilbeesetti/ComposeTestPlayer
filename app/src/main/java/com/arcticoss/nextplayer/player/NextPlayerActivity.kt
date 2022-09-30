@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.player
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -14,6 +15,9 @@ import androidx.core.view.WindowCompat
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
 import com.arcticoss.nextplayer.player.ui.theme.NextPlayerTheme
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
+
+private const val TAG = "NextPlayerActivity"
 
 class NextPlayerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

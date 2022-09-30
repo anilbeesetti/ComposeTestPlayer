@@ -17,8 +17,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.AddLifecycleEventObserver
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
+
+private const val TAG = "NextExoPlayer"
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -38,6 +44,15 @@ fun NextExoPlayer(
         exoPlayer.seekTo(lastPlayedPosition)
     }
 
+    if (isPlaying) {
+        LaunchedEffect(Unit) {
+            while (true) {
+                viewModel.setCurrentPosition(exoPlayer.currentPosition)
+                delay(1.seconds / 30)
+            }
+        }
+    }
+
     val lifecycleOwner = LocalLifecycleOwner.current
 
     AddLifecycleEventObserver(
@@ -45,14 +60,13 @@ fun NextExoPlayer(
         onLifecycleEvent = { event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
-                    viewModel.setIsPlaying(exoPlayer.playWhenReady)
                     exoPlayer.playWhenReady = false
                     viewModel.setLastPlayingPosition(exoPlayer.currentPosition)
                 }
                 Lifecycle.Event.ON_RESUME -> {
                     exoPlayer.playWhenReady = isPlaying
                 }
-                Lifecycle.Event.ON_START -> { }
+                Lifecycle.Event.ON_START -> {}
                 else -> {}
             }
         }
@@ -60,6 +74,7 @@ fun NextExoPlayer(
 
 
     lateinit var playerView: StyledPlayerView
+    lateinit var playbackStateListener: Player.Listener
     DisposableEffect(
         AndroidView(
             factory = { context ->
@@ -78,7 +93,30 @@ fun NextExoPlayer(
                 .background(Color.Black)
         )
     ) {
+        playbackStateListener = object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                when (playbackState) {
+                    Player.STATE_BUFFERING -> {
+                        /*TODO*/
+                    }
+                    Player.STATE_ENDED -> {
+                        /*TODO*/
+                    }
+                    Player.STATE_IDLE -> {
+                        /*TODO*/
+                    }
+                    Player.STATE_READY -> {
+                        viewModel.setDuration(exoPlayer.duration)
+                    }
+                }
+            }
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                viewModel.setIsPlaying(isPlaying)
+            }
+        }
+        exoPlayer.addListener(playbackStateListener)
         onDispose {
+            exoPlayer.removeListener(playbackStateListener)
             exoPlayer.release()
         }
     }

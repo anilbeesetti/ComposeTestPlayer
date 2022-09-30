@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">NextPlayer</string>
     <string name="title_activity_next_player">NextPlayerActivity</string>
+    <string name="time_hours_minutes_seconds_formatter" translatable="false">%02d:%02d:%02d</string>
+    <string name="time_minutes_seconds_formatter" translatable="false">%02d:%02d</string>
+    <string name="time_seconds_formatter" translatable="false">00:%02d</string>
 </resources>

@@ -27,12 +27,10 @@ fun PlayerUIHeader(
             Icon(
                 imageVector = Icons.Rounded.ArrowBack,
                 contentDescription = "",
-                tint = Color.White
             )
         }
         Text(
             text = title,
-            color = Color.White,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
