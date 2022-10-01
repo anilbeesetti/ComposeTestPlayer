@@ -60,7 +60,8 @@ fun NextPlayerScreen(
         NextExoPlayer(
             exoPlayer = exoPlayer,
             mediaPath = mediaPath,
-            viewModel = viewModel
+            viewModel = viewModel,
+            onBackPressed = onBackPressed
         )
         AnimatedVisibility(
             visible = showUI,

@@ -11,9 +11,6 @@ class NextPlayerViewModel : ViewModel() {
     private val _duration = MutableStateFlow(0L)
     val duration = _duration.asStateFlow()
 
-    private val _lastPlayedPosition = MutableStateFlow(0L)
-    val lastPlayedPosition = _lastPlayedPosition.asStateFlow()
-
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
 
@@ -30,8 +27,10 @@ class NextPlayerViewModel : ViewModel() {
         )
     }
 
-    fun setLastPlayingPosition(millis: Long) {
-        _lastPlayedPosition.value = millis
+    fun updatePlayWhenReady(playWhenReady: Boolean) {
+        _playerState.value = playerState.value.copy(
+            playWhenReady = playWhenReady
+        )
     }
 
     fun setDuration(millis: Long) {
@@ -41,5 +40,6 @@ class NextPlayerViewModel : ViewModel() {
 
 data class PlayerState(
     val currentPosition: Long = 0,
-    val isPlaying: Boolean = true
+    val isPlaying: Boolean = true,
+    val playWhenReady: Boolean = true
 )

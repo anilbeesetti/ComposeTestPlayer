@@ -32,16 +32,16 @@ private const val TAG = "NextExoPlayer"
 fun NextExoPlayer(
     exoPlayer: ExoPlayer,
     mediaPath: String,
-    viewModel: NextPlayerViewModel
+    viewModel: NextPlayerViewModel,
+    onBackPressed: () -> Unit
 ) {
-    val lastPlayedPosition by viewModel.lastPlayedPosition.collectAsStateWithLifecycle()
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
 
     LaunchedEffect(exoPlayer) {
         val mediaItem = MediaItem.fromUri(Uri.fromFile(File(mediaPath)))
         exoPlayer.addMediaItem(mediaItem)
         exoPlayer.prepare()
-        exoPlayer.seekTo(lastPlayedPosition)
+        exoPlayer.seekTo(playerState.currentPosition)
     }
 
     if (playerState.isPlaying) {
@@ -60,11 +60,11 @@ fun NextExoPlayer(
         onLifecycleEvent = { event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
+                    viewModel.updatePlayWhenReady(exoPlayer.playWhenReady)
                     exoPlayer.playWhenReady = false
-                    viewModel.setLastPlayingPosition(exoPlayer.currentPosition)
                 }
                 Lifecycle.Event.ON_RESUME -> {
-                    exoPlayer.playWhenReady = playerState.isPlaying
+                    exoPlayer.playWhenReady = playerState.playWhenReady
                 }
                 Lifecycle.Event.ON_START -> {}
                 else -> {}
@@ -97,6 +97,9 @@ fun NextExoPlayer(
                         Log.d(TAG, "onPlaybackStateChanged: buffering")
                     }
                     Player.STATE_ENDED -> {
+                        if (!exoPlayer.hasNextMediaItem()) run {
+                            onBackPressed()
+                        }
                         Log.d(TAG, "onPlaybackStateChanged: ended")
                     }
                     Player.STATE_IDLE -> {
