@@ -15,13 +15,9 @@ import com.arcticoss.nextplayer.player.utils.TimeUtils
 fun PlayerUIFooter(
     duration: Long,
     currentPosition: Long,
-    onSeek: (Float) -> Unit,
-    onSeekCompleted: () -> Unit
+    onSeek: (Float) -> Unit
 ) {
     val context = LocalContext.current
-    var seekPosition by remember {
-        mutableStateOf(currentPosition.toFloat())
-    }
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -40,8 +36,7 @@ fun PlayerUIFooter(
                 Slider(
                     value = currentPosition.toFloat(),
                     valueRange = 0f..duration.toFloat(),
-                    onValueChange = { onSeek(it) },
-                    onValueChangeFinished = { onSeekCompleted() }
+                    onValueChange = { onSeek(it) }
                 )
             }
             Spacer(modifier = Modifier.width(5.dp))

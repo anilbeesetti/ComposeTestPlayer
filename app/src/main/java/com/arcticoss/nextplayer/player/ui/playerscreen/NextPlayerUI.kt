@@ -27,9 +27,6 @@ fun NextPlayerUI(
     val duration by viewModel.duration.collectAsStateWithLifecycle()
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val file = File(path)
-    var seekPosition by remember {
-        mutableStateOf(0f)
-    }
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -45,10 +42,7 @@ fun NextPlayerUI(
                 currentPosition = playerState.currentPosition,
                 onSeek = {
                     viewModel.updateCurrentPosition(it.toLong())
-                    seekPosition = it
-                    player.seekTo(seekPosition.toLong())
-                },
-                onSeekCompleted = {
+                    player.seekTo(it.toLong())
                 }
             )
         }

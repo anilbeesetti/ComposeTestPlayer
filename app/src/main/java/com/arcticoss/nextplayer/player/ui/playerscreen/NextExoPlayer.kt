@@ -1,6 +1,7 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -93,15 +94,16 @@ fun NextExoPlayer(
             override fun onPlaybackStateChanged(playbackState: Int) {
                 when (playbackState) {
                     Player.STATE_BUFFERING -> {
-                        /*TODO*/
+                        Log.d(TAG, "onPlaybackStateChanged: buffering")
                     }
                     Player.STATE_ENDED -> {
-                        /*TODO*/
+                        Log.d(TAG, "onPlaybackStateChanged: ended")
                     }
                     Player.STATE_IDLE -> {
-                        /*TODO*/
+                        Log.d(TAG, "onPlaybackStateChanged: idle")
                     }
                     Player.STATE_READY -> {
+                        Log.d(TAG, "onPlaybackStateChanged: ready")
                         viewModel.setDuration(exoPlayer.duration)
                     }
                 }

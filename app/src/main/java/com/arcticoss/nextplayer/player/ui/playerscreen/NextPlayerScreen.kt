@@ -9,26 +9,43 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.arcticoss.nextplayer.player.hideSystemBars
 import com.google.android.exoplayer2.ExoPlayer
+import kotlinx.coroutines.delay
 
 
 private const val TAG = "NextPlayerScreen"
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun NextPlayerScreen(
-    showUI: Boolean,
     mediaPath: String,
     exoPlayer: ExoPlayer,
     viewModel: NextPlayerViewModel = viewModel(),
     onVisibilityChange: (visibility: Boolean) -> Unit,
     onBackPressed: () -> Unit
 ) {
+    var showUI by remember {
+        mutableStateOf(false)
+    }
+    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    LaunchedEffect(key1 = showUI, key2 = playerState.isPlaying) {
+        if (playerState.isPlaying) {
+            if (showUI) {
+                delay(5000)
+                showUI = false
+                onVisibilityChange(false)
+            } else {
+                onVisibilityChange(false)
+            }
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -36,7 +53,8 @@ fun NextPlayerScreen(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) {
-                onVisibilityChange(!showUI)
+                showUI = !showUI
+                onVisibilityChange(showUI)
             }
     ) {
         NextExoPlayer(

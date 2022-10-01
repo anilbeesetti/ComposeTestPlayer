@@ -32,18 +32,6 @@ class NextPlayerActivity : ComponentActivity() {
         }
         val player = ExoPlayer.Builder(this).build()
         setContent {
-            var showUI by remember {
-                mutableStateOf(false)
-            }
-            LaunchedEffect(key1 = showUI) {
-                if (showUI) {
-                    delay(5000)
-                    showUI = false
-                    hideSystemBars()
-                } else {
-                    hideSystemBars()
-                }
-            }
             NextPlayerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -51,19 +39,12 @@ class NextPlayerActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     NextPlayerScreen(
-                        showUI = showUI,
                         mediaPath = videoFilePath,
                         exoPlayer = player,
                         onVisibilityChange = { visibility ->
                             when (visibility) {
-                                true -> {
-                                    showUI = true
-                                    showSystemBars()
-                                }
-                                false -> {
-                                    showUI = false
-                                    hideSystemBars()
-                                }
+                                true -> showSystemBars()
+                                false -> hideSystemBars()
                             }
                         },
                         onBackPressed = { finish() }
