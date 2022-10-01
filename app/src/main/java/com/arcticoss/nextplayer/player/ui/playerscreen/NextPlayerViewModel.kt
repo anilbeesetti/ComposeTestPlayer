@@ -1,14 +1,12 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.io.File
 
 private const val TAG = "NextPlayerViewModel"
 
-class NextPlayerViewModel: ViewModel() {
+class NextPlayerViewModel : ViewModel() {
 
     private val _duration = MutableStateFlow(0L)
     val duration = _duration.asStateFlow()
@@ -16,26 +14,32 @@ class NextPlayerViewModel: ViewModel() {
     private val _lastPlayedPosition = MutableStateFlow(0L)
     val lastPlayedPosition = _lastPlayedPosition.asStateFlow()
 
-    private val _isPlaying = MutableStateFlow(true)
-    val isPlaying = _isPlaying.asStateFlow()
+    private val _playerState = MutableStateFlow(PlayerState())
+    val playerState = _playerState.asStateFlow()
 
-    private val _currentPosition = MutableStateFlow(0L)
-    val currentPosition = _currentPosition.asStateFlow()
 
+    fun updatePlayingState(isPlaying: Boolean) {
+        _playerState.value = playerState.value.copy(
+            isPlaying = isPlaying
+        )
+    }
+
+    fun updateCurrentPosition(currentPosition: Long) {
+        _playerState.value = playerState.value.copy(
+            currentPosition = currentPosition
+        )
+    }
 
     fun setLastPlayingPosition(millis: Long) {
         _lastPlayedPosition.value = millis
     }
 
-    fun setIsPlaying(state: Boolean) {
-        _isPlaying.value = state
-    }
-
     fun setDuration(millis: Long) {
         _duration.value = millis
     }
-
-    fun setCurrentPosition(millis: Long) {
-        _currentPosition.value = millis
-    }
 }
+
+data class PlayerState(
+    val currentPosition: Long = 0,
+    val isPlaying: Boolean = true
+)

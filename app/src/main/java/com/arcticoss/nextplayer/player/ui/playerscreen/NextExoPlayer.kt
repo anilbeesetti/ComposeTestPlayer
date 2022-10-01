@@ -34,7 +34,7 @@ fun NextExoPlayer(
     viewModel: NextPlayerViewModel
 ) {
     val lastPlayedPosition by viewModel.lastPlayedPosition.collectAsStateWithLifecycle()
-    val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
+    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
 
     LaunchedEffect(exoPlayer) {
         val mediaItem = MediaItem.fromUri(Uri.fromFile(File(mediaPath)))
@@ -43,10 +43,10 @@ fun NextExoPlayer(
         exoPlayer.seekTo(lastPlayedPosition)
     }
 
-    if (isPlaying) {
+    if (playerState.isPlaying) {
         LaunchedEffect(Unit) {
             while (true) {
-                viewModel.setCurrentPosition(exoPlayer.currentPosition)
+                viewModel.updateCurrentPosition(exoPlayer.currentPosition)
                 delay(1.seconds / 30)
             }
         }
@@ -63,7 +63,7 @@ fun NextExoPlayer(
                     viewModel.setLastPlayingPosition(exoPlayer.currentPosition)
                 }
                 Lifecycle.Event.ON_RESUME -> {
-                    exoPlayer.playWhenReady = isPlaying
+                    exoPlayer.playWhenReady = playerState.isPlaying
                 }
                 Lifecycle.Event.ON_START -> {}
                 else -> {}
@@ -107,7 +107,7 @@ fun NextExoPlayer(
                 }
             }
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                viewModel.setIsPlaying(isPlaying)
+                viewModel.updatePlayingState(isPlaying)
             }
         }
         exoPlayer.addListener(playbackStateListener)
