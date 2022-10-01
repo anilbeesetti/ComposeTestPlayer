@@ -64,8 +64,9 @@ fun VideoFileItem(
     ) {
         Box(
             modifier = Modifier
+                .widthIn(max = 500.dp)
                 .fillMaxWidth(0.40f)
-                .height(100.dp)
+                .aspectRatio((1.5).toFloat())
                 .background(Color.Cyan, MaterialTheme.shapes.small)
         )
         Spacer(modifier = Modifier.width(10.dp))
