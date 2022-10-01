@@ -31,8 +31,7 @@ private const val TAG = "NextExoPlayer"
 fun NextExoPlayer(
     exoPlayer: ExoPlayer,
     mediaPath: String,
-    viewModel: NextPlayerViewModel,
-    onVisibilityChange: (visibility: Int) -> Unit
+    viewModel: NextPlayerViewModel
 ) {
     val lastPlayedPosition by viewModel.lastPlayedPosition.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
@@ -82,9 +81,6 @@ fun NextExoPlayer(
                     hideController()
                     useController = false
                     player = exoPlayer
-                    setControllerVisibilityListener(
-                        StyledPlayerView.ControllerVisibilityListener { onVisibilityChange(it) }
-                    )
                 }
                 playerView
             },

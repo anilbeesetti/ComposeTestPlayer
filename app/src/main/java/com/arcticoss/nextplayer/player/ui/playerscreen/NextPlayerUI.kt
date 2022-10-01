@@ -1,6 +1,7 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ fun NextPlayerUI(
     path: String,
     player: ExoPlayer,
     viewModel: NextPlayerViewModel,
+    modifier: Modifier = Modifier,
     onBackPressed: () -> Unit
 ) {
     val duration by viewModel.duration.collectAsStateWithLifecycle()
@@ -33,7 +35,7 @@ fun NextPlayerUI(
         mutableStateOf(0f)
     }
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier

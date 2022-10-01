@@ -10,6 +10,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
@@ -30,6 +34,9 @@ class NextPlayerActivity : ComponentActivity() {
         }
         val player = ExoPlayer.Builder(this).build()
         setContent {
+            var showUI by remember {
+                mutableStateOf(true)
+            }
             NextPlayerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -37,12 +44,19 @@ class NextPlayerActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     NextPlayerScreen(
+                        showUI = showUI,
                         mediaPath = videoFilePath,
                         exoPlayer = player,
                         onVisibilityChange = { visibility ->
                             when (visibility) {
-                                View.VISIBLE -> showSystemBars()
-                                View.GONE -> hideSystemBars()
+                                true -> {
+                                    showUI = true
+                                    showSystemBars()
+                                }
+                                false -> {
+                                    showUI = false
+                                    hideSystemBars()
+                                }
                             }
                         },
                         onBackPressed = { finish() }
