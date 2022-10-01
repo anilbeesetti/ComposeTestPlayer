@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.media.ui.mediascreen
+package com.arcticoss.nextplayer.media.ui.mediascreen.composables
 
 import android.content.Context
 import android.content.Intent
@@ -38,7 +38,6 @@ fun ShowVideoFiles(
                 videoFile = video,
                 onClick = { startPlayerActivity(context, video.path) }
             )
-//            Spacer(modifier = Modifier.height(5.dp))
         }
     }
 }

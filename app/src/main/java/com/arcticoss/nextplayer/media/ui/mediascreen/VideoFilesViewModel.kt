@@ -22,9 +22,6 @@ class VideoFilesViewModel : ViewModel() {
         viewModelScope.launch {
             val storage = Environment.getExternalStorageDirectory()
             val videos = storage.getVideos()
-            Log.d(TAG, "init: ${Environment.isExternalStorageManager()}")
-            Log.d(TAG, "init: $storage")
-            Log.d(TAG, "init: $videos")
             _videoFiles.value = videos
         }
     }
