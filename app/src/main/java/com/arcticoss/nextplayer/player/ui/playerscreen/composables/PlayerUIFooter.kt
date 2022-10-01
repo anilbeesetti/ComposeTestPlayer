@@ -7,7 +7,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.player.utils.TimeUtils
@@ -46,7 +45,10 @@ fun PlayerUIFooter(
                 )
             }
             Spacer(modifier = Modifier.width(5.dp))
-            Text(text = TimeUtils.formatTime(context, duration), style = MaterialTheme.typography.labelSmall)
+            Text(
+                text = TimeUtils.formatTime(context, duration),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
         Row(modifier = Modifier.fillMaxWidth()) {
             IconButton(onClick = { /*TODO*/ }) {
