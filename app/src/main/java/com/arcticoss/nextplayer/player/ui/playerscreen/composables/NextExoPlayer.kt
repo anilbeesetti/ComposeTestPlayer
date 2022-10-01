@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.player.ui.playerscreen
+package com.arcticoss.nextplayer.player.ui.playerscreen.composables
 
 import android.net.Uri
 import android.util.Log
@@ -15,13 +15,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.nextplayer.player.ui.playerscreen.composables.AddLifecycleEventObserver
+import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerViewModel
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -111,8 +110,10 @@ fun NextExoPlayer(
                     }
                 }
             }
+
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 viewModel.updatePlayingState(isPlaying)
+                playerView.keepScreenOn = isPlaying
             }
         }
         exoPlayer.addListener(playbackStateListener)

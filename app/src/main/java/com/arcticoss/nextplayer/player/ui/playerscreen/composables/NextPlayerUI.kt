@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.player.ui.playerscreen
+package com.arcticoss.nextplayer.player.ui.playerscreen.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -6,9 +6,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.nextplayer.player.ui.playerscreen.composables.PlayerUIFooter
-import com.arcticoss.nextplayer.player.ui.playerscreen.composables.PlayerUIHeader
-import com.arcticoss.nextplayer.player.ui.playerscreen.composables.PlayerUIMainControls
+import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerViewModel
 import com.google.android.exoplayer2.ExoPlayer
 import java.io.File
 

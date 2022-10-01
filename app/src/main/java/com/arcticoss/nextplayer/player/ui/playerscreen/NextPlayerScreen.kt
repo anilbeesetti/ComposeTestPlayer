@@ -3,7 +3,6 @@ package com.arcticoss.nextplayer.player.ui.playerscreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -15,7 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.arcticoss.nextplayer.player.hideSystemBars
+import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextExoPlayer
+import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextPlayerUI
 import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.delay
 
