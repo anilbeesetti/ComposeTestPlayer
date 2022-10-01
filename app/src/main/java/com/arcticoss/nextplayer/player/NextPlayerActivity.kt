@@ -10,16 +10,14 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
 import com.arcticoss.nextplayer.player.ui.theme.NextPlayerTheme
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
+import kotlinx.coroutines.delay
 
 private const val TAG = "NextPlayerActivity"
 
@@ -35,7 +33,16 @@ class NextPlayerActivity : ComponentActivity() {
         val player = ExoPlayer.Builder(this).build()
         setContent {
             var showUI by remember {
-                mutableStateOf(true)
+                mutableStateOf(false)
+            }
+            LaunchedEffect(key1 = showUI) {
+                if (showUI) {
+                    delay(5000)
+                    showUI = false
+                    hideSystemBars()
+                } else {
+                    hideSystemBars()
+                }
             }
             NextPlayerTheme {
                 // A surface container using the 'background' color from the theme
