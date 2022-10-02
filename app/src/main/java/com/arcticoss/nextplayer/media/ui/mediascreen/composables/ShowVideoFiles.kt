@@ -28,7 +28,7 @@ fun ShowVideoFiles(
     val context = LocalContext.current
     LazyColumn(
         contentPadding = contentPadding,
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     ) {
         item {
             Spacer(modifier = Modifier.height(5.dp))
