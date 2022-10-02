@@ -18,11 +18,18 @@ class VideoFilesViewModel : ViewModel() {
     private val _videoFiles = MutableStateFlow(listOf<File>())
     val videoFiles = _videoFiles.asStateFlow()
 
+    private val _hasPermission = MutableStateFlow(false)
+    val hasPermission = _hasPermission.asStateFlow()
+
     init {
         viewModelScope.launch {
             val storage = Environment.getExternalStorageDirectory()
             val videos = storage.getVideos()
             _videoFiles.value = videos
         }
+    }
+
+    fun updatePermissionStatus(status: Boolean) {
+        _hasPermission.value = status
     }
 }
