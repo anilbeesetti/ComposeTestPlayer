@@ -13,13 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun PlayerUIMainControls(
     isPlaying: Boolean,
     onPlayPauseClick: () -> Unit,
+    onSkipNextClick: () -> Unit,
+    onSkipPreviousClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -28,7 +29,7 @@ fun PlayerUIMainControls(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconRippleButton(onClick = { /*TODO*/ }) {
+        IconRippleButton(onClick = onSkipPreviousClick) {
             Icon(
                 imageVector = Icons.Rounded.SkipPrevious,
                 contentDescription = "",
@@ -42,7 +43,7 @@ fun PlayerUIMainControls(
                 modifier = Modifier.size(48.dp)
             )
         }
-        IconRippleButton(onClick = { /*TODO*/ }) {
+        IconRippleButton(onClick = onSkipNextClick) {
             Icon(
                 imageVector = Icons.Rounded.SkipNext,
                 contentDescription = "",

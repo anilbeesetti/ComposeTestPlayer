@@ -1,13 +1,15 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen.composables
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerViewModel
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import java.io.File
 
 
@@ -17,7 +19,7 @@ private const val TAG = "NextPlayerUI"
 @Composable
 fun NextPlayerUI(
     path: String,
-    player: ExoPlayer,
+    player: Player,
     viewModel: NextPlayerViewModel,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit
@@ -53,6 +55,8 @@ fun NextPlayerUI(
                     player.play()
                 }
             },
+            onSkipNextClick = {},
+            onSkipPreviousClick = {},
             modifier = Modifier.align(Alignment.Center)
         )
     }

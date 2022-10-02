@@ -29,7 +29,7 @@ private const val TAG = "NextExoPlayer"
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun NextExoPlayer(
-    exoPlayer: ExoPlayer,
+    exoPlayer: Player,
     mediaPath: String,
     viewModel: NextPlayerViewModel,
     onBackPressed: () -> Unit

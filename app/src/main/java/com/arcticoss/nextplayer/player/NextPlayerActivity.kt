@@ -2,26 +2,25 @@ package com.arcticoss.nextplayer.player
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
 import com.arcticoss.nextplayer.player.ui.theme.NextPlayerTheme
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
-import kotlinx.coroutines.delay
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 private const val TAG = "NextPlayerActivity"
 
+@AndroidEntryPoint
 class NextPlayerActivity : ComponentActivity() {
+    @Inject lateinit var player: Player
     override fun onCreate(savedInstanceState: Bundle?) {
         val videoFilePath = intent.getStringExtra("videoFilePath") ?: ""
         super.onCreate(savedInstanceState)
@@ -30,7 +29,6 @@ class NextPlayerActivity : ComponentActivity() {
             window.attributes.layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
-        val player = ExoPlayer.Builder(this).build()
         setContent {
             NextPlayerTheme {
                 // A surface container using the 'background' color from the theme
@@ -40,7 +38,7 @@ class NextPlayerActivity : ComponentActivity() {
                 ) {
                     NextPlayerScreen(
                         mediaPath = videoFilePath,
-                        exoPlayer = player,
+                        player = player,
                         onVisibilityChange = { visibility ->
                             when (visibility) {
                                 true -> showSystemBars()
