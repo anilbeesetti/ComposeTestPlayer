@@ -114,6 +114,7 @@ fun NextExoPlayer(
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
+                viewModel.updatePlayWhenReady(exoPlayer.playWhenReady)
                 viewModel.updatePlayingState(isPlaying)
                 playerView.keepScreenOn = isPlaying
             }

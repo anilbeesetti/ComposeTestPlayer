@@ -48,14 +48,14 @@ fun NextPlayerUI(
         PlayerUIMainControls(
             isPlaying = playerState.playWhenReady,
             onPlayPauseClick = {
-                if (player.isPlaying) {
+                if (player.playWhenReady) {
                     player.pause()
                 } else {
                     player.play()
                 }
             },
-            onSkipNextClick = {},
-            onSkipPreviousClick = {},
+            onSkipNextClick = { player.seekToNext() },
+            onSkipPreviousClick = { player.seekToPrevious() },
             modifier = Modifier.align(Alignment.Center)
         )
     }
