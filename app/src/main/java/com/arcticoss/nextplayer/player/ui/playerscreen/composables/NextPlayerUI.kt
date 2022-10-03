@@ -23,7 +23,6 @@ fun NextPlayerUI(
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit
 ) {
-    val duration by viewModel.duration.collectAsStateWithLifecycle()
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val file = File(path)
     Box(
@@ -37,7 +36,7 @@ fun NextPlayerUI(
         ) {
             PlayerUIHeader(title = file.name, onBackPressed = onBackPressed)
             PlayerUIFooter(
-                duration = duration,
+                duration = playerState.currentMediaItemDuration,
                 currentPosition = playerState.currentPosition,
                 onSeek = {
                     viewModel.updateCurrentPosition(it.toLong())

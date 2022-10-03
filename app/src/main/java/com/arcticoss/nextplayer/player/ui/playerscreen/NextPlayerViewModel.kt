@@ -8,9 +8,6 @@ private const val TAG = "NextPlayerViewModel"
 
 class NextPlayerViewModel : ViewModel() {
 
-    private val _duration = MutableStateFlow(0L)
-    val duration = _duration.asStateFlow()
-
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
 
@@ -34,12 +31,15 @@ class NextPlayerViewModel : ViewModel() {
     }
 
     fun setDuration(millis: Long) {
-        _duration.value = millis
+        _playerState.value = playerState.value.copy(
+            currentMediaItemDuration = millis
+        )
     }
 }
 
 data class PlayerState(
     val currentPosition: Long = 0,
+    val currentMediaItemDuration: Long = 0,
     val isPlaying: Boolean = true,
     val playWhenReady: Boolean = true
 )
