@@ -2,12 +2,15 @@ package com.arcticoss.nextplayer.media.ui.mediascreen.composables
 
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.AddLifecycleEventObserver
+
+private const val TAG = "RequestManageExternalSt"
 
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
@@ -16,16 +19,12 @@ fun RequestManageExternalStoragePermission(
     permissionNotGrantedContent: @Composable () -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val context = LocalContext.current
     var hasPermission by remember {
         mutableStateOf(false)
     }
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
-        when (event) {
-            Lifecycle.Event.ON_RESUME -> {
-                hasPermission = Environment.isExternalStorageManager()
-            }
-            else -> {}
+        if (event == Lifecycle.Event.ON_START) {
+            hasPermission = Environment.isExternalStorageManager()
         }
     }
     if (hasPermission) {
