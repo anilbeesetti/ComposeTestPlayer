@@ -9,7 +9,6 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerViewModel
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
 import java.io.File
 
 
@@ -19,7 +18,7 @@ private const val TAG = "NextPlayerUI"
 @Composable
 fun NextPlayerUI(
     path: String,
-    player: Player,
+    player: ExoPlayer,
     viewModel: NextPlayerViewModel,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit
@@ -47,7 +46,7 @@ fun NextPlayerUI(
             )
         }
         PlayerUIMainControls(
-            isPlaying = playerState.isPlaying,
+            isPlaying = playerState.playWhenReady,
             onPlayPauseClick = {
                 if (player.isPlaying) {
                     player.pause()

@@ -16,7 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextExoPlayer
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextPlayerUI
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.delay
 
 
@@ -26,7 +26,7 @@ private const val TAG = "NextPlayerScreen"
 @Composable
 fun NextPlayerScreen(
     mediaPath: String,
-    player: Player,
+    player: ExoPlayer,
     viewModel: NextPlayerViewModel = viewModel(),
     onVisibilityChange: (visibility: Boolean) -> Unit,
     onBackPressed: () -> Unit

@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.arcticoss.nextplayer.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
 import java.io.File
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -63,6 +62,7 @@ fun ShowContentForMarshMellow(
                         )
                     }
                 }
-            })
+            }
+        )
     })
 }

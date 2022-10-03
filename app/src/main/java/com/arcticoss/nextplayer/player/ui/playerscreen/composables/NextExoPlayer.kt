@@ -19,6 +19,7 @@ import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerViewModel
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SeekParameters
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.delay
 import java.io.File
@@ -29,7 +30,7 @@ private const val TAG = "NextExoPlayer"
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun NextExoPlayer(
-    exoPlayer: Player,
+    exoPlayer: ExoPlayer,
     mediaPath: String,
     viewModel: NextPlayerViewModel,
     onBackPressed: () -> Unit
@@ -40,6 +41,7 @@ fun NextExoPlayer(
         val mediaItem = MediaItem.fromUri(Uri.fromFile(File(mediaPath)))
         exoPlayer.addMediaItem(mediaItem)
         exoPlayer.prepare()
+        exoPlayer.setSeekParameters(SeekParameters.CLOSEST_SYNC)
         exoPlayer.seekTo(playerState.currentPosition)
     }
 

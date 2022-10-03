@@ -17,7 +17,7 @@ object PlayerModule {
 
     @Provides
     @ActivityScoped
-    fun provideExoPlayer(@ApplicationContext context: Context): Player {
+    fun provideExoPlayer(@ApplicationContext context: Context): ExoPlayer {
         return ExoPlayer.Builder(context).build()
     }
 }

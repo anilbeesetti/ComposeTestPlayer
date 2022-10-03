@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
 import com.arcticoss.nextplayer.player.ui.theme.NextPlayerTheme
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ExoPlayer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,7 +20,8 @@ private const val TAG = "NextPlayerActivity"
 
 @AndroidEntryPoint
 class NextPlayerActivity : ComponentActivity() {
-    @Inject lateinit var player: Player
+    @Inject
+    lateinit var player: ExoPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         val videoFilePath = intent.getStringExtra("videoFilePath") ?: ""
         super.onCreate(savedInstanceState)
