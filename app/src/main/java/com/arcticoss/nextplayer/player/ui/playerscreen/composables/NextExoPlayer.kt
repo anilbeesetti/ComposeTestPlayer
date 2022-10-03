@@ -1,5 +1,6 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen.composables
 
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
@@ -10,16 +11,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerViewModel
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SeekParameters
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.delay
 import java.io.File
@@ -33,9 +32,11 @@ fun NextExoPlayer(
     exoPlayer: ExoPlayer,
     mediaPath: String,
     viewModel: NextPlayerViewModel,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    changeOrientation: (requestedOrientation: Int) -> Unit
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(exoPlayer) {
         val mediaItem = MediaItem.fromUri(Uri.fromFile(File(mediaPath)))
@@ -78,8 +79,8 @@ fun NextExoPlayer(
     lateinit var playbackStateListener: Player.Listener
     DisposableEffect(
         AndroidView(
-            factory = { context ->
-                playerView = StyledPlayerView(context).apply {
+            factory = { androidContext ->
+                playerView = StyledPlayerView(androidContext).apply {
                     hideController()
                     useController = false
                     player = exoPlayer
@@ -111,6 +112,26 @@ fun NextExoPlayer(
                         viewModel.setDuration(exoPlayer.duration)
                     }
                 }
+            }
+
+            override fun onTracksChanged(tracks: Tracks) {
+                tracks.groups.forEach {
+                    if (it.type == C.TRACK_TYPE_VIDEO) {
+                        for (i in 0 until it.length) {
+                            val trackFormat = it.getTrackFormat(i)
+                            if (trackFormat.height >= trackFormat.width) {
+                                changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                            } else {
+                                if (trackFormat.rotationDegrees < 90) {
+                                    changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE)
+                                } else {
+                                    changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                                }
+                            }
+                        }
+                    }
+                }
+                super.onTracksChanged(tracks)
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {

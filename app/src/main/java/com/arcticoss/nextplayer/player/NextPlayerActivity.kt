@@ -1,7 +1,9 @@
 package com.arcticoss.nextplayer.player
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -51,6 +53,11 @@ class NextPlayerActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        Log.d(TAG, "onConfigurationChanged: ${newConfig.orientation}")
+        super.onConfigurationChanged(newConfig)
     }
 }
 
