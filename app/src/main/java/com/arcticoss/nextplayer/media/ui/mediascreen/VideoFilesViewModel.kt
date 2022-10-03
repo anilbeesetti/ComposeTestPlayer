@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.arcticoss.nextplayer.utils.getVideos
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -15,21 +16,25 @@ private const val TAG = "VideoFilesViewModel"
 
 class VideoFilesViewModel : ViewModel() {
 
-    private val _videoFiles = MutableStateFlow(listOf<File>())
-    val videoFiles = _videoFiles.asStateFlow()
-
-    private val _hasPermission = MutableStateFlow(false)
-    val hasPermission = _hasPermission.asStateFlow()
+    private val _mediaListState = MutableStateFlow(MediaListState())
+    val mediaListState = _mediaListState.asStateFlow()
 
     init {
         viewModelScope.launch {
+            _mediaListState.value = mediaListState.value.copy(
+                isLoading = true
+            )
             val storage = Environment.getExternalStorageDirectory()
             val videos = storage.getVideos()
-            _videoFiles.value = videos
+            _mediaListState.value = mediaListState.value.copy(
+                isLoading = false,
+                videoFiles = videos
+            )
         }
     }
-
-    fun updatePermissionStatus(status: Boolean) {
-        _hasPermission.value = status
-    }
 }
+
+data class MediaListState(
+    val isLoading: Boolean = true,
+    val videoFiles: List<File> = emptyList()
+)

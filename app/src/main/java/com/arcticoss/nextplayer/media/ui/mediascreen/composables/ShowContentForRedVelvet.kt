@@ -17,19 +17,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.arcticoss.nextplayer.R
-import java.io.File
+import com.arcticoss.nextplayer.media.ui.mediascreen.MediaListState
 
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun ShowContentForRedVelvet(
-    videoFiles: List<File>,
+    mediaListState: MediaListState,
     contentPadding: PaddingValues,
 ) {
     val context = LocalContext.current
     RequestManageExternalStoragePermission(
         permissionGrantedContent = {
             ShowVideoFiles(
-                videoFiles = videoFiles,
+                mediaListState = mediaListState,
                 contentPadding = contentPadding
             )
         },

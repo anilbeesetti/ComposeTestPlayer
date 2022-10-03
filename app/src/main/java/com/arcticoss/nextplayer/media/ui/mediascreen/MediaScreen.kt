@@ -25,7 +25,7 @@ import com.arcticoss.nextplayer.media.ui.mediascreen.composables.ShowVideoFiles
 fun MediaScreen(
     viewModel: VideoFilesViewModel = viewModel(),
 ) {
-    val videoFiles by viewModel.videoFiles.collectAsStateWithLifecycle()
+    val mediaListState by viewModel.mediaListState.collectAsStateWithLifecycle()
     val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -38,11 +38,11 @@ fun MediaScreen(
         }
     ) { innerPadding ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            ShowContentForRedVelvet(videoFiles = videoFiles, contentPadding = innerPadding)
+            ShowContentForRedVelvet(mediaListState = mediaListState, contentPadding = innerPadding)
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            ShowContentForMarshMellow(videoFiles = videoFiles, contentPadding = innerPadding)
+            ShowContentForMarshMellow(mediaListState = mediaListState, contentPadding = innerPadding)
         } else {
-            ShowVideoFiles(videoFiles = videoFiles, contentPadding = innerPadding)
+            ShowVideoFiles(mediaListState = mediaListState, contentPadding = innerPadding)
         }
     }
 }

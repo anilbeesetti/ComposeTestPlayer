@@ -20,7 +20,7 @@ fun RequestManageExternalStoragePermission(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var hasPermission by remember {
-        mutableStateOf(false)
+        mutableStateOf(Environment.isExternalStorageManager())
     }
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
         if (event == Lifecycle.Event.ON_START) {
