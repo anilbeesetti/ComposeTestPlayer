@@ -36,6 +36,12 @@ class NextPlayerViewModel : ViewModel() {
         )
     }
 
+    fun updateBrightness(brightness: Int) {
+        _playerState.value = playerState.value.copy(
+            currentBrightness = brightness
+        )
+    }
+
     fun updateScreenOrientation(currentOrientation: Int) {
         _playerState.value = playerState.value.copy(
             screenOrientation = currentOrientation
@@ -46,6 +52,7 @@ class NextPlayerViewModel : ViewModel() {
 data class PlayerState(
     val currentPosition: Long = 0,
     val currentMediaItemDuration: Long = 0,
+    val currentBrightness: Int = 0,
     val screenOrientation: Int = 1,
     val isPlaying: Boolean = true,
     val playWhenReady: Boolean = true

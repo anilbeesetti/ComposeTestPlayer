@@ -3,8 +3,6 @@ package com.arcticoss.nextplayer.player.ui.playerscreen
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.res.Configuration
-import android.util.LayoutDirection
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -20,10 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,7 +49,6 @@ fun NextPlayerScreen(
     var playerCurrentState by remember {
         mutableStateOf(false)
     }
-    val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = showUI, key2 = playerState.isPlaying) {
@@ -105,6 +99,60 @@ fun NextPlayerScreen(
                     },
                     onDragEnd = {
                         player.playWhenReady = playerCurrentState
+                    }
+                )
+            }
+            .pointerInput(Unit) {
+                val activity = context.findActivity()
+                val width = activity?.resources?.displayMetrics?.widthPixels ?: 0
+                val height = activity?.resources?.displayMetrics?.heightPixels ?: 0
+                var initialOffset = 0.0f
+                var currentMetricChange = "Audio"
+                detectVerticalDragGestures(
+                    onDragStart = { offset ->
+                        initialOffset = offset.y
+                        currentMetricChange = if (offset.x < (width / 2)) {
+                            "Brightness"
+                        } else {
+                            "Audio"
+                        }
+                    },
+                    onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
+                        if (abs(change.position.y - initialOffset) > height / 18) {
+                            if (currentMetricChange == "Audio") {
+                                TODO("Audio")
+                            } else {
+                                if (change.position.y - initialOffset < 0) {
+                                    val newBrightness = playerState.currentBrightness + 1
+                                    if (newBrightness <= 30) {
+                                        val windowAttributes = activity?.window?.attributes
+                                        val level = 0.064f + 0.936 / 30 * newBrightness
+                                        Log.d(
+                                            TAG,
+                                            "NextPlayerScreen: ${windowAttributes?.screenBrightness}"
+                                        )
+                                        windowAttributes?.screenBrightness =
+                                            (level * level).toFloat()
+                                        activity?.window?.attributes = windowAttributes
+                                        viewModel.updateBrightness(newBrightness)
+                                    }
+                                } else {
+                                    val newBrightness = playerState.currentBrightness - 1
+                                    if (newBrightness >= 0) {
+                                        val windowAttributes = activity?.window?.attributes
+                                        val level = 1.0f / 30 * newBrightness
+                                        Log.d(
+                                            TAG,
+                                            "NextPlayerScreen: ${windowAttributes?.screenBrightness}"
+                                        )
+                                        windowAttributes?.screenBrightness = (level * level)
+                                        activity?.window?.attributes = windowAttributes
+                                        viewModel.updateBrightness(newBrightness)
+                                    }
+                                }
+                            }
+                            initialOffset = change.position.y
+                        }
                     }
                 )
             }
