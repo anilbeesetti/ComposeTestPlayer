@@ -48,14 +48,13 @@ fun NextExoPlayer(
         exoPlayer.seekTo(playerState.currentPosition)
     }
 
-    if (playerState.isPlaying) {
-        LaunchedEffect(Unit) {
-            while (true) {
-                viewModel.updateCurrentPosition(exoPlayer.currentPosition)
-                delay(1.seconds / 30)
-            }
+    LaunchedEffect(Unit) {
+        while (true) {
+            viewModel.updateCurrentPosition(exoPlayer.currentPosition)
+            delay(1.seconds / 30)
         }
     }
+
 
     val lifecycleOwner = LocalLifecycleOwner.current
 

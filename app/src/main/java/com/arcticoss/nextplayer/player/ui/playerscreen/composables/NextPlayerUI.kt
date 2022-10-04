@@ -39,7 +39,6 @@ fun NextPlayerUI(
                 duration = playerState.currentMediaItemDuration,
                 currentPosition = playerState.currentPosition,
                 onSeek = {
-                    viewModel.updateCurrentPosition(it.toLong())
                     player.seekTo(it.toLong())
                 }
             )

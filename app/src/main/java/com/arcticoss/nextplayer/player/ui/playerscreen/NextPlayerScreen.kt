@@ -91,12 +91,9 @@ fun NextPlayerScreen(
                     },
                     onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
                         val seekAmount = abs(change.position.x - dragStartOffset) * dragAmount
-                        viewModel.updateCurrentPosition(
-                            (playerState.currentPosition + seekAmount.toLong()).coerceIn(
-                                0..playerState.currentMediaItemDuration
-                            )
-                        )
-                        player.seekTo(playerState.currentPosition)
+                        val newPosition = (playerState.currentPosition + seekAmount.toLong())
+                            .coerceIn(0..playerState.currentMediaItemDuration)
+                        player.seekTo(newPosition)
                         dragStartOffset = change.position.x
                     },
                     onDragEnd = {
