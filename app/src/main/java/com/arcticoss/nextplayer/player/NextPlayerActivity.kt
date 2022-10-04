@@ -48,12 +48,6 @@ class NextPlayerActivity : ComponentActivity() {
                         NextPlayerScreen(
                             mediaPath = videoFilePath,
                             player = player,
-                            onVisibilityChange = { visibility ->
-                                when (visibility) {
-                                    true -> showSystemBars()
-                                    false -> hideSystemBars()
-                                }
-                            },
                             onBackPressed = { finish() }
                         )
                     }

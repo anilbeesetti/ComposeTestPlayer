@@ -40,35 +40,21 @@ fun NextPlayerScreen(
     mediaPath: String,
     player: ExoPlayer,
     viewModel: NextPlayerViewModel = viewModel(),
-    onVisibilityChange: (visibility: Boolean) -> Unit,
     onBackPressed: () -> Unit
 ) {
-    var showUI by remember { mutableStateOf(false) }
-    var showBars by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
 
     val audioManager = context.getSystemService(AUDIO_SERVICE) as AudioManager
-    LaunchedEffect(key1 = showUI, key2 = playerState.isPlaying) {
-        if (playerState.isPlaying) {
-            if (showUI) {
-                delay(5000)
-                showUI = false
-                onVisibilityChange(false)
-            } else {
-                onVisibilityChange(false)
-            }
-        }
-    }
     Box(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
-                        showUI = !showUI
-                        onVisibilityChange(showUI)
+                        viewModel.onUiEvent(PlayerUiEvent.showUi(!playerUiState.showUi))
                     },
                     onDoubleTap = {
                         if (player.playWhenReady) {
@@ -105,15 +91,13 @@ fun NextPlayerScreen(
                 val width = activity?.resources?.displayMetrics?.widthPixels ?: 0
                 val height = activity?.resources?.displayMetrics?.heightPixels ?: 0
                 var initialOffset = 0.0f
-                var currentMetricChange = "Audio"
                 detectVerticalDragGestures(
                     onDragStart = { offset ->
                         initialOffset = offset.y
-                        showBars = true
-                        currentMetricChange = if (offset.x < (width / 2)) {
-                            "Brightness"
+                        if (offset.x < (width / 2)) {
+                            viewModel.onUiEvent(PlayerUiEvent.showBrightnessBar(true))
                         } else {
-                            "Audio"
+                            viewModel.onUiEvent(PlayerUiEvent.showVolumeBar(true))
                         }
                     },
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
@@ -121,7 +105,7 @@ fun NextPlayerScreen(
                         val isOffsetEnough = abs(offset) > height / 40
                         val isDragEnough = abs(dragAmount) > 100
                         if (isOffsetEnough or isDragEnough) {
-                            if (currentMetricChange == "Audio") {
+                            if (playerUiState.showVolumeBar) {
                                 if (change.position.y - initialOffset < 0) {
                                     audioManager.adjustStreamVolume(
                                         AudioManager.STREAM_MUSIC,
@@ -140,7 +124,8 @@ fun NextPlayerScreen(
                                         AudioManager.STREAM_MUSIC
                                     )
                                 )
-                            } else {
+                            }
+                            if (playerUiState.showBrightnessBar) {
                                 activity?.let {
                                     if (change.position.y - initialOffset < 0) {
                                         BrightnessController.increaseBrightness(
@@ -163,6 +148,10 @@ fun NextPlayerScreen(
                             }
                             initialOffset = change.position.y
                         }
+                    },
+                    onDragEnd = {
+                        viewModel.onUiEvent(PlayerUiEvent.showBrightnessBar(false))
+                        viewModel.onUiEvent(PlayerUiEvent.showVolumeBar(false))
                     }
                 )
             }
@@ -178,26 +167,12 @@ fun NextPlayerScreen(
                 activity?.requestedOrientation?.let { viewModel.updateScreenOrientation(it) }
             }
         )
-        VerticalSwipeMediaControls(
-            volumeLevel = playerState.currentVolumeLevel,
-            brightness = playerState.currentBrightness,
-            maxVolumeLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
-            maxBrightness = BrightnessController.MAX_BRIGHTNESS,
-            showBars = showBars,
-            modifier = Modifier.align(Alignment.Center)
+        NextPlayerUI(
+            player = player,
+            path = mediaPath,
+            viewModel = viewModel,
+            onBackPressed = onBackPressed
         )
-        AnimatedVisibility(
-            visible = showUI,
-            enter = fadeIn(animationSpec = tween(100)),
-            exit = fadeOut(animationSpec = tween(100))
-        ) {
-            NextPlayerUI(
-                mediaPath,
-                player = player,
-                onBackPressed = onBackPressed,
-                viewModel = viewModel
-            )
-        }
     }
 }
 

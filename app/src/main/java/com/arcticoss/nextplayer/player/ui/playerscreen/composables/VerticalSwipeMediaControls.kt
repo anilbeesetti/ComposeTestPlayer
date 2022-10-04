@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import com.arcticoss.nextplayer.player.ui.playerscreen.PlayerUiEvent
 import kotlinx.coroutines.delay
 
 @Composable
@@ -17,29 +18,28 @@ fun VerticalSwipeMediaControls(
     brightness: Int,
     maxVolumeLevel: Int,
     maxBrightness: Int,
-    showBars: Boolean,
+    showVolumeBar: Boolean,
+    showBrightnessBar: Boolean,
+    dismissVolumeBar: () -> Unit,
+    dismissBrightnessBar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showBrightnessBar by remember { mutableStateOf(false) }
-    var showVolumeBar by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = brightness) {
-        if (showBars) {
-            showVolumeBar = false
-            showBrightnessBar = true
-            delay(1000)
-            showBrightnessBar = false
-        }
-    }
-
-    LaunchedEffect(key1 = volumeLevel) {
-        if (showBars) {
-            showBrightnessBar = false
-            showVolumeBar = true
-            delay(1000)
-            showVolumeBar = false
-        }
-    }
+//    LaunchedEffect(key1 = showBrightnessBar, key2 = brightness) {
+//        if (showBrightnessBar) {
+//            dismissVolumeBar()
+//            delay(1000)
+//            dismissBrightnessBar()
+//        }
+//    }
+//
+//    LaunchedEffect(key1 = showVolumeBar, key2 = volumeLevel) {
+//        if (showVolumeBar) {
+//            dismissBrightnessBar()
+//            delay(1000)
+//            dismissVolumeBar()
+//        }
+//    }
 
     Row(
         modifier = modifier
