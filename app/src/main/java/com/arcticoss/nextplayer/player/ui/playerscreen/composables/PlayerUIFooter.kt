@@ -19,7 +19,9 @@ fun PlayerUIFooter(
 ) {
     val context = LocalContext.current
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

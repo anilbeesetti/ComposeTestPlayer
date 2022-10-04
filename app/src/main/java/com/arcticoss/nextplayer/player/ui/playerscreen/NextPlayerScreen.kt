@@ -2,8 +2,11 @@ package com.arcticoss.nextplayer.player.ui.playerscreen
 
 import android.content.Context.AUDIO_SERVICE
 import android.media.AudioManager
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -43,10 +46,6 @@ fun NextPlayerScreen(
     var showUI by remember { mutableStateOf(false) }
     var showBars by remember { mutableStateOf(false) }
 
-    val animatedAlpha by animateFloatAsState(
-        targetValue = if (showUI) 1f else 0f,
-        animationSpec = tween(durationMillis = 500)
-    )
     val context = LocalContext.current
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
 
@@ -187,13 +186,18 @@ fun NextPlayerScreen(
             showBars = showBars,
             modifier = Modifier.align(Alignment.Center)
         )
-        NextPlayerUI(
-            mediaPath,
-            player = player,
-            onBackPressed = onBackPressed,
-            viewModel = viewModel,
-            modifier = Modifier.alpha(animatedAlpha)
-        )
+        AnimatedVisibility(
+            visible = showUI,
+            enter = fadeIn(animationSpec = tween(100)),
+            exit = fadeOut(animationSpec = tween(100))
+        ) {
+            NextPlayerUI(
+                mediaPath,
+                player = player,
+                onBackPressed = onBackPressed,
+                viewModel = viewModel
+            )
+        }
     }
 }
 

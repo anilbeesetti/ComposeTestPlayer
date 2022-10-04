@@ -1,6 +1,9 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen.composables
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,7 +47,7 @@ fun NextPlayerUI(
             )
         }
         PlayerUIMainControls(
-            isPlaying = playerState.playWhenReady,
+            playPauseIcon = if (playerState.playWhenReady) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
             onPlayPauseClick = {
                 if (player.playWhenReady) {
                     player.pause()

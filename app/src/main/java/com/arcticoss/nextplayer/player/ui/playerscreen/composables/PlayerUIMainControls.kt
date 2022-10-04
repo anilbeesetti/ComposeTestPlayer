@@ -13,11 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun PlayerUIMainControls(
-    isPlaying: Boolean,
+    playPauseIcon: ImageVector,
     onPlayPauseClick: () -> Unit,
     onSkipNextClick: () -> Unit,
     onSkipPreviousClick: () -> Unit,
@@ -38,7 +39,7 @@ fun PlayerUIMainControls(
         }
         IconRippleButton(onClick = { onPlayPauseClick() }) {
             Icon(
-                imageVector = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                imageVector = playPauseIcon,
                 contentDescription = "",
                 modifier = Modifier.size(48.dp)
             )
