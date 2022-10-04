@@ -2,9 +2,8 @@ package com.arcticoss.nextplayer.player.ui.playerscreen
 
 import android.content.Context.AUDIO_SERVICE
 import android.media.AudioManager
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -40,15 +40,13 @@ fun NextPlayerScreen(
     onVisibilityChange: (visibility: Boolean) -> Unit,
     onBackPressed: () -> Unit
 ) {
-    var showUI by remember {
-        mutableStateOf(false)
-    }
-    var dragStartOffset by remember {
-        mutableStateOf(0.0F)
-    }
-    var playerCurrentState by remember {
-        mutableStateOf(false)
-    }
+    var showUI by remember { mutableStateOf(false) }
+    var showBars by remember { mutableStateOf(false) }
+
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (showUI) 1f else 0f,
+        animationSpec = tween(durationMillis = 500)
+    )
     val context = LocalContext.current
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
 
@@ -83,6 +81,8 @@ fun NextPlayerScreen(
                 )
             }
             .pointerInput(Unit) {
+                var dragStartOffset = 0f
+                var playerCurrentState = false
                 detectHorizontalDragGestures(
                     onDragStart = {
                         playerCurrentState = player.playWhenReady
@@ -113,6 +113,7 @@ fun NextPlayerScreen(
                 detectVerticalDragGestures(
                     onDragStart = { offset ->
                         initialOffset = offset.y
+                        showBars = true
                         currentMetricChange = if (offset.x < (width / 2)) {
                             "Brightness"
                         } else {
@@ -186,20 +187,16 @@ fun NextPlayerScreen(
             brightness = playerState.currentBrightness,
             maxVolumeLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
             maxBrightness = BrightnessController.MAX_BRIGHTNESS,
+            showBars = showBars,
             modifier = Modifier.align(Alignment.Center)
         )
-        AnimatedVisibility(
-            visible = showUI,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            NextPlayerUI(
-                mediaPath,
-                player = player,
-                onBackPressed = onBackPressed,
-                viewModel = viewModel
-            )
-        }
+        NextPlayerUI(
+            mediaPath,
+            player = player,
+            onBackPressed = onBackPressed,
+            viewModel = viewModel,
+            modifier = Modifier.alpha(animatedAlpha)
+        )
     }
 }
 
