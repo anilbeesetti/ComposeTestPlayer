@@ -8,9 +8,12 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
 import com.arcticoss.nextplayer.player.ui.theme.NextPlayerTheme
@@ -41,17 +44,19 @@ class NextPlayerActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NextPlayerScreen(
-                        mediaPath = videoFilePath,
-                        player = player,
-                        onVisibilityChange = { visibility ->
-                            when (visibility) {
-                                true -> showSystemBars()
-                                false -> hideSystemBars()
-                            }
-                        },
-                        onBackPressed = { finish() }
-                    )
+                    CompositionLocalProvider(LocalContentColor provides Color.White) {
+                        NextPlayerScreen(
+                            mediaPath = videoFilePath,
+                            player = player,
+                            onVisibilityChange = { visibility ->
+                                when (visibility) {
+                                    true -> showSystemBars()
+                                    false -> hideSystemBars()
+                                }
+                            },
+                            onBackPressed = { finish() }
+                        )
+                    }
                 }
             }
         }
