@@ -52,7 +52,7 @@ class NextPlayerViewModel : ViewModel() {
 data class PlayerState(
     val currentPosition: Long = 0,
     val currentMediaItemDuration: Long = 0,
-    val currentBrightness: Int = 0,
+    val currentBrightness: Int = 5,
     val screenOrientation: Int = 1,
     val isPlaying: Boolean = true,
     val playWhenReady: Boolean = true

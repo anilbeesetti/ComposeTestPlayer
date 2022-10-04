@@ -24,6 +24,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextExoPlayer
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextPlayerUI
+import com.arcticoss.nextplayer.player.utils.BrightnessController
+import com.arcticoss.nextplayer.player.utils.findActivity
 import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.delay
 import kotlin.math.abs
@@ -120,34 +122,26 @@ fun NextPlayerScreen(
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
                         if (abs(change.position.y - initialOffset) > height / 18) {
                             if (currentMetricChange == "Audio") {
-                                TODO("Audio")
+                                Log.d(TAG, "NextPlayerScreen: audio")
+                                //TODO: Audio
                             } else {
-                                if (change.position.y - initialOffset < 0) {
-                                    val newBrightness = playerState.currentBrightness + 1
-                                    if (newBrightness <= 30) {
-                                        val windowAttributes = activity?.window?.attributes
-                                        val level = 0.064f + 0.936 / 30 * newBrightness
-                                        Log.d(
-                                            TAG,
-                                            "NextPlayerScreen: ${windowAttributes?.screenBrightness}"
+                                activity?.let {
+                                    if (change.position.y - initialOffset < 0) {
+                                        BrightnessController.increaseBrightness(
+                                            it,
+                                            playerState.currentBrightness,
+                                            onBrightnessChanged = { newBrightness ->
+                                                viewModel.updateBrightness(newBrightness)
+                                            }
                                         )
-                                        windowAttributes?.screenBrightness =
-                                            (level * level).toFloat()
-                                        activity?.window?.attributes = windowAttributes
-                                        viewModel.updateBrightness(newBrightness)
-                                    }
-                                } else {
-                                    val newBrightness = playerState.currentBrightness - 1
-                                    if (newBrightness >= 0) {
-                                        val windowAttributes = activity?.window?.attributes
-                                        val level = 1.0f / 30 * newBrightness
-                                        Log.d(
-                                            TAG,
-                                            "NextPlayerScreen: ${windowAttributes?.screenBrightness}"
+                                    } else {
+                                        BrightnessController.decreaseBrightness(
+                                            it,
+                                            playerState.currentBrightness,
+                                            onBrightnessChanged = { newBrightness ->
+                                                viewModel.updateBrightness(newBrightness)
+                                            }
                                         )
-                                        windowAttributes?.screenBrightness = (level * level)
-                                        activity?.window?.attributes = windowAttributes
-                                        viewModel.updateBrightness(newBrightness)
                                     }
                                 }
                             }
@@ -183,10 +177,4 @@ fun NextPlayerScreen(
             }
         }
     }
-}
-
-fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
 }

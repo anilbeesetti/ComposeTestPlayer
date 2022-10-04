@@ -18,6 +18,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerViewModel
+import com.arcticoss.nextplayer.player.utils.BrightnessController
+import com.arcticoss.nextplayer.player.utils.findActivity
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.delay
@@ -68,7 +70,12 @@ fun NextExoPlayer(
                 Lifecycle.Event.ON_RESUME -> {
                     exoPlayer.playWhenReady = playerState.playWhenReady
                 }
-                Lifecycle.Event.ON_START -> {}
+                Lifecycle.Event.ON_START -> {
+                    val activity = context.findActivity()
+                    activity?.let {
+                        BrightnessController.setBrightness(it, playerState.currentBrightness)
+                    }
+                }
                 else -> {}
             }
         }
@@ -108,7 +115,6 @@ fun NextExoPlayer(
                         Log.d(TAG, "onPlaybackStateChanged: idle")
                     }
                     Player.STATE_READY -> {
-                        Log.d(TAG, "onPlaybackStateChanged: ready")
                         viewModel.setDuration(exoPlayer.duration)
                     }
                 }

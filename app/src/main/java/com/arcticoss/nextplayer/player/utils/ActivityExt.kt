@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.player
+package com.arcticoss.nextplayer.player.utils
 
 import android.app.Activity
 import androidx.core.view.WindowCompat

@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
 import com.arcticoss.nextplayer.player.ui.theme.NextPlayerTheme
+import com.arcticoss.nextplayer.player.utils.hideSystemBars
+import com.arcticoss.nextplayer.player.utils.showSystemBars
 import com.google.android.exoplayer2.ExoPlayer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
