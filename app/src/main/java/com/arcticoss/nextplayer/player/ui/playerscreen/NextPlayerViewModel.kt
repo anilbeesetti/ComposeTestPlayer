@@ -42,6 +42,12 @@ class NextPlayerViewModel : ViewModel() {
         )
     }
 
+    fun updateVolumeLevel(volumeLevel: Int) {
+        _playerState.value = playerState.value.copy(
+            currentVolumeLevel = volumeLevel
+        )
+    }
+
     fun updateScreenOrientation(currentOrientation: Int) {
         _playerState.value = playerState.value.copy(
             screenOrientation = currentOrientation
@@ -53,6 +59,7 @@ data class PlayerState(
     val currentPosition: Long = 0,
     val currentMediaItemDuration: Long = 0,
     val currentBrightness: Int = 5,
+    val currentVolumeLevel: Int = 0,
     val screenOrientation: Int = 1,
     val isPlaying: Boolean = true,
     val playWhenReady: Boolean = true

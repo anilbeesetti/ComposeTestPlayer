@@ -1,9 +1,7 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
-import android.util.Log
+import android.content.Context.AUDIO_SERVICE
+import android.media.AudioManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -53,6 +51,8 @@ fun NextPlayerScreen(
     }
     val context = LocalContext.current
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+
+    val audioManager = context.getSystemService(AUDIO_SERVICE) as AudioManager
     LaunchedEffect(key1 = showUI, key2 = playerState.isPlaying) {
         if (playerState.isPlaying) {
             if (showUI) {
@@ -122,8 +122,20 @@ fun NextPlayerScreen(
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
                         if (abs(change.position.y - initialOffset) > height / 18) {
                             if (currentMetricChange == "Audio") {
-                                Log.d(TAG, "NextPlayerScreen: audio")
-                                //TODO: Audio
+                                if (change.position.y - initialOffset < 0) {
+                                    audioManager.adjustStreamVolume(
+                                        AudioManager.STREAM_MUSIC,
+                                        AudioManager.ADJUST_RAISE,
+                                        AudioManager.FLAG_PLAY_SOUND
+                                    )
+                                } else {
+                                    audioManager.adjustStreamVolume(
+                                        AudioManager.STREAM_MUSIC,
+                                        AudioManager.ADJUST_LOWER,
+                                        AudioManager.FLAG_PLAY_SOUND
+                                    )
+                                }
+                                viewModel.updateVolumeLevel(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC))
                             } else {
                                 activity?.let {
                                     if (change.position.y - initialOffset < 0) {
