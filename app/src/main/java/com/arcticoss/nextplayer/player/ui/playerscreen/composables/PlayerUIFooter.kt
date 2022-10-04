@@ -27,9 +27,9 @@ fun PlayerUIFooter(
         ) {
             Text(
                 text = TimeUtils.formatTime(context, currentPosition),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(horizontal = 5.dp)
             )
-            Spacer(modifier = Modifier.width(5.dp))
             Box(
                 modifier = Modifier.weight(1f)
             ) {
@@ -39,10 +39,10 @@ fun PlayerUIFooter(
                     onValueChange = { onSeek(it) }
                 )
             }
-            Spacer(modifier = Modifier.width(5.dp))
             Text(
                 text = TimeUtils.formatTime(context, duration),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(horizontal = 5.dp)
             )
         }
         Row(modifier = Modifier.fillMaxWidth()) {

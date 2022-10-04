@@ -5,34 +5,23 @@ import android.media.AudioManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.LightMode
-import androidx.compose.material.icons.rounded.VolumeMute
-import androidx.compose.material.icons.rounded.VolumeUp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.arcticoss.nextplayer.player.ui.playerscreen.composables.LinearVerticalProgressIndicator
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextExoPlayer
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextPlayerUI
+import com.arcticoss.nextplayer.player.ui.playerscreen.composables.VerticalSwipeMediaControls
 import com.arcticoss.nextplayer.player.utils.BrightnessController
 import com.arcticoss.nextplayer.player.utils.findActivity
 import com.google.android.exoplayer2.ExoPlayer
@@ -131,7 +120,10 @@ fun NextPlayerScreen(
                         }
                     },
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
-                        if (abs(change.position.y - initialOffset) > height / 18) {
+                        val offset = change.position.y - initialOffset
+                        val isOffsetEnough = abs(offset) > height / 40
+                        val isDragEnough = abs(dragAmount) > 100
+                        if (isOffsetEnough or isDragEnough) {
                             if (currentMetricChange == "Audio") {
                                 if (change.position.y - initialOffset < 0) {
                                     audioManager.adjustStreamVolume(
@@ -211,59 +203,4 @@ fun NextPlayerScreen(
     }
 }
 
-@Composable
-fun AdjustmentBar(
-    value: Int,
-    maxValue: Int,
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .clip(MaterialTheme.shapes.extraSmall)
-            .background(Color.Black.copy(alpha = 0.6f))
-            .padding(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        val progress = (1f / maxValue) * value
-        Text(text = value.toString())
-        Spacer(modifier = Modifier.height(10.dp))
-        LinearVerticalProgressIndicator(
-            modifier = Modifier.weight(1f),
-            progress = progress
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        Icon(imageVector = icon, contentDescription = icon.name)
-    }
-}
 
-
-@Composable
-fun VerticalSwipeMediaControls(
-    volumeLevel: Int,
-    brightness: Int,
-    maxVolumeLevel: Int,
-    maxBrightness: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxHeight(0.5f)
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        AdjustmentBar(
-            icon = Icons.Rounded.LightMode,
-            value = brightness,
-            maxValue = maxBrightness
-        )
-        AdjustmentBar(
-            value = volumeLevel,
-            maxValue = maxVolumeLevel,
-            icon = if (volumeLevel == 0) Icons.Rounded.VolumeMute else Icons.Rounded.VolumeUp
-        )
-    }
-}
