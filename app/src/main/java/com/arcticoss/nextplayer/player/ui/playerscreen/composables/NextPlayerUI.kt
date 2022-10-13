@@ -36,7 +36,6 @@ private const val TAG = "NextPlayerUI"
 @Composable
 fun NextPlayerUI(
     path: String,
-    player: ExoPlayer,
     viewModel: NextPlayerViewModel,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit
@@ -46,6 +45,7 @@ fun NextPlayerUI(
     val enterTransition = fadeIn(animationSpec = tween(100))
     val exitTransition = fadeOut(animationSpec = tween(100))
     val context = LocalContext.current
+    val player = viewModel.player as ExoPlayer
     val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     LaunchedEffect(key1 = playerUiState.showUi, key2 = playerState.isPlaying) {

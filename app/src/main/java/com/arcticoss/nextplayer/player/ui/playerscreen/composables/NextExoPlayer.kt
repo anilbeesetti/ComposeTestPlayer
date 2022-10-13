@@ -31,7 +31,6 @@ private const val TAG = "NextExoPlayer"
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun NextExoPlayer(
-    exoPlayer: ExoPlayer,
     mediaPath: String,
     viewModel: NextPlayerViewModel,
     onBackPressed: () -> Unit,
@@ -39,6 +38,7 @@ fun NextExoPlayer(
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val exoPlayer = viewModel.player as ExoPlayer
 
     LaunchedEffect(exoPlayer) {
         val mediaItem = MediaItem.fromUri(Uri.fromFile(File(mediaPath)))

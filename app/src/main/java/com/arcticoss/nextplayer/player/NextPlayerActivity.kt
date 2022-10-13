@@ -27,8 +27,6 @@ private const val TAG = "NextPlayerActivity"
 
 @AndroidEntryPoint
 class NextPlayerActivity : ComponentActivity() {
-    @Inject
-    lateinit var player: ExoPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         val videoFilePath = intent.getStringExtra("videoFilePath") ?: ""
         super.onCreate(savedInstanceState)
@@ -47,7 +45,6 @@ class NextPlayerActivity : ComponentActivity() {
                     CompositionLocalProvider(LocalContentColor provides Color.White) {
                         NextPlayerScreen(
                             mediaPath = videoFilePath,
-                            player = player,
                             onBackPressed = { finish() }
                         )
                     }

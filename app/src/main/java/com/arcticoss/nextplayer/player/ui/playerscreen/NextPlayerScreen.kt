@@ -2,33 +2,26 @@ package com.arcticoss.nextplayer.player.ui.playerscreen
 
 import android.content.Context.AUDIO_SERVICE
 import android.media.AudioManager
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextExoPlayer
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextPlayerUI
-import com.arcticoss.nextplayer.player.ui.playerscreen.composables.VerticalSwipeMediaControls
 import com.arcticoss.nextplayer.player.utils.BrightnessController
 import com.arcticoss.nextplayer.player.utils.findActivity
 import com.google.android.exoplayer2.ExoPlayer
-import kotlinx.coroutines.delay
 import kotlin.math.abs
 
 
@@ -38,11 +31,10 @@ private const val TAG = "NextPlayerScreen"
 @Composable
 fun NextPlayerScreen(
     mediaPath: String,
-    player: ExoPlayer,
-    viewModel: NextPlayerViewModel = viewModel(),
+    viewModel: NextPlayerViewModel = hiltViewModel(),
     onBackPressed: () -> Unit
 ) {
-
+    val player = viewModel.player as ExoPlayer
     val context = LocalContext.current
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
@@ -157,7 +149,6 @@ fun NextPlayerScreen(
             }
     ) {
         NextExoPlayer(
-            exoPlayer = player,
             mediaPath = mediaPath,
             viewModel = viewModel,
             onBackPressed = onBackPressed,
@@ -168,7 +159,6 @@ fun NextPlayerScreen(
             }
         )
         NextPlayerUI(
-            player = player,
             path = mediaPath,
             viewModel = viewModel,
             onBackPressed = onBackPressed

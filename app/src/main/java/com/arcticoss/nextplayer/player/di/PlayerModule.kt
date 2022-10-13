@@ -6,18 +6,18 @@ import com.google.android.exoplayer2.Player
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ActivityScoped
+import dagger.hilt.android.scopes.ViewModelScoped
 
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(ViewModelComponent::class)
 object PlayerModule {
 
     @Provides
-    @ActivityScoped
-    fun provideExoPlayer(@ApplicationContext context: Context): ExoPlayer {
+    @ViewModelScoped
+    fun provideExoPlayer(@ApplicationContext context: Context): Player {
         return ExoPlayer.Builder(context).build()
     }
 }

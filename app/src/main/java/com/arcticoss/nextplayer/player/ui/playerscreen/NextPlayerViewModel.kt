@@ -1,12 +1,20 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.google.android.exoplayer2.Player
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 private const val TAG = "NextPlayerViewModel"
 
-class NextPlayerViewModel : ViewModel() {
+@HiltViewModel
+class NextPlayerViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    val player: Player
+) : ViewModel() {
 
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
