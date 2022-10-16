@@ -1,11 +1,14 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.File
 import javax.inject.Inject
 
 private const val TAG = "NextPlayerViewModel"
@@ -22,6 +25,11 @@ class NextPlayerViewModel @Inject constructor(
     private val _playerUiState = MutableStateFlow(PlayerUiState())
     val playerUiState = _playerUiState.asStateFlow()
 
+    fun addVideoUri(uri: Uri) {
+        val mediaItem = MediaItem.fromUri(uri)
+        player.addMediaItem(mediaItem)
+        player.prepare()
+    }
 
     fun updatePlayingState(isPlaying: Boolean) {
         _playerState.value = playerState.value.copy(

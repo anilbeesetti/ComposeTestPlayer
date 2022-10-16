@@ -1,7 +1,9 @@
 package com.arcticoss.nextplayer.player
 
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,16 +15,24 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
+import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerViewModel
 import com.arcticoss.nextplayer.player.ui.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 private const val TAG = "NextPlayerActivity"
 
 @AndroidEntryPoint
 class NextPlayerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val videoFilePath = intent.getStringExtra("videoFilePath") ?: ""
+        
+        val videoFilePath = intent.getStringExtra("videoFilePath")
+        val intentData = intent.data
+
+        Log.d(TAG, "onCreate: videoFilePath: $videoFilePath and intentData: $intentData")
+        
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -37,9 +47,12 @@ class NextPlayerActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val viewModel: NextPlayerViewModel = hiltViewModel()
+                    
+                    videoFilePath?.let { viewModel.addVideoUri(Uri.fromFile(File(it))) }
+                    intentData?.let { viewModel.addVideoUri(it) }
                     CompositionLocalProvider(LocalContentColor provides Color.White) {
                         NextPlayerScreen(
-                            mediaPath = videoFilePath,
                             onBackPressed = { finish() }
                         )
                     }

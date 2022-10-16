@@ -29,7 +29,6 @@ private const val TAG = "NextPlayerScreen"
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun NextPlayerScreen(
-    mediaPath: String,
     viewModel: NextPlayerViewModel = hiltViewModel(),
     onBackPressed: () -> Unit
 ) {
@@ -148,7 +147,6 @@ fun NextPlayerScreen(
             }
     ) {
         NextExoPlayer(
-            mediaPath = mediaPath,
             viewModel = viewModel,
             onBackPressed = onBackPressed,
             changeOrientation = { requestedOrientation ->
@@ -158,7 +156,6 @@ fun NextPlayerScreen(
             }
         )
         NextPlayerUI(
-            path = mediaPath,
             viewModel = viewModel,
             onBackPressed = onBackPressed
         )

@@ -35,7 +35,6 @@ private const val TAG = "NextPlayerUI"
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun NextPlayerUI(
-    path: String,
     viewModel: NextPlayerViewModel,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit
@@ -60,7 +59,6 @@ fun NextPlayerUI(
             context.findActivity()?.hideSystemBars()
         }
     }
-    val file = File(path)
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -76,7 +74,7 @@ fun NextPlayerUI(
                     .padding(top = 10.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                PlayerUIHeader(title = file.name, onBackPressed = onBackPressed)
+                PlayerUIHeader(title = "TODO", onBackPressed = onBackPressed)
                 PlayerUIFooter(
                     duration = playerState.currentMediaItemDuration,
                     currentPosition = playerState.currentPosition,
