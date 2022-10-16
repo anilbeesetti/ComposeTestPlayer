@@ -56,7 +56,7 @@ fun NextPlayerUI(
         }
         if (playerState.isPlaying and playerUiState.showUi) {
             delay(3000)
-            viewModel.onUiEvent(PlayerUiEvent.showUi(false))
+            viewModel.onUiEvent(PlayerUiEvent.ShowUi(false))
             context.findActivity()?.hideSystemBars()
         }
     }
@@ -72,7 +72,8 @@ fun NextPlayerUI(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .statusBarsPadding(),
+                    .statusBarsPadding()
+                    .padding(top = 10.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 PlayerUIHeader(title = file.name, onBackPressed = onBackPressed)
@@ -95,8 +96,8 @@ fun NextPlayerUI(
             modifier = Modifier
                 .heightIn(max = 500.dp)
                 .align(Alignment.Center),
-            dismissBrightnessBar = { viewModel.onUiEvent(PlayerUiEvent.showBrightnessBar(false)) },
-            dismissVolumeBar = { viewModel.onUiEvent(PlayerUiEvent.showVolumeBar(false)) }
+            dismissBrightnessBar = { viewModel.onUiEvent(PlayerUiEvent.ShowBrightnessBar(false)) },
+            dismissVolumeBar = { viewModel.onUiEvent(PlayerUiEvent.ShowVolumeBar(false)) }
         )
         PlayerUIMainControls(
             show = playerUiState.showUi,

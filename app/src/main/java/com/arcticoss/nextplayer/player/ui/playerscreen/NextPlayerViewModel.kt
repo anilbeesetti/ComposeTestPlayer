@@ -71,9 +71,9 @@ class NextPlayerViewModel @Inject constructor(
 
     fun onUiEvent(event: PlayerUiEvent) {
         when(event) {
-            is PlayerUiEvent.showUi -> _playerUiState.value = playerUiState.value.copy(showUi = event.value)
-            is PlayerUiEvent.showBrightnessBar -> _playerUiState.value = playerUiState.value.copy(showBrightnessBar = event.value)
-            is PlayerUiEvent.showVolumeBar -> _playerUiState.value = playerUiState.value.copy(showVolumeBar = event.value)
+            is PlayerUiEvent.ShowUi -> _playerUiState.value = playerUiState.value.copy(showUi = event.value)
+            is PlayerUiEvent.ShowBrightnessBar -> _playerUiState.value = playerUiState.value.copy(showBrightnessBar = event.value)
+            is PlayerUiEvent.ShowVolumeBar -> _playerUiState.value = playerUiState.value.copy(showVolumeBar = event.value)
         }
     }
 }
@@ -96,7 +96,7 @@ data class PlayerUiState(
 )
 
 sealed class PlayerUiEvent {
-    data class showUi(val value: Boolean): PlayerUiEvent()
-    data class showBrightnessBar(val value: Boolean): PlayerUiEvent()
-    data class showVolumeBar(val value: Boolean): PlayerUiEvent()
+    data class ShowUi(val value: Boolean): PlayerUiEvent()
+    data class ShowBrightnessBar(val value: Boolean): PlayerUiEvent()
+    data class ShowVolumeBar(val value: Boolean): PlayerUiEvent()
 }

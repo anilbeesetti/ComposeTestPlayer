@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextExoPlayer
 import com.arcticoss.nextplayer.player.ui.playerscreen.composables.NextPlayerUI
 import com.arcticoss.nextplayer.player.utils.BrightnessController
@@ -46,7 +45,7 @@ fun NextPlayerScreen(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
-                        viewModel.onUiEvent(PlayerUiEvent.showUi(!playerUiState.showUi))
+                        viewModel.onUiEvent(PlayerUiEvent.ShowUi(!playerUiState.showUi))
                     },
                     onDoubleTap = {
                         if (player.playWhenReady) {
@@ -87,9 +86,9 @@ fun NextPlayerScreen(
                     onDragStart = { offset ->
                         initialOffset = offset.y
                         if (offset.x < (width / 2)) {
-                            viewModel.onUiEvent(PlayerUiEvent.showBrightnessBar(true))
+                            viewModel.onUiEvent(PlayerUiEvent.ShowBrightnessBar(true))
                         } else {
-                            viewModel.onUiEvent(PlayerUiEvent.showVolumeBar(true))
+                            viewModel.onUiEvent(PlayerUiEvent.ShowVolumeBar(true))
                         }
                     },
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
@@ -142,8 +141,8 @@ fun NextPlayerScreen(
                         }
                     },
                     onDragEnd = {
-                        viewModel.onUiEvent(PlayerUiEvent.showBrightnessBar(false))
-                        viewModel.onUiEvent(PlayerUiEvent.showVolumeBar(false))
+                        viewModel.onUiEvent(PlayerUiEvent.ShowBrightnessBar(false))
+                        viewModel.onUiEvent(PlayerUiEvent.ShowVolumeBar(false))
                     }
                 )
             }
