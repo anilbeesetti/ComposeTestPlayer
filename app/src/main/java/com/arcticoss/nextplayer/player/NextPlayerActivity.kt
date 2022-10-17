@@ -15,7 +15,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.arcticoss.nextplayer.player.ui.playerscreen.NextPlayerScreen
@@ -53,14 +52,8 @@ class NextPlayerActivity : ComponentActivity() {
 
                     LaunchedEffect(key1 = Unit) {
 
-                        videoFilePath?.let {
-                            Log.d(TAG, "onCreate: ${File(it).toUri()}")
-                            viewModel.addVideoUri(Uri.fromFile(File(it)))
-                        }
-                        intentData?.let {
-                            Log.d(TAG, "onCreate: ${it.path}")
-                            viewModel.addVideoUri(it) 
-                        }
+                        videoFilePath?.let { viewModel.addVideoUri(Uri.fromFile(File(it))) }
+                        intentData?.let { viewModel.addVideoUri(it) }
                     }
                     CompositionLocalProvider(LocalContentColor provides Color.White) {
                         NextPlayerScreen(
