@@ -1,10 +1,16 @@
 #include <jni.h>
 #include <string>
+#include "mediainfo/frame_extractor.h"
 
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_arcticoss_mediainfo_NativeLib_stringFromJNI(
-        JNIEnv* env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_arcticoss_mediainfo_FrameLoader_nativeLoadFrame(JNIEnv *env,
+                                                         jobject thiz,
+                                                         jstring jFilePath,
+                                                         jobject bitmap,
+                                                         jlong at_duration) {
+    const char *cFilePath = env->GetStringUTFChars(jFilePath, nullptr);
+    bool result = frameExtractorLoadFrame(env, cFilePath, bitmap, at_duration);
+    env->ReleaseStringUTFChars(jFilePath, cFilePath);
+    return result;
 }

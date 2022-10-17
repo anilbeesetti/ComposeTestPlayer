@@ -5,6 +5,29 @@
 
 cmake_minimum_required(VERSION 3.18.1)
 
+set(ffmpeg_dir ${CMAKE_SOURCE_DIR}/../ffmpeg/output)
+set(ffmpeg_libs ${ffmpeg_dir}/lib/${ANDROID_ABI})
+
+include_directories(${ffmpeg_dir}/include/${ANDROID_ABI})
+
+set(
+        # List variable name
+        ffmpeg_libs_names
+        # Values in the list
+        avutil avformat avcodec swscale)
+
+foreach (ffmpeg_lib_name ${ffmpeg_libs_names})
+    add_library(
+            ${ffmpeg_lib_name}
+            SHARED
+            IMPORTED)
+    set_target_properties(
+            ${ffmpeg_lib_name}
+            PROPERTIES
+            IMPORTED_LOCATION
+            ${ffmpeg_libs}/lib${ffmpeg_lib_name}.so)
+endforeach ()
+
 # Declares and names the project.
 
 project("mediainfo")
@@ -21,7 +44,8 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        mediainfo.cpp)
+        mediainfo.cpp
+        mediainfo/frame_extractor.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -45,4 +69,6 @@ target_link_libraries( # Specifies the target library.
 
         # Links the target library to the log library
         # included in the NDK.
-        ${log-lib})
+        ${log-lib}
+        jnigraphics
+        ${ffmpeg_libs_names})
