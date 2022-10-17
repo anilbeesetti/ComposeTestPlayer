@@ -16,3 +16,4 @@ rootProject.name = "NextPlayer"
 include ':app'
 include ':mediainfo'
 include ':core:database'
+include ':core:data'
