@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,7 +24,7 @@ import com.arcticoss.nextplayer.media.ui.mediascreen.composables.ShowVideoFiles
 )
 @Composable
 fun MediaScreen(
-    viewModel: MediaScreenViewModel = viewModel(),
+    viewModel: MediaScreenViewModel = hiltViewModel(),
 ) {
     val mediaListState by viewModel.mediaListState.collectAsStateWithLifecycle()
     val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()

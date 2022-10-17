@@ -35,7 +35,7 @@ fun ShowVideoFiles(
             CircularProgressIndicator()
         }
     } else {
-        if (mediaListState.videoFiles.isEmpty()) {
+        if (mediaListState.mediaItems.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -53,10 +53,10 @@ fun ShowVideoFiles(
                 item {
                     Spacer(modifier = Modifier.height(5.dp))
                 }
-                items(mediaListState.videoFiles) { video ->
+                items(mediaListState.mediaItems) { mediaItem ->
                     VideoFileItem(
-                        videoFile = video,
-                        onClick = { startPlayerActivity(context, video.path) }
+                        videoFile = mediaItem.file,
+                        onClick = { startPlayerActivity(context, mediaItem.file.path) }
                     )
                 }
             }
