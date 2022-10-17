@@ -147,7 +147,6 @@ fun NextPlayerScreen(
             }
     ) {
         NextExoPlayer(
-            viewModel = viewModel,
             onBackPressed = onBackPressed,
             changeOrientation = { requestedOrientation ->
                 val activity = context.findActivity()
@@ -156,7 +155,6 @@ fun NextPlayerScreen(
             }
         )
         NextPlayerUI(
-            viewModel = viewModel,
             onBackPressed = onBackPressed
         )
     }

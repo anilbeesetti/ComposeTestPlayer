@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,8 +32,8 @@ private const val TAG = "NextExoPlayer"
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun NextExoPlayer(
-    viewModel: NextPlayerViewModel,
     onBackPressed: () -> Unit,
+    viewModel: NextPlayerViewModel = hiltViewModel(),
     changeOrientation: (requestedOrientation: Int) -> Unit
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
