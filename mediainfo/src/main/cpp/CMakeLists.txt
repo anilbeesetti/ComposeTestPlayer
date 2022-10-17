@@ -44,6 +44,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
+        main.cpp
         mediainfo.cpp
         mediainfo/utils.cpp
         mediainfo/frame_extractor.cpp

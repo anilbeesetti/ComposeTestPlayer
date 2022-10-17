@@ -1,12 +1,10 @@
 package com.arcticoss.mediainfo
 
 import android.net.Uri
-import androidx.core.net.toUri
 import com.arcticoss.mediainfo.models.AudioStream
 import com.arcticoss.mediainfo.models.MediaInfo
 import com.arcticoss.mediainfo.models.SubtitleStream
 import com.arcticoss.mediainfo.models.VideoStream
-import java.io.File
 
 class MediaInfoBuilder {
 
