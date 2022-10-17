@@ -23,7 +23,7 @@ import com.arcticoss.nextplayer.media.ui.mediascreen.composables.ShowVideoFiles
 )
 @Composable
 fun MediaScreen(
-    viewModel: VideoFilesViewModel = viewModel(),
+    viewModel: MediaScreenViewModel = viewModel(),
 ) {
     val mediaListState by viewModel.mediaListState.collectAsStateWithLifecycle()
     val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
