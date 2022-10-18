@@ -10,7 +10,7 @@ import androidx.room.PrimaryKey
 * It has one to one relationship with [MediaItemEntity]
 */
 @Entity(
-    tableName = "thumbnails",
+    tableName = "thumbnail",
     foreignKeys = [
         ForeignKey(
             entity = MediaItemEntity::class,
