@@ -7,14 +7,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.arcticoss.model.MediaItem
 import java.io.File
 
 @Composable
-fun VideoFileItem(
-    videoFile: File,
+fun MediaItem(
+    mediaItem: MediaItem,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -33,7 +33,7 @@ fun VideoFileItem(
         )
         Spacer(modifier = Modifier.width(10.dp))
         Text(
-            text = videoFile.name,
+            text = mediaItem.title,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )

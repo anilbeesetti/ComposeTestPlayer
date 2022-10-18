@@ -17,6 +17,9 @@ interface MediaItemDao {
     @Delete
     suspend fun delete(mediaItemEntity: MediaItemEntity)
 
+    @Query("SELECT EXISTS(SELECT * FROM media WHERE path = :path )")
+    suspend fun isExist(path: String): Boolean
+
     @Query("SELECT * From media")
     fun getMediaItemEntitiesStream(): Flow<List<MediaItemEntity>>
 

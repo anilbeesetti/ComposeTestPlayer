@@ -1,12 +1,14 @@
 package com.arcticoss.nextplayer.media.ui.mediascreen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.data.repository.IMediaRepository
-import com.arcticoss.data.repository.MediaItem
-import com.arcticoss.data.repository.MediaRepository
+import com.arcticoss.model.MediaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -14,23 +16,40 @@ private const val TAG = "VideoFilesViewModel"
 
 @HiltViewModel
 class MediaScreenViewModel @Inject constructor(
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: IMediaRepository
 ): ViewModel() {
 
-    private val _mediaListState = MutableStateFlow(MediaListState())
-    val mediaListState = _mediaListState.asStateFlow()
+    private val _mediaUiState = MutableStateFlow(MediaUiState())
+    val mediaUiState = _mediaUiState.asStateFlow()
 
-    init {
-        mediaRepository.getAllMedia().onEach {
-            _mediaListState.value = _mediaListState.value.copy(
-                isLoading = false,
-                mediaItems = it
-            )
-        }.launchIn(viewModelScope)
+    val mediaState: StateFlow<List<MediaItem>> = mediaRepository
+        .getMediaStream()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+
+    private var syncMediaJob: Job? = null
+
+    fun syncMedia() {
+        Log.d(TAG, "syncMedia: syncing...")
+        if (syncMediaJob == null) {
+            syncMediaJob = viewModelScope.launch {
+                mediaRepository.syncMedia()
+            }
+        } else {
+            if (!syncMediaJob!!.isActive) {
+                syncMediaJob = viewModelScope.launch {
+                    mediaRepository.syncMedia()
+                }
+            }
+        }
+        _mediaUiState.value = _mediaUiState.value.copy(isLoading = false)
     }
 }
 
-data class MediaListState(
-    val isLoading: Boolean = true,
-    val mediaItems: List<MediaItem> = emptyList()
+data class MediaUiState(
+    val isLoading: Boolean = true
 )

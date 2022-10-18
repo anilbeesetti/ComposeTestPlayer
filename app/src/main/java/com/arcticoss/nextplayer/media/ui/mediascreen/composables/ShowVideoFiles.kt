@@ -9,22 +9,29 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.arcticoss.nextplayer.media.ui.mediascreen.MediaListState
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arcticoss.nextplayer.media.ui.mediascreen.MediaScreenViewModel
 import com.arcticoss.nextplayer.player.NextPlayerActivity
 
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ShowVideoFiles(
-    mediaListState: MediaListState,
     contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: MediaScreenViewModel = hiltViewModel()
 ) {
+    val media by viewModel.mediaState.collectAsStateWithLifecycle()
+    val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    if (mediaListState.isLoading) {
+    if (mediaUiState.isLoading) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -35,7 +42,7 @@ fun ShowVideoFiles(
             CircularProgressIndicator()
         }
     } else {
-        if (mediaListState.mediaItems.isEmpty()) {
+        if (media.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -53,10 +60,10 @@ fun ShowVideoFiles(
                 item {
                     Spacer(modifier = Modifier.height(5.dp))
                 }
-                items(mediaListState.mediaItems) { mediaItem ->
-                    VideoFileItem(
-                        videoFile = mediaItem.file,
-                        onClick = { startPlayerActivity(context, mediaItem.file.path) }
+                items(media) { mediaItem ->
+                    MediaItem(
+                        mediaItem = mediaItem,
+                        onClick = { startPlayerActivity(context, mediaItem.path) }
                     )
                 }
             }

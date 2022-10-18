@@ -16,20 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.arcticoss.nextplayer.R
-import com.arcticoss.nextplayer.media.ui.mediascreen.MediaListState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ShowContentForMarshMellow(
-    mediaListState: MediaListState, contentPadding: PaddingValues
+    contentPadding: PaddingValues
 ) {
     val context = LocalContext.current
     RequestMultiplePermissions(permissions = listOf(
         Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
     ), permissionGrantedContent = {
         ShowVideoFiles(
-            mediaListState = mediaListState, contentPadding = contentPadding
+            contentPadding = contentPadding
         )
     }, permissionNotGrantedContent = { multiplePermissionsState ->
         ShowPermissionInfo(modifier = Modifier.padding(contentPadding),
