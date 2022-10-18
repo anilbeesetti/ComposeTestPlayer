@@ -1,6 +1,7 @@
 package com.arcticoss.nextplayer.player.ui.playerscreen
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.android.exoplayer2.MediaItem
@@ -8,6 +9,7 @@ import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.File
 import javax.inject.Inject
 
 private const val TAG = "NextPlayerViewModel"
@@ -54,18 +56,6 @@ class NextPlayerViewModel @Inject constructor(
         )
     }
 
-    fun updateVolumeLevel(volumeLevel: Int) {
-        _playerState.value = playerState.value.copy(
-            currentVolumeLevel = volumeLevel
-        )
-    }
-
-    fun updateScreenOrientation(currentOrientation: Int) {
-        _playerState.value = playerState.value.copy(
-            screenOrientation = currentOrientation
-        )
-    }
-
     fun updatePlayerState(state: PlayerState) {
         _playerState.value = state
     }
@@ -85,6 +75,7 @@ class NextPlayerViewModel @Inject constructor(
         when(event) {
             is PlayerEvent.ChangeBrightness -> _playerState.value = playerState.value.copy(currentBrightness = event.value)
             is PlayerEvent.ChangeVolumeLevel -> _playerState.value = playerState.value.copy(currentVolumeLevel = event.value)
+            is PlayerEvent.ChangeOrientation -> _playerState.value = playerState.value.copy(screenOrientation = event.value)
         }
     }
 }
@@ -115,4 +106,5 @@ sealed class PlayerUiEvent {
 sealed interface PlayerEvent {
     data class ChangeBrightness(val value: Int): PlayerEvent
     data class ChangeVolumeLevel(val value: Int): PlayerEvent
+    data class ChangeOrientation(val value: Int): PlayerEvent
 }

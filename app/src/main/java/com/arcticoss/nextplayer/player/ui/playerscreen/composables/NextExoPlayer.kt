@@ -40,12 +40,6 @@ fun NextExoPlayer(
     val context = LocalContext.current
     val exoPlayer = viewModel.player as ExoPlayer
 
-//    LaunchedEffect(exoPlayer) {
-//        exoPlayer.prepare()
-//        exoPlayer.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-//        exoPlayer.seekTo(playerState.currentPosition)
-//    }
-
     LaunchedEffect(Unit) {
         while (true) {
             viewModel.updateCurrentPosition(exoPlayer.currentPosition)

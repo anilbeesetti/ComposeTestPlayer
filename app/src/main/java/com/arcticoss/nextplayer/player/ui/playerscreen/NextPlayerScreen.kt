@@ -152,7 +152,7 @@ fun NextPlayerScreen(
             changeOrientation = { requestedOrientation ->
                 val activity = context.findActivity()
                 activity?.requestedOrientation = requestedOrientation
-                activity?.requestedOrientation?.let { viewModel.updateScreenOrientation(it) }
+                activity?.requestedOrientation?.let { viewModel.onEvent(PlayerEvent.ChangeOrientation(it)) }
             }
         )
         NextPlayerUI(
