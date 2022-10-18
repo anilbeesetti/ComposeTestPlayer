@@ -1,11 +1,8 @@
 package com.arcticoss.database.daos
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.arcticoss.database.entities.MediaItemEntity
+import com.arcticoss.database.relations.MediaItemAndThumbnailRelation
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,9 +18,10 @@ interface MediaItemDao {
     suspend fun isExist(path: String): Boolean
 
     @Query("SELECT * From media")
-    fun getMediaItemEntitiesStream(): Flow<List<MediaItemEntity>>
-
-    @Query("SELECT * From media")
     fun getMediaItemEntities(): List<MediaItemEntity>
+
+    @Transaction
+    @Query("SELECT * From media")
+    fun getMediaItemEntitiesStream(): Flow<List<MediaItemAndThumbnailRelation>>
 
 }

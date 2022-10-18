@@ -1,6 +1,6 @@
 package com.arcticoss.model
 
-import java.time.Duration
+import java.io.File
 
 data class MediaItem(
     val id: Long,
@@ -11,5 +11,6 @@ data class MediaItem(
     val title: String,
     val frameRate: Double,
     val duration: Long,
-    val lastPlayedPosition: Long
+    val lastPlayedPosition: Long,
+    val thumbnailPath: String? = null
 )
