@@ -5,6 +5,7 @@ import com.arcticoss.mediainfo.models.AudioStream
 import com.arcticoss.mediainfo.models.MediaInfo
 import com.arcticoss.mediainfo.models.SubtitleStream
 import com.arcticoss.mediainfo.models.VideoStream
+import java.io.File
 
 class MediaInfoBuilder {
 
@@ -14,17 +15,31 @@ class MediaInfoBuilder {
     private var audioStreams = mutableListOf<AudioStream>()
     private var subtitleStreams = mutableListOf<SubtitleStream>()
 
+    private var fromFile: File? = null
+    private var fromUri: Uri? = null
+
 
     fun from(uri: Uri) = apply {
+        fromUri = uri
         nativeCreateMediaInfo(uri.toString())
     }
 
-    fun fromFile(path: String) = apply {
-        nativeCreateMediaInfo(path)
+    fun from(file: File) = apply {
+        fromFile = file
+        nativeCreateMediaInfo(file.path)
     }
 
     fun build(): MediaInfo {
+        if (fromFile == null && fromUri == null) {
+            throw NoFileProvidedException()
+        }
         return MediaInfo(
+            title = fromFile?.name ?: "",
+            filePath = fromFile?.path ?: "",
+            size = fromFile?.length() ?: 0,
+            width = videoStreams.firstOrNull()?.frameWidth ?: 0,
+            height = videoStreams.firstOrNull()?.frameHeight ?: 0,
+            frameRate = videoStreams.firstOrNull()?.frameRate ?: 0.0,
             fileFormatName = fileFormatName,
             duration = duration,
             videoStreams = videoStreams,
