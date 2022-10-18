@@ -54,12 +54,6 @@ class NextPlayerViewModel @Inject constructor(
         )
     }
 
-    fun updateBrightness(brightness: Int) {
-        _playerState.value = playerState.value.copy(
-            currentBrightness = brightness
-        )
-    }
-
     fun updateVolumeLevel(volumeLevel: Int) {
         _playerState.value = playerState.value.copy(
             currentVolumeLevel = volumeLevel
@@ -76,11 +70,21 @@ class NextPlayerViewModel @Inject constructor(
         _playerState.value = state
     }
 
+    fun updatePlayPosition(position: Long) {
+    }
+
     fun onUiEvent(event: PlayerUiEvent) {
         when(event) {
             is PlayerUiEvent.ShowUi -> _playerUiState.value = playerUiState.value.copy(showUi = event.value)
             is PlayerUiEvent.ShowBrightnessBar -> _playerUiState.value = playerUiState.value.copy(showBrightnessBar = event.value)
             is PlayerUiEvent.ShowVolumeBar -> _playerUiState.value = playerUiState.value.copy(showVolumeBar = event.value)
+        }
+    }
+
+    fun onEvent(event: PlayerEvent) {
+        when(event) {
+            is PlayerEvent.ChangeBrightness -> _playerState.value = playerState.value.copy(currentBrightness = event.value)
+            is PlayerEvent.ChangeVolumeLevel -> _playerState.value = playerState.value.copy(currentVolumeLevel = event.value)
         }
     }
 }
@@ -106,4 +110,9 @@ sealed class PlayerUiEvent {
     data class ShowUi(val value: Boolean): PlayerUiEvent()
     data class ShowBrightnessBar(val value: Boolean): PlayerUiEvent()
     data class ShowVolumeBar(val value: Boolean): PlayerUiEvent()
+}
+
+sealed interface PlayerEvent {
+    data class ChangeBrightness(val value: Int): PlayerEvent
+    data class ChangeVolumeLevel(val value: Int): PlayerEvent
 }

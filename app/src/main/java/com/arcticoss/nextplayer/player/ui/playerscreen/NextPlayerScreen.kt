@@ -109,9 +109,10 @@ fun NextPlayerScreen(
                                         AudioManager.FLAG_PLAY_SOUND
                                     )
                                 }
-                                viewModel.updateVolumeLevel(
-                                    audioManager.getStreamVolume(
-                                        AudioManager.STREAM_MUSIC
+                                viewModel.onEvent(PlayerEvent.ChangeVolumeLevel(
+                                        audioManager.getStreamVolume(
+                                            AudioManager.STREAM_MUSIC
+                                        )
                                     )
                                 )
                             }
@@ -122,7 +123,7 @@ fun NextPlayerScreen(
                                             it,
                                             playerState.currentBrightness,
                                             onBrightnessChanged = { newBrightness ->
-                                                viewModel.updateBrightness(newBrightness)
+                                                viewModel.onEvent(PlayerEvent.ChangeBrightness(newBrightness))
                                             }
                                         )
                                     } else {
@@ -130,7 +131,7 @@ fun NextPlayerScreen(
                                             it,
                                             playerState.currentBrightness,
                                             onBrightnessChanged = { newBrightness ->
-                                                viewModel.updateBrightness(newBrightness)
+                                                viewModel.onEvent(PlayerEvent.ChangeBrightness(newBrightness))
                                             }
                                         )
                                     }
