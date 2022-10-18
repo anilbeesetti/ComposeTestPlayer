@@ -23,4 +23,7 @@ interface MediaItemDao {
     @Query("SELECT * From media")
     fun getMediaItemEntitiesStream(): Flow<List<MediaItemEntity>>
 
+    @Query("SELECT * From media")
+    fun getMediaItemEntities(): List<MediaItemEntity>
+
 }

@@ -3,6 +3,7 @@ package com.arcticoss.data.repository
 import android.os.Environment
 import com.arcticoss.data.utils.getFolders
 import com.arcticoss.data.utils.getVideos
+import com.arcticoss.data.utils.notExists
 import com.arcticoss.database.daos.*
 import com.arcticoss.database.entities.FolderEntity
 import com.arcticoss.database.entities.MediaItemEntity
@@ -14,9 +15,11 @@ import com.arcticoss.model.MediaFolder
 import com.arcticoss.model.MediaItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 class MediaRepository @Inject constructor(
@@ -39,6 +42,7 @@ class MediaRepository @Inject constructor(
             .map { it.map(FolderAndMediaItemRelation::asExternalModel) }
 
     override suspend fun syncMedia() = withContext(Dispatchers.IO) {
+        syncDatabase()
         syncFolders()
         syncVideos()
     }
@@ -73,6 +77,14 @@ class MediaRepository @Inject constructor(
                         folderId = folderDao.id(it.parentFile!!.path)
                     )
                 )
+            }
+        }
+    }
+
+    private suspend fun syncDatabase() {
+        mediaItemDao.getMediaItemEntities().forEach { mediaItemEntity ->
+            if (File(mediaItemEntity.path).notExists()) {
+                mediaItemDao.delete(mediaItemEntity)
             }
         }
     }
