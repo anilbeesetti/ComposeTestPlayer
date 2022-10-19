@@ -1,7 +1,5 @@
 package com.arcticoss.model
 
-import java.io.File
-
 data class MediaItem(
     val id: Long,
     val size: Long,

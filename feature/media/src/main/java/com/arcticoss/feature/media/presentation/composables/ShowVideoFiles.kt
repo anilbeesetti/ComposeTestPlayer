@@ -29,7 +29,7 @@ fun ShowVideoFiles(
     modifier: Modifier = Modifier,
     viewModel: MediaScreenViewModel = hiltViewModel()
 ) {
-    val media by viewModel.mediaState.collectAsStateWithLifecycle()
+    val media by viewModel.mediaItemList.collectAsStateWithLifecycle()
     val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 

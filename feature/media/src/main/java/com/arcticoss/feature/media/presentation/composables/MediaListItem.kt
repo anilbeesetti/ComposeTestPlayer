@@ -51,7 +51,7 @@ fun MediaListItem(
         ) {
             Surface(
                 color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = MaterialTheme.shapes.extraSmall,
+                shape = MaterialTheme.shapes.small,
                 modifier = Modifier
                     .widthIn(max = 500.dp)
                     .fillMaxWidth(0.45f)

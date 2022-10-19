@@ -20,15 +20,3 @@ data class MediaItemEntity(
     @ColumnInfo(name = "last_played_position") val lastPlayedPosition: Long = 0,
     @ColumnInfo(name = "folder_id") val folderId: Long
 )
-
-fun MediaItemEntity.asExternalModel() = MediaItem(
-    id,
-    size,
-    width,
-    height,
-    path,
-    title,
-    frameRate,
-    duration,
-    lastPlayedPosition
-)

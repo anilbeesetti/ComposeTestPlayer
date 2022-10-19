@@ -4,16 +4,16 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.arcticoss.database.entities.FolderEntity
 import com.arcticoss.database.entities.MediaItemEntity
-import com.arcticoss.database.entities.asExternalModel
 import com.arcticoss.model.MediaFolder
 
 data class FolderAndMediaItemRelation(
     @Embedded val folderEntity: FolderEntity,
     @Relation(
+        entity = MediaItemEntity::class,
         parentColumn = "id",
         entityColumn = "folder_id"
     )
-    val mediaItems: List<MediaItemEntity>
+    val mediaItems: List<MediaItemAndThumbnailRelation>
 )
 
 

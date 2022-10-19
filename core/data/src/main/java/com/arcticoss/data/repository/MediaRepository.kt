@@ -6,9 +6,7 @@ import android.os.Environment
 import com.arcticoss.data.utils.*
 import com.arcticoss.database.daos.*
 import com.arcticoss.database.entities.FolderEntity
-import com.arcticoss.database.entities.MediaItemEntity
 import com.arcticoss.database.entities.ThumbnailEntity
-import com.arcticoss.database.entities.asExternalModel
 import com.arcticoss.database.relations.FolderAndMediaItemRelation
 import com.arcticoss.database.relations.MediaItemAndThumbnailRelation
 import com.arcticoss.database.relations.asExternalModel
@@ -17,10 +15,12 @@ import com.arcticoss.mediainfo.MediaInfoBuilder
 import com.arcticoss.model.MediaFolder
 import com.arcticoss.model.MediaItem
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 

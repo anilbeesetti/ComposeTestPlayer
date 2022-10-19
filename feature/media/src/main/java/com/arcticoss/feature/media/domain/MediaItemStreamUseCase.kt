@@ -1,13 +1,13 @@
 package com.arcticoss.feature.media.domain
 
-import com.arcticoss.data.repository.MediaRepository
+import com.arcticoss.data.repository.IMediaRepository
 import com.arcticoss.model.MediaItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class MediaItemStreamUseCase @Inject constructor(
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: IMediaRepository
 ) {
 
     operator fun invoke(
