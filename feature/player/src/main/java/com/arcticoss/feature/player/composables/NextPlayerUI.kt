@@ -2,10 +2,6 @@ package com.arcticoss.feature.player.composables
 
 import android.content.Context
 import android.media.AudioManager
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
@@ -16,18 +12,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.feature.player.PlayerViewModel
 import com.arcticoss.feature.player.PlayerUiEvent
+import com.arcticoss.feature.player.PlayerViewModel
 import com.arcticoss.feature.player.utils.BrightnessController
+import com.arcticoss.feature.player.utils.findActivity
 import com.arcticoss.feature.player.utils.hideSystemBars
 import com.arcticoss.feature.player.utils.showSystemBars
-import com.arcticoss.feature.player.utils.findActivity
 import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.delay
 
