@@ -18,7 +18,6 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.feature.player.PlayerUiEvent
 import com.arcticoss.feature.player.PlayerViewModel
-import com.arcticoss.feature.player.utils.BrightnessController
 import com.arcticoss.feature.player.utils.findActivity
 import com.arcticoss.feature.player.utils.hideSystemBars
 import com.arcticoss.feature.player.utils.showSystemBars
@@ -92,8 +91,8 @@ fun NextPlayerUI(
         }
         if (playerUiState.showVolumeBar) {
             AudioAdjustmentBar(
-                volumeLevel = playerState.currentVolumeLevel,
-                maxVolumeLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                volumeLevel = playerState.currentVolume,
+                maxVolumeLevel = playerState.maxLevel,
                 modifier = Modifier
                     .fillMaxHeight(0.6f)
                     .padding(20.dp)
@@ -103,7 +102,7 @@ fun NextPlayerUI(
         if (playerUiState.showBrightnessBar) {
             BrightnessAdjustmentBar(
                 brightness = playerState.currentBrightness,
-                maxBrightness = BrightnessController.MAX_BRIGHTNESS,
+                maxBrightness = playerState.maxLevel,
                 modifier = Modifier
                     .fillMaxHeight(0.6f)
                     .padding(20.dp)

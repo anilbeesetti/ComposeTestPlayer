@@ -24,3 +24,10 @@ fun Activity.showSystemBars() {
     // Show both the status bar and the navigation bar
     windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
 }
+
+
+fun Activity.setBrightness(brightness: Float) {
+    val windowAttributes = this.window.attributes
+    windowAttributes.screenBrightness = brightness
+    this.window.attributes = windowAttributes
+}

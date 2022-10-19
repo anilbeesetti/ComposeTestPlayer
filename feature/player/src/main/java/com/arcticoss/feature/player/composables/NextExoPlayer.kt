@@ -18,8 +18,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.feature.player.PlayerViewModel
-import com.arcticoss.feature.player.utils.BrightnessController
 import com.arcticoss.feature.player.utils.findActivity
+import com.arcticoss.feature.player.utils.setBrightness
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
@@ -64,9 +64,8 @@ fun NextExoPlayer(
                 }
                 Lifecycle.Event.ON_START -> {
                     val activity = context.findActivity()
-                    activity?.let {
-                        BrightnessController.setBrightness(it, playerState.currentBrightness)
-                    }
+                    val level = 1.0f / playerState.maxLevel * playerState.currentBrightness
+                    activity?.setBrightness(level)
                 }
                 else -> {}
             }

@@ -1,5 +1,6 @@
 package com.arcticoss.feature.player
 
+import android.app.Activity
 import android.content.Context.AUDIO_SERVICE
 import android.media.AudioManager
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -18,8 +19,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.feature.player.composables.NextExoPlayer
 import com.arcticoss.feature.player.composables.NextPlayerUI
-import com.arcticoss.feature.player.utils.BrightnessController
-import com.arcticoss.feature.player.utils.findActivity
+import com.arcticoss.feature.player.utils.*
 import com.google.android.exoplayer2.ExoPlayer
 import kotlin.math.abs
 
@@ -94,48 +94,31 @@ fun PlayerScreen(
                         val offset = change.position.y - initialOffset
                         val isOffsetEnough = abs(offset) > height / 40
                         val isDragEnough = abs(dragAmount) > 100
-                        if (isOffsetEnough or isDragEnough) {
+                        if (isOffsetEnough || isDragEnough) {
                             if (playerUiState.showVolumeBar) {
                                 if (change.position.y - initialOffset < 0) {
-                                    audioManager.adjustStreamVolume(
-                                        AudioManager.STREAM_MUSIC,
-                                        AudioManager.ADJUST_RAISE,
-                                        AudioManager.FLAG_PLAY_SOUND
-                                    )
+                                    audioManager.increaseVolume()
                                 } else {
-                                    audioManager.adjustStreamVolume(
-                                        AudioManager.STREAM_MUSIC,
-                                        AudioManager.ADJUST_LOWER,
-                                        AudioManager.FLAG_PLAY_SOUND
-                                    )
+                                    audioManager.decreaseVolume()
                                 }
-                                viewModel.onEvent(PlayerEvent.ChangeVolumeLevel(
-                                        audioManager.getStreamVolume(
-                                            AudioManager.STREAM_MUSIC
-                                        )
-                                    )
-                                )
+                                viewModel.onEvent(PlayerEvent.ChangeVolumeLevel(audioManager.getVolume()))
                             }
                             if (playerUiState.showBrightnessBar) {
-                                activity?.let {
-                                    if (change.position.y - initialOffset < 0) {
-                                        BrightnessController.increaseBrightness(
-                                            it,
-                                            playerState.currentBrightness,
-                                            onBrightnessChanged = { newBrightness ->
-                                                viewModel.onEvent(PlayerEvent.ChangeBrightness(newBrightness))
-                                            }
-                                        )
-                                    } else {
-                                        BrightnessController.decreaseBrightness(
-                                            it,
-                                            playerState.currentBrightness,
-                                            onBrightnessChanged = { newBrightness ->
-                                                viewModel.onEvent(PlayerEvent.ChangeBrightness(newBrightness))
-                                            }
-                                        )
+                                var brightness = playerState.currentBrightness
+                                if (change.position.y - initialOffset < 0) {
+                                    if (brightness < playerState.maxLevel) {
+                                        brightness++
+                                        val level = 1.0f / playerState.maxLevel * brightness
+                                        activity?.setBrightness(level)
+                                    }
+                                } else {
+                                    if (brightness > 0) {
+                                        brightness--
+                                        val level = 1.0f / playerState.maxLevel * brightness
+                                        activity?.setBrightness(level)
                                     }
                                 }
+                                viewModel.onEvent(PlayerEvent.ChangeBrightness(brightness))
                             }
                             initialOffset = change.position.y
                         }

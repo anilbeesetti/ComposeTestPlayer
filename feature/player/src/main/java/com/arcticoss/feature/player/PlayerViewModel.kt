@@ -72,7 +72,7 @@ class PlayerViewModel @Inject constructor(
     fun onEvent(event: PlayerEvent) {
         when(event) {
             is PlayerEvent.ChangeBrightness -> _playerState.value = playerState.value.copy(currentBrightness = event.value)
-            is PlayerEvent.ChangeVolumeLevel -> _playerState.value = playerState.value.copy(currentVolumeLevel = event.value)
+            is PlayerEvent.ChangeVolumeLevel -> _playerState.value = playerState.value.copy(currentVolume = event.value)
             is PlayerEvent.ChangeOrientation -> _playerState.value = playerState.value.copy(screenOrientation = event.value)
         }
     }
@@ -82,10 +82,11 @@ data class PlayerState(
     val currentPosition: Long = 0,
     val currentMediaItemDuration: Long = 0,
     val currentBrightness: Int = 5,
-    val currentVolumeLevel: Int = 0,
+    val currentVolume: Int = 0,
     val screenOrientation: Int = 1,
     val isPlaying: Boolean = true,
-    val playWhenReady: Boolean = true
+    val playWhenReady: Boolean = true,
+    val maxLevel: Int = 25
 )
 
 
