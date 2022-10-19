@@ -17,7 +17,7 @@ private const val TAG = "VideoFilesViewModel"
 @HiltViewModel
 class MediaScreenViewModel @Inject constructor(
     private val mediaRepository: IMediaRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _mediaUiState = MutableStateFlow(MediaUiState())
     val mediaUiState = _mediaUiState.asStateFlow()
@@ -39,15 +39,14 @@ class MediaScreenViewModel @Inject constructor(
         if (syncMediaJob == null) {
             syncMediaJob = viewModelScope.launch {
                 mediaRepository.syncMedia()
+                _mediaUiState.value = _mediaUiState.value.copy(isLoading = false)
             }
-        } else {
-            if (!syncMediaJob!!.isActive) {
-                syncMediaJob = viewModelScope.launch {
-                    mediaRepository.syncMedia()
-                }
+        } else if (!syncMediaJob!!.isActive) {
+            syncMediaJob = viewModelScope.launch {
+                mediaRepository.syncMedia()
+                _mediaUiState.value = _mediaUiState.value.copy(isLoading = false)
             }
         }
-        _mediaUiState.value = _mediaUiState.value.copy(isLoading = false)
     }
 }
 

@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.media.ui.mediascreen.MediaScreenViewModel
 import com.arcticoss.nextplayer.player.NextPlayerActivity
 
+private const val TAG = "ShowVideoFiles"
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -31,6 +32,7 @@ fun ShowVideoFiles(
     val media by viewModel.mediaState.collectAsStateWithLifecycle()
     val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
     if (mediaUiState.isLoading && media.isEmpty()) {
         Column(
             modifier = Modifier
@@ -41,34 +43,33 @@ fun ShowVideoFiles(
         ) {
             CircularProgressIndicator()
         }
+    } else if (media.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
+        }
     } else {
-        if (media.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
+        LazyColumn(
+            contentPadding = contentPadding,
+            modifier = modifier.fillMaxWidth()
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(5.dp))
             }
-        } else {
-            LazyColumn(
-                contentPadding = contentPadding,
-                modifier = modifier.fillMaxWidth()
-            ) {
-                item {
-                    Spacer(modifier = Modifier.height(5.dp))
-                }
-                items(media, key = {it.id}) { mediaItem ->
-                    MediaItem(
-                        mediaItem = mediaItem,
-                        onClick = { startPlayerActivity(context, mediaItem.path) }
-                    )
-                }
+            items(media, key = { it.id }) { mediaItem ->
+                MediaListItem(
+                    mediaItem = mediaItem,
+                    onClick = { startPlayerActivity(context, mediaItem.path) }
+                )
             }
         }
     }
+
 }
 
 fun startPlayerActivity(context: Context, path: String) {
