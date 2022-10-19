@@ -47,13 +47,13 @@ fun MediaListItem(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
             Surface(
                 color = MaterialTheme.colorScheme.secondaryContainer,
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier
-                    .widthIn(max = 500.dp)
+                    .widthIn(max = 420.dp)
                     .fillMaxWidth(0.45f)
                     .aspectRatio(16f / 10f)
             ) {
