@@ -35,6 +35,7 @@ class MediaScreenViewModel @Inject constructor(
 
     fun syncMedia() {
         Log.d(TAG, "syncMedia: syncing...")
+        _mediaUiState.value = _mediaUiState.value.copy(isLoading = true)
         if (syncMediaJob == null) {
             syncMediaJob = viewModelScope.launch {
                 mediaRepository.syncMedia()

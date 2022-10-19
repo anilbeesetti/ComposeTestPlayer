@@ -31,7 +31,7 @@ fun ShowVideoFiles(
     val media by viewModel.mediaState.collectAsStateWithLifecycle()
     val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    if (mediaUiState.isLoading) {
+    if (mediaUiState.isLoading && media.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

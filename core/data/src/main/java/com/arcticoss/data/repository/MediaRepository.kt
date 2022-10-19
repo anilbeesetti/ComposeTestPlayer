@@ -17,10 +17,10 @@ import com.arcticoss.mediainfo.MediaInfoBuilder
 import com.arcticoss.model.MediaFolder
 import com.arcticoss.model.MediaItem
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
@@ -48,9 +48,32 @@ class MediaRepository @Inject constructor(
 
     override suspend fun syncMedia() = withContext(Dispatchers.IO) {
         syncDatabase()
-        syncFolders()
-        syncVideos()
+        syncFoldersAndVideos()
         syncThumbnails()
+    }
+
+    private suspend fun syncFoldersAndVideos() {
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            storageDir.getFoldersAndVideos().collect { file ->
+                if (file.isDirectory) {
+                    syncFolder(file)
+                } else {
+                    launch { syncVideoFile(file) }
+                }
+            }
+        }
+        job.join()
+    }
+
+    private suspend fun syncFolder(folder: File) {
+        if (!folderDao.isExist(folder.path)) {
+            folderDao.insert(
+                FolderEntity(
+                    name = folder.name,
+                    path = folder.path
+                )
+            )
+        }
     }
 
     private suspend fun syncFolders() {
@@ -66,24 +89,30 @@ class MediaRepository @Inject constructor(
         }
     }
 
+
+    private suspend fun syncVideoFile(videoFile: File) {
+        if (!mediaItemDao.isExist(videoFile.path)) {
+            val mediaInfoBuilder = MediaInfoBuilder()
+            val mediaInfo = mediaInfoBuilder.from(videoFile).build()
+
+            val mediaItemId = mediaItemDao.insert(
+                mediaInfo.asMediaItemEntity(folderDao.id(videoFile.parentFile!!.path))
+            )
+            mediaInfo.videoStreams.forEach {
+                videoTrackDao.insert(it.asVideoTrackEntity(mediaItemId))
+            }
+            mediaInfo.audioStreams.forEach {
+                audioTrackDao.insert(it.asAudioTrackEntity(mediaItemId))
+            }
+            mediaInfo.subtitleStreams.forEach {
+                subtitleTrackDao.insert(it.asSubtitleTrackEntity(mediaItemId))
+            }
+        }
+    }
+
     private suspend fun syncVideos() {
         storageDir.getVideos().collect { file ->
-            val mediaInfoBuilder = MediaInfoBuilder()
-            if (!mediaItemDao.isExist(file.path)) {
-                val mediaInfo = mediaInfoBuilder.from(file).build()
-                val mediaItemId = mediaItemDao.insert(
-                    mediaInfo.asMediaItemEntity(folderDao.id(file.parentFile!!.path))
-                )
-                mediaInfo.videoStreams.forEach {
-                    videoTrackDao.insert(it.asVideoTrackEntity(mediaItemId))
-                }
-                mediaInfo.audioStreams.forEach {
-                    audioTrackDao.insert(it.asAudioTrackEntity(mediaItemId))
-                }
-                mediaInfo.subtitleStreams.forEach {
-                    subtitleTrackDao.insert(it.asSubtitleTrackEntity(mediaItemId))
-                }
-            }
+            syncVideoFile(file)
         }
     }
 

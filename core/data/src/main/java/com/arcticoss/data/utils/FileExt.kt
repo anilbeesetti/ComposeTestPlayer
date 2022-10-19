@@ -52,3 +52,19 @@ fun File.getFolders(): List<File> {
     }
     return folders.toList()
 }
+
+
+fun File.getFoldersAndVideos() = flow {
+    val folderStack: Stack<File> = Stack()
+    folderStack.add(this@getFoldersAndVideos)
+    while (folderStack.isNotEmpty()) {
+        for (file in folderStack.pop().listFiles() ?: emptyArray()) {
+            if (file.isDirectory) {
+                folderStack.add(file)
+                emit(file)
+            } else if (file.isVideoFile()) {
+                emit(file)
+            }
+        }
+    }
+}
