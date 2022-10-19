@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.arcticoss.nextplayer.media.ui.mediascreen.MediaScreen
-import com.arcticoss.nextplayer.media.ui.theme.NextPlayerTheme
+import com.arcticoss.feature.media.MediaScreen
+import com.arcticoss.nextplayer.ui.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 
