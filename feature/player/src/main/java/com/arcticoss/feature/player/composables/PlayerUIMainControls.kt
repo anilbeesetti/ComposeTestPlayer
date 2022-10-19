@@ -1,8 +1,5 @@
 package com.arcticoss.feature.player.composables
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,48 +16,38 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PlayerUIMainControls(
-    show: Boolean,
-    enterTransition: EnterTransition,
-    exitTransition: ExitTransition,
     playPauseIcon: ImageVector,
     onPlayPauseClick: () -> Unit,
     onSkipNextClick: () -> Unit,
     onSkipPreviousClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AnimatedVisibility(
-        visible = show,
-        enter = enterTransition,
-        exit = exitTransition,
+    Row(
         modifier = modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconRippleButton(onClick = onSkipPreviousClick) {
-                Icon(
-                    imageVector = Icons.Rounded.SkipPrevious,
-                    contentDescription = "",
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-            IconRippleButton(onClick = { onPlayPauseClick() }) {
-                Icon(
-                    imageVector = playPauseIcon,
-                    contentDescription = "",
-                    modifier = Modifier.size(48.dp)
-                )
-            }
-            IconRippleButton(onClick = onSkipNextClick) {
-                Icon(
-                    imageVector = Icons.Rounded.SkipNext,
-                    contentDescription = "",
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+        IconRippleButton(onClick = onSkipPreviousClick) {
+            Icon(
+                imageVector = Icons.Rounded.SkipPrevious,
+                contentDescription = "",
+                modifier = Modifier.size(32.dp)
+            )
+        }
+        IconRippleButton(onClick = { onPlayPauseClick() }) {
+            Icon(
+                imageVector = playPauseIcon,
+                contentDescription = "",
+                modifier = Modifier.size(48.dp)
+            )
+        }
+        IconRippleButton(onClick = onSkipNextClick) {
+            Icon(
+                imageVector = Icons.Rounded.SkipNext,
+                contentDescription = "",
+                modifier = Modifier.size(32.dp)
+            )
         }
     }
 }

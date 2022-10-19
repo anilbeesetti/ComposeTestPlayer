@@ -16,6 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -41,8 +43,6 @@ fun NextPlayerUI(
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
-    val enterTransition = fadeIn(animationSpec = tween(100))
-    val exitTransition = fadeOut(animationSpec = tween(100))
     val context = LocalContext.current
     val player = viewModel.player as ExoPlayer
     val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -60,59 +60,62 @@ fun NextPlayerUI(
         }
     }
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
     ) {
-        AnimatedVisibility(
-            visible = playerUiState.showUi,
-            enter = enterTransition,
-            exit = exitTransition
-        ) {
-            Column(
+        if(playerUiState.showUi) {
+            PlayerUIHeader(
+                title = "TODO",
+                onBackPressed = onBackPressed,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .padding(top = 10.dp),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                PlayerUIHeader(title = "TODO", onBackPressed = onBackPressed)
-                PlayerUIFooter(
-                    duration = playerState.currentMediaItemDuration,
-                    currentPosition = playerState.currentPosition,
-                    onSeek = {
-                        player.seekTo(it.toLong())
+                    .systemBarsPadding()
+                    .align(Alignment.TopCenter)
+            )
+            PlayerUIMainControls(
+                playPauseIcon = if (playerState.playWhenReady) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                onPlayPauseClick = {
+                    if (player.playWhenReady) {
+                        player.pause()
+                    } else {
+                        player.play()
                     }
-                )
-            }
+                },
+                onSkipNextClick = { player.seekToNext() },
+                onSkipPreviousClick = { player.seekToPrevious() },
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+            PlayerUIFooter(
+                duration = playerState.currentMediaItemDuration,
+                currentPosition = playerState.currentPosition,
+                onSeek = {
+                    player.seekTo(it.toLong())
+                },
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .align(Alignment.BottomCenter)
+            )
         }
-        VerticalSwipeMediaControls(
-            showVolumeBar = playerUiState.showVolumeBar,
-            showBrightnessBar = playerUiState.showBrightnessBar,
-            volumeLevel = playerState.currentVolumeLevel,
-            brightness = playerState.currentBrightness,
-            maxVolumeLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
-            maxBrightness = BrightnessController.MAX_BRIGHTNESS,
-            modifier = Modifier
-                .heightIn(max = 500.dp)
-                .align(Alignment.Center),
-            dismissBrightnessBar = { viewModel.onUiEvent(PlayerUiEvent.ShowBrightnessBar(false)) },
-            dismissVolumeBar = { viewModel.onUiEvent(PlayerUiEvent.ShowVolumeBar(false)) }
-        )
-        PlayerUIMainControls(
-            show = playerUiState.showUi,
-            playPauseIcon = if (playerState.playWhenReady) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-            onPlayPauseClick = {
-                if (player.playWhenReady) {
-                    player.pause()
-                } else {
-                    player.play()
-                }
-            },
-            enterTransition = enterTransition,
-            exitTransition = exitTransition,
-            onSkipNextClick = { player.seekToNext() },
-            onSkipPreviousClick = { player.seekToPrevious() },
-            modifier = Modifier.align(Alignment.Center)
-        )
+        if (playerUiState.showVolumeBar) {
+            AudioAdjustmentBar(
+                volumeLevel = playerState.currentVolumeLevel,
+                maxVolumeLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                modifier = Modifier
+                    .fillMaxHeight(0.6f)
+                    .padding(20.dp)
+                    .align(Alignment.CenterStart)
+            )
+        }
+        if (playerUiState.showBrightnessBar) {
+            BrightnessAdjustmentBar(
+                brightness = playerState.currentBrightness,
+                maxBrightness = BrightnessController.MAX_BRIGHTNESS,
+                modifier = Modifier
+                    .fillMaxHeight(0.6f)
+                    .padding(20.dp)
+                    .align(Alignment.CenterEnd)
+            )
+        }
     }
 }
 

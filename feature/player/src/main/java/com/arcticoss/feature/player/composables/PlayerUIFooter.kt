@@ -15,11 +15,12 @@ import com.arcticoss.feature.player.utils.TimeUtils
 fun PlayerUIFooter(
     duration: Long,
     currentPosition: Long,
-    onSeek: (Float) -> Unit
+    onSeek: (Float) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
     ) {
