@@ -1,4 +1,4 @@
-package com.arcticoss.feature.player.composables
+package com.arcticoss.feature.player.presentation.composables
 
 import android.content.pm.ActivityInfo
 import android.util.Log

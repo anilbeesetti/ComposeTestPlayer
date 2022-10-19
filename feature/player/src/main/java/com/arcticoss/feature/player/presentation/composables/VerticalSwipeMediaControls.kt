@@ -1,4 +1,4 @@
-package com.arcticoss.feature.player.composables
+package com.arcticoss.feature.player.presentation.composables
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.LightMode

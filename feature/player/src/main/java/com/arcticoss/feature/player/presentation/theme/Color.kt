@@ -1,4 +1,4 @@
-package com.arcticoss.feature.player.ui.theme
+package com.arcticoss.feature.player.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

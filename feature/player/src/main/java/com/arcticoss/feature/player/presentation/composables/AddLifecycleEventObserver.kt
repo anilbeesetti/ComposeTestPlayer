@@ -1,4 +1,4 @@
-package com.arcticoss.feature.player.composables
+package com.arcticoss.feature.player.presentation.composables
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

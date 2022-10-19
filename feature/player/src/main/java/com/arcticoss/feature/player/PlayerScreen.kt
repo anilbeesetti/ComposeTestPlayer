@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.feature.player.composables.NextExoPlayer
-import com.arcticoss.feature.player.composables.NextPlayerUI
+import com.arcticoss.feature.player.presentation.composables.NextExoPlayer
+import com.arcticoss.feature.player.presentation.composables.NextPlayerUI
 import com.arcticoss.feature.player.utils.*
 import com.google.android.exoplayer2.ExoPlayer
 import kotlin.math.abs

@@ -1,4 +1,4 @@
-package com.arcticoss.feature.player.composables
+package com.arcticoss.feature.player.presentation.composables
 
 import android.content.Context
 import android.media.AudioManager
@@ -38,7 +38,6 @@ fun NextPlayerUI(
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val player = viewModel.player as ExoPlayer
-    val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     LaunchedEffect(key1 = playerUiState.showUi, key2 = playerState.isPlaying) {
         if (playerUiState.showUi) {
@@ -52,6 +51,7 @@ fun NextPlayerUI(
             context.findActivity()?.hideSystemBars()
         }
     }
+
     Box(
         modifier = modifier
             .fillMaxSize()

@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.arcticoss.feature.player.ui.theme.NextPlayerTheme
+import com.arcticoss.feature.player.presentation.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
