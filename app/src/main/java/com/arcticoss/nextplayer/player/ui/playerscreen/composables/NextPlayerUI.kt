@@ -13,6 +13,7 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,7 +29,7 @@ import com.arcticoss.nextplayer.player.utils.hideSystemBars
 import com.arcticoss.nextplayer.player.utils.showSystemBars
 import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.delay
-import java.io.File
+
 
 
 private const val TAG = "NextPlayerUI"

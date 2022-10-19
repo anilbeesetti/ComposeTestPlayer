@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,9 +47,8 @@ fun MediaItem(
                 .aspectRatio((1.5).toFloat())
         ) {
             mediaItem.thumbnailPath?.let {
-                val imgBitmap = BitmapFactory.decodeFile(it)
                 Image(
-                    bitmap = imgBitmap.asImageBitmap(),
+                    bitmap = remember { BitmapFactory.decodeFile(it).asImageBitmap() },
                     contentDescription = "" ,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()

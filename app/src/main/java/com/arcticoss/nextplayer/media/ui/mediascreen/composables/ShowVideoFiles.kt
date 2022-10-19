@@ -60,7 +60,7 @@ fun ShowVideoFiles(
                 item {
                     Spacer(modifier = Modifier.height(5.dp))
                 }
-                items(media) { mediaItem ->
+                items(media, key = {it.id}) { mediaItem ->
                     MediaItem(
                         mediaItem = mediaItem,
                         onClick = { startPlayerActivity(context, mediaItem.path) }
