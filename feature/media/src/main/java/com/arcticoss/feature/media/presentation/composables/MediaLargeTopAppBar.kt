@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media.composables
+package com.arcticoss.feature.media.presentation.composables
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons

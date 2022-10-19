@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media.composables
+package com.arcticoss.feature.media.presentation.composables
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalLifecycleOwner

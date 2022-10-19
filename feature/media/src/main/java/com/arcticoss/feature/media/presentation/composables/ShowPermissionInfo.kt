@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media.composables
+package com.arcticoss.feature.media.presentation.composables
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*

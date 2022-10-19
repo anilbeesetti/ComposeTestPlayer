@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import com.arcticoss.feature.media.composables.*
+import com.arcticoss.feature.media.presentation.composables.*
 
 
 @OptIn(ExperimentalMaterial3Api::class)
