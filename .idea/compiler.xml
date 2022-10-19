@@ -2,7 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.7">
-      <module name="NextPlayer.feature.mediaext" target="11" />
+      <module name="NextPlayer.feature.media" target="11" />
+      <module name="NextPlayer.feature.player" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
