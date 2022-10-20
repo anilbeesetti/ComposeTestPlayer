@@ -9,7 +9,6 @@ import com.arcticoss.feature.media.domain.MediaItemStreamUseCase
 import com.arcticoss.model.MediaFolder
 import com.arcticoss.model.MediaItem
 import com.arcticoss.model.MediaPreferences
-import com.arcticoss.model.PlayerUiPreferences
 import com.arcticoss.nextplayer.core.datastore.datasource.MediaPreferencesDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -38,19 +37,25 @@ class MediaScreenViewModel @Inject constructor(
             initialValue = MediaPreferences()
         )
 
-    val mediaItemList: StateFlow<List<MediaItem>> = mediaItemStreamUseCase(mediaPreferenceFlow.value.showHidden)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    val mediaItemList: StateFlow<List<MediaItem>> = mediaItemStreamUseCase(
+        mediaPreferenceFlow.value.showHidden,
+        mediaPreferenceFlow.value.sortBy,
+        mediaPreferenceFlow.value.sortOrder
+    ).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
-    val mediaFolderList: StateFlow<List<MediaFolder>> = mediaFolderStreamUseCase(mediaPreferenceFlow.value.showHidden)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    val mediaFolderList: StateFlow<List<MediaFolder>> = mediaFolderStreamUseCase(
+        mediaPreferenceFlow.value.showHidden,
+        mediaPreferenceFlow.value.sortBy,
+        mediaPreferenceFlow.value.sortOrder
+    ).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
 
     private var syncMediaJob: Job? = null
