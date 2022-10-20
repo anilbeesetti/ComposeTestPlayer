@@ -7,9 +7,11 @@ import androidx.datastore.dataStoreFile
 import com.arcticoss.model.PlayerUiPreferences
 import com.arcticoss.nextplayer.core.datastore.PlayerUiPreferencesSerializer
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 
 private const val PLAYER_UI_PREFERENCES_DATASTORE_FILE = "player_ui_preferences.json"
@@ -19,6 +21,8 @@ private const val PLAYER_UI_PREFERENCES_DATASTORE_FILE = "player_ui_preferences.
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
 
+    @Provides
+    @Singleton
     fun providePlayerUiPreferencesDataStore(
         @ApplicationContext appContext: Context
     ): DataStore<PlayerUiPreferences> {
