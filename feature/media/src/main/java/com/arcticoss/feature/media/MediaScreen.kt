@@ -12,7 +12,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import com.arcticoss.feature.media.composables.*
 import com.arcticoss.feature.media.presentation.composables.*
 
 
@@ -24,7 +23,7 @@ fun MediaScreen(
     val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner,) { event ->
+    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
         if (event == Lifecycle.Event.ON_START) {
             viewModel.syncMedia()
         }
@@ -36,7 +35,7 @@ fun MediaScreen(
             MediaLargeTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.next_player),
+                        text = stringResource(id = R.string.all_videos),
                         modifier = Modifier.padding()
                     )
                 },
