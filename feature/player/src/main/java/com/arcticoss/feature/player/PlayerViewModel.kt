@@ -68,11 +68,10 @@ class PlayerViewModel @Inject constructor(
         )
     }
 
-    fun updatePlayerState(state: PlayerState) {
-        _playerState.value = state
-    }
-
-    fun updatePlayPosition(position: Long) {
+    fun setVolume(level: Int) {
+        _playerState.value = playerState.value.copy(
+            volumeLevel = level
+        )
     }
 
     fun onUiEvent(event: PlayerUiEvent) {
@@ -85,14 +84,6 @@ class PlayerViewModel @Inject constructor(
 
     fun onEvent(event: PlayerEvent) {
         when(event) {
-            is PlayerEvent.ChangeBrightness -> {
-                if (event.value in 1..24) {
-                    viewModelScope.launch {
-                        playerPreferencesDataSource.updateUiPref(uiPreferencesFlow.value.copy(brightnessLevel = event.value))
-                    }
-                }
-            }
-            is PlayerEvent.ChangeVolumeLevel -> _playerState.value = playerState.value.copy(currentVolume = event.value)
             is PlayerEvent.ChangeOrientation -> _playerState.value = playerState.value.copy(screenOrientation = event.value)
             PlayerEvent.IncreaseBrightness -> {
                 val brightness = uiPreferencesFlow.value.brightnessLevel
@@ -114,6 +105,18 @@ class PlayerViewModel @Inject constructor(
                     }
                 }
             }
+            PlayerEvent.IncreaseVolume -> {
+                val volume = playerState.value.volumeLevel
+                if (volume < 25) {
+                    _playerState.value = playerState.value.copy(volumeLevel = volume + 1)
+                }
+            }
+            PlayerEvent.DecreaseVolume -> {
+                val volume = playerState.value.volumeLevel
+                if (volume > 0) {
+                    _playerState.value = playerState.value.copy(volumeLevel = volume - 1)
+                }
+            }
         }
     }
 }
@@ -122,7 +125,7 @@ data class PlayerState(
     val currentPosition: Long = 0,
     val currentMediaItemDuration: Long = 0,
     val currentBrightness: Int = 5,
-    val currentVolume: Int = 0,
+    val volumeLevel: Int = 0,
     val screenOrientation: Int = 1,
     val isPlaying: Boolean = true,
     val playWhenReady: Boolean = true,
@@ -145,7 +148,7 @@ sealed class PlayerUiEvent {
 sealed interface PlayerEvent {
     object IncreaseBrightness: PlayerEvent
     object DecreaseBrightness: PlayerEvent
-    data class ChangeBrightness(val value: Int): PlayerEvent
-    data class ChangeVolumeLevel(val value: Int): PlayerEvent
+    object IncreaseVolume: PlayerEvent
+    object DecreaseVolume: PlayerEvent
     data class ChangeOrientation(val value: Int): PlayerEvent
 }

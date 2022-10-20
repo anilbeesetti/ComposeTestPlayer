@@ -2,6 +2,7 @@ package com.arcticoss.feature.player
 
 import android.content.Context.AUDIO_SERVICE
 import android.media.AudioManager
+import android.util.Log
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -96,11 +99,10 @@ fun PlayerScreen(
                         if (isOffsetEnough || isDragEnough) {
                             if (playerUiState.showVolumeBar) {
                                 if (change.position.y - initialOffset < 0) {
-                                    audioManager.increaseVolume()
+                                    viewModel.increaseVolume()
                                 } else {
-                                    audioManager.decreaseVolume()
+                                    viewModel.decreaseVolume()
                                 }
-                                viewModel.onEvent(PlayerEvent.ChangeVolumeLevel(audioManager.getVolume()))
                             }
                             if (playerUiState.showBrightnessBar) {
                                 if (change.position.y - initialOffset < 0) {

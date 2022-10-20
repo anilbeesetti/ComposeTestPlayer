@@ -1,7 +1,5 @@
 package com.arcticoss.feature.player.presentation.composables
 
-import android.content.Context
-import android.media.AudioManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
@@ -92,7 +90,7 @@ fun NextPlayerUI(
         }
         if (playerUiState.showVolumeBar) {
             AudioAdjustmentBar(
-                volumeLevel = playerState.currentVolume,
+                volumeLevel = playerState.volumeLevel,
                 maxVolumeLevel = playerState.maxLevel,
                 modifier = Modifier
                     .fillMaxHeight(0.6f)
