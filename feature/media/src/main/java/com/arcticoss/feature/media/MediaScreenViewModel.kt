@@ -8,6 +8,9 @@ import com.arcticoss.feature.media.domain.MediaFolderStreamUseCase
 import com.arcticoss.feature.media.domain.MediaItemStreamUseCase
 import com.arcticoss.model.MediaFolder
 import com.arcticoss.model.MediaItem
+import com.arcticoss.model.MediaPreferences
+import com.arcticoss.model.PlayerUiPreferences
+import com.arcticoss.nextplayer.core.datastore.datasource.MediaPreferencesDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -21,20 +24,28 @@ private const val TAG = "VideoFilesViewModel"
 class MediaScreenViewModel @Inject constructor(
     private val mediaRepository: IMediaRepository,
     private val mediaItemStreamUseCase: MediaItemStreamUseCase,
-    private val mediaFolderStreamUseCase: MediaFolderStreamUseCase
+    private val mediaFolderStreamUseCase: MediaFolderStreamUseCase,
+    private val mediaPreferencesDataSource: MediaPreferencesDataSource
 ) : ViewModel() {
 
     private val _mediaUiState = MutableStateFlow(MediaUiState())
     val mediaUiState = _mediaUiState.asStateFlow()
 
-    val mediaItemList: StateFlow<List<MediaItem>> = mediaItemStreamUseCase(false)
+    private val mediaPreferenceFlow = mediaPreferencesDataSource.mediaPrefStream
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = MediaPreferences()
+        )
+
+    val mediaItemList: StateFlow<List<MediaItem>> = mediaItemStreamUseCase(mediaPreferenceFlow.value.showHidden)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
 
-    val mediaFolderList: StateFlow<List<MediaFolder>> = mediaFolderStreamUseCase(false)
+    val mediaFolderList: StateFlow<List<MediaFolder>> = mediaFolderStreamUseCase(mediaPreferenceFlow.value.showHidden)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
