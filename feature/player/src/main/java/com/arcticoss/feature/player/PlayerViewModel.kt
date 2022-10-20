@@ -3,11 +3,17 @@ package com.arcticoss.feature.player
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.arcticoss.model.PlayerUiPreferences
+import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "NextPlayerViewModel"
@@ -15,8 +21,16 @@ private const val TAG = "NextPlayerViewModel"
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val playerPreferencesDataSource: PlayerPreferencesDataSource,
     val player: Player
 ) : ViewModel() {
+
+    val uiPreferencesFlow = playerPreferencesDataSource.uiPrefStream
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = PlayerUiPreferences()
+        )
 
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
@@ -71,9 +85,35 @@ class PlayerViewModel @Inject constructor(
 
     fun onEvent(event: PlayerEvent) {
         when(event) {
-            is PlayerEvent.ChangeBrightness -> _playerState.value = playerState.value.copy(currentBrightness = event.value)
+            is PlayerEvent.ChangeBrightness -> {
+                if (event.value in 1..24) {
+                    viewModelScope.launch {
+                        playerPreferencesDataSource.updateUiPref(uiPreferencesFlow.value.copy(brightnessLevel = event.value))
+                    }
+                }
+            }
             is PlayerEvent.ChangeVolumeLevel -> _playerState.value = playerState.value.copy(currentVolume = event.value)
             is PlayerEvent.ChangeOrientation -> _playerState.value = playerState.value.copy(screenOrientation = event.value)
+            PlayerEvent.IncreaseBrightness -> {
+                val brightness = uiPreferencesFlow.value.brightnessLevel
+                if (brightness < 25) {
+                    viewModelScope.launch {
+                        playerPreferencesDataSource.updateUiPref(
+                            uiPreferencesFlow.value.copy(brightnessLevel = brightness + 1)
+                        )
+                    }
+                }
+            }
+            PlayerEvent.DecreaseBrightness -> {
+                val brightness = uiPreferencesFlow.value.brightnessLevel
+                if (brightness > 0) {
+                    viewModelScope.launch {
+                        playerPreferencesDataSource.updateUiPref(
+                            uiPreferencesFlow.value.copy(brightnessLevel = brightness - 1)
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -103,6 +143,8 @@ sealed class PlayerUiEvent {
 }
 
 sealed interface PlayerEvent {
+    object IncreaseBrightness: PlayerEvent
+    object DecreaseBrightness: PlayerEvent
     data class ChangeBrightness(val value: Int): PlayerEvent
     data class ChangeVolumeLevel(val value: Int): PlayerEvent
     data class ChangeOrientation(val value: Int): PlayerEvent

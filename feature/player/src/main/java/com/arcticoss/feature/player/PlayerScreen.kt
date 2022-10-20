@@ -1,6 +1,5 @@
 package com.arcticoss.feature.player
 
-import android.app.Activity
 import android.content.Context.AUDIO_SERVICE
 import android.media.AudioManager
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -104,21 +103,11 @@ fun PlayerScreen(
                                 viewModel.onEvent(PlayerEvent.ChangeVolumeLevel(audioManager.getVolume()))
                             }
                             if (playerUiState.showBrightnessBar) {
-                                var brightness = playerState.currentBrightness
                                 if (change.position.y - initialOffset < 0) {
-                                    if (brightness < playerState.maxLevel) {
-                                        brightness++
-                                        val level = 1.0f / playerState.maxLevel * brightness
-                                        activity?.setBrightness(level)
-                                    }
+                                    viewModel.onEvent(PlayerEvent.IncreaseBrightness)
                                 } else {
-                                    if (brightness > 0) {
-                                        brightness--
-                                        val level = 1.0f / playerState.maxLevel * brightness
-                                        activity?.setBrightness(level)
-                                    }
+                                    viewModel.onEvent(PlayerEvent.DecreaseBrightness)
                                 }
-                                viewModel.onEvent(PlayerEvent.ChangeBrightness(brightness))
                             }
                             initialOffset = change.position.y
                         }

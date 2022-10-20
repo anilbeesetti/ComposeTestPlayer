@@ -10,7 +10,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,8 +17,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.feature.player.PlayerViewModel
-import com.arcticoss.feature.player.utils.findActivity
-import com.arcticoss.feature.player.utils.setBrightness
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
@@ -38,7 +35,6 @@ fun NextExoPlayer(
     changeOrientation: (requestedOrientation: Int) -> Unit
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val exoPlayer = viewModel.player as ExoPlayer
 
     LaunchedEffect(Unit) {
@@ -61,11 +57,6 @@ fun NextExoPlayer(
                 }
                 Lifecycle.Event.ON_RESUME -> {
                     exoPlayer.playWhenReady = playerState.playWhenReady
-                }
-                Lifecycle.Event.ON_START -> {
-                    val activity = context.findActivity()
-                    val level = 1.0f / playerState.maxLevel * playerState.currentBrightness
-                    activity?.setBrightness(level)
                 }
                 else -> {}
             }

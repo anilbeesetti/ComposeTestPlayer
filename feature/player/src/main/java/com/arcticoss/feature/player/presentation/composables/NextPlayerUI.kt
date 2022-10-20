@@ -36,6 +36,7 @@ fun NextPlayerUI(
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
+    val uiPreferences by viewModel.uiPreferencesFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val player = viewModel.player as ExoPlayer
 
@@ -101,7 +102,7 @@ fun NextPlayerUI(
         }
         if (playerUiState.showBrightnessBar) {
             BrightnessAdjustmentBar(
-                brightness = playerState.currentBrightness,
+                brightness = uiPreferences.brightnessLevel,
                 maxBrightness = playerState.maxLevel,
                 modifier = Modifier
                     .fillMaxHeight(0.6f)
