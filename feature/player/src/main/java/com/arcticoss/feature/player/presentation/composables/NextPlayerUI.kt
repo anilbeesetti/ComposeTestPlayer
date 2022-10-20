@@ -1,7 +1,5 @@
 package com.arcticoss.feature.player.presentation.composables
 
-import android.content.Context
-import android.media.AudioManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
@@ -36,6 +34,7 @@ fun NextPlayerUI(
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
+    val uiPreferences by viewModel.uiPreferencesFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val player = viewModel.player as ExoPlayer
 
@@ -56,7 +55,7 @@ fun NextPlayerUI(
         modifier = modifier
             .fillMaxSize()
     ) {
-        if(playerUiState.showUi) {
+        if (playerUiState.showUi) {
             PlayerUIHeader(
                 title = "TODO",
                 onBackPressed = onBackPressed,
@@ -91,7 +90,7 @@ fun NextPlayerUI(
         }
         if (playerUiState.showVolumeBar) {
             AudioAdjustmentBar(
-                volumeLevel = playerState.currentVolume,
+                volumeLevel = playerState.volumeLevel,
                 maxVolumeLevel = playerState.maxLevel,
                 modifier = Modifier
                     .fillMaxHeight(0.6f)
@@ -101,7 +100,7 @@ fun NextPlayerUI(
         }
         if (playerUiState.showBrightnessBar) {
             BrightnessAdjustmentBar(
-                brightness = playerState.currentBrightness,
+                brightness = uiPreferences.brightnessLevel,
                 maxBrightness = playerState.maxLevel,
                 modifier = Modifier
                     .fillMaxHeight(0.6f)

@@ -3,11 +3,17 @@ package com.arcticoss.feature.player
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.arcticoss.model.PlayerUiPreferences
+import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "NextPlayerViewModel"
@@ -15,8 +21,16 @@ private const val TAG = "NextPlayerViewModel"
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val playerPreferencesDataSource: PlayerPreferencesDataSource,
     val player: Player
 ) : ViewModel() {
+
+    val uiPreferencesFlow = playerPreferencesDataSource.uiPrefStream
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = PlayerUiPreferences()
+        )
 
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
@@ -54,26 +68,30 @@ class PlayerViewModel @Inject constructor(
         )
     }
 
-    fun updatePlayerState(state: PlayerState) {
-        _playerState.value = state
-    }
-
-    fun updatePlayPosition(position: Long) {
-    }
-
     fun onUiEvent(event: PlayerUiEvent) {
-        when(event) {
-            is PlayerUiEvent.ShowUi -> _playerUiState.value = playerUiState.value.copy(showUi = event.value)
-            is PlayerUiEvent.ShowBrightnessBar -> _playerUiState.value = playerUiState.value.copy(showBrightnessBar = event.value)
-            is PlayerUiEvent.ShowVolumeBar -> _playerUiState.value = playerUiState.value.copy(showVolumeBar = event.value)
+        when (event) {
+            is PlayerUiEvent.ShowUi -> _playerUiState.value =
+                playerUiState.value.copy(showUi = event.value)
+            is PlayerUiEvent.ShowVolumeBar -> _playerUiState.value =
+                playerUiState.value.copy(showVolumeBar = event.value)
+            is PlayerUiEvent.ShowBrightnessBar -> _playerUiState.value =
+                playerUiState.value.copy(showBrightnessBar = event.value)
         }
     }
 
     fun onEvent(event: PlayerEvent) {
-        when(event) {
-            is PlayerEvent.ChangeBrightness -> _playerState.value = playerState.value.copy(currentBrightness = event.value)
-            is PlayerEvent.ChangeVolumeLevel -> _playerState.value = playerState.value.copy(currentVolume = event.value)
-            is PlayerEvent.ChangeOrientation -> _playerState.value = playerState.value.copy(screenOrientation = event.value)
+        when (event) {
+            is PlayerEvent.ChangeOrientation -> _playerState.value =
+                playerState.value.copy(screenOrientation = event.value)
+            is PlayerEvent.SetVolume -> _playerState.value =
+                playerState.value.copy(volumeLevel = event.value)
+            is PlayerEvent.SetBrightness -> {
+                viewModelScope.launch {
+                    playerPreferencesDataSource.updateUiPref(
+                        uiPreferencesFlow.value.copy(brightnessLevel = event.value)
+                    )
+                }
+            }
         }
     }
 }
@@ -82,7 +100,7 @@ data class PlayerState(
     val currentPosition: Long = 0,
     val currentMediaItemDuration: Long = 0,
     val currentBrightness: Int = 5,
-    val currentVolume: Int = 0,
+    val volumeLevel: Int = 0,
     val screenOrientation: Int = 1,
     val isPlaying: Boolean = true,
     val playWhenReady: Boolean = true,
@@ -93,17 +111,21 @@ data class PlayerState(
 data class PlayerUiState(
     val showUi: Boolean = false,
     val showBrightnessBar: Boolean = false,
-    val showVolumeBar: Boolean = false
+    val showVolumeBar: Boolean = false,
 )
 
 sealed class PlayerUiEvent {
-    data class ShowUi(val value: Boolean): PlayerUiEvent()
-    data class ShowBrightnessBar(val value: Boolean): PlayerUiEvent()
-    data class ShowVolumeBar(val value: Boolean): PlayerUiEvent()
+    data class ShowUi(val value: Boolean) : PlayerUiEvent()
+    data class ShowBrightnessBar(val value: Boolean) : PlayerUiEvent()
+    data class ShowVolumeBar(val value: Boolean) : PlayerUiEvent()
 }
 
 sealed interface PlayerEvent {
-    data class ChangeBrightness(val value: Int): PlayerEvent
-    data class ChangeVolumeLevel(val value: Int): PlayerEvent
-    data class ChangeOrientation(val value: Int): PlayerEvent
+    data class SetVolume(val value: Int) : PlayerEvent
+    data class SetBrightness(val value: Int) : PlayerEvent
+    data class ChangeOrientation(val value: Int) : PlayerEvent
+}
+
+enum class Bar {
+    Brightness, Volume
 }

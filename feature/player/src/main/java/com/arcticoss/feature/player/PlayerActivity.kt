@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.arcticoss.feature.player.presentation.composables.EventHandler
 import com.arcticoss.feature.player.presentation.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -47,6 +48,7 @@ class PlayerActivity : ComponentActivity() {
                         videoFilePath?.let { viewModel.addVideoUri(Uri.fromFile(File(it))) }
                         intentData?.let { viewModel.addVideoUri(it) }
                     }
+                    EventHandler()
                     CompositionLocalProvider(LocalContentColor provides Color.White) {
                         PlayerScreen(
                             onBackPressed = { finish() }

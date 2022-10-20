@@ -24,3 +24,11 @@ fun AudioManager.getVolume(): Int {
         AudioManager.STREAM_MUSIC
     )
 }
+
+fun AudioManager.setVolume(value: Int) {
+    this.setStreamVolume(
+        AudioManager.STREAM_MUSIC,
+        value,
+        AudioManager.FLAG_PLAY_SOUND
+    )
+}

@@ -22,7 +22,12 @@ object TimeUtils {
                 seconds
             )
 
-            else -> context.getString(R.string.time_hours_minutes_seconds_formatter, hours, minutes, seconds)
+            else -> context.getString(
+                R.string.time_hours_minutes_seconds_formatter,
+                hours,
+                minutes,
+                seconds
+            )
         }
     }
 }

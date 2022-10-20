@@ -29,11 +29,10 @@ fun ShowVideoFiles(
     modifier: Modifier = Modifier,
     viewModel: MediaScreenViewModel = hiltViewModel()
 ) {
-    val media by viewModel.mediaItemList.collectAsStateWithLifecycle()
     val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    if (mediaUiState.isLoading && media.isEmpty()) {
+    if (mediaUiState.isLoading && mediaUiState.mediaItemList.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -43,7 +42,7 @@ fun ShowVideoFiles(
         ) {
             CircularProgressIndicator()
         }
-    } else if (media.isEmpty()) {
+    } else if (mediaUiState.mediaItemList.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -61,7 +60,7 @@ fun ShowVideoFiles(
             item {
                 Spacer(modifier = Modifier.height(5.dp))
             }
-            items(media, key = { it.id }) { mediaItem ->
+            items(mediaUiState.mediaItemList, key = { it.id }) { mediaItem ->
                 MediaListItem(
                     mediaItem = mediaItem,
                     onClick = { startPlayerActivity(context, mediaItem.path) }
