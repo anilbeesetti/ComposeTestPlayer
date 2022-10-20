@@ -41,7 +41,7 @@ fun MediaScreen(
                 },
                 scrollBehavior = scrollBehaviour,
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { viewModel.toggleMediaView() }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = stringResource(id = R.string.settings))

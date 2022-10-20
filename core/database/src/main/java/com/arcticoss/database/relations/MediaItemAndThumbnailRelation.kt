@@ -25,5 +25,5 @@ fun MediaItemAndThumbnailRelation.asExternalModel() = MediaItem(
     frameRate = mediaEntity.frameRate,
     duration = mediaEntity.duration,
     lastPlayedPosition = mediaEntity.lastPlayedPosition,
-    thumbnailPath = thumbnail?.path
+    thumbnailPath = thumbnail?.path ?: ""
 )

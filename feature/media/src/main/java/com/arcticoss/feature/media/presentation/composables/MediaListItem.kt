@@ -57,9 +57,11 @@ fun MediaListItem(
                     .fillMaxWidth(0.45f)
                     .aspectRatio(16f / 10f)
             ) {
-                mediaItem.thumbnailPath?.let {
+                if (mediaItem.thumbnailPath.isNotEmpty()) {
                     Image(
-                        bitmap = remember { BitmapFactory.decodeFile(it).asImageBitmap() },
+                        bitmap = remember {
+                            BitmapFactory.decodeFile(mediaItem.thumbnailPath).asImageBitmap()
+                        },
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
@@ -81,8 +83,7 @@ fun MediaListItem(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp)
-                    ,
+                        .padding(top = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -95,7 +96,7 @@ fun MediaListItem(
                 .align(Alignment.BottomEnd)
                 .padding(12.dp)
                 .size(18.dp)
-                .clearAndSetSemantics {  },
+                .clearAndSetSemantics { },
             onClick = { /*TODO*/ }
         ) {
             Icon(

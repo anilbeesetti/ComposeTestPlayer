@@ -10,8 +10,8 @@ data class MediaItem(
     val height: Int = 0,
     val path: String = "",
     val title: String = "",
-    val frameRate: Double = 0.0,
     val duration: Long = 0,
-    val lastPlayedPosition: Long = 0,
-    val thumbnailPath: String? = null
+    val frameRate: Double = 0.0,
+    val thumbnailPath: String = "",
+    val lastPlayedPosition: Long = 0
 )
