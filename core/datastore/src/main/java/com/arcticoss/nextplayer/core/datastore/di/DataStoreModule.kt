@@ -32,7 +32,7 @@ object DataStoreModule {
     ): DataStore<MediaPreferences> {
         return DataStoreFactory.create(
             serializer = MediaPreferencesSerializer,
-            produceFile = { appContext.dataStoreFile(PLAYER_UI_PREFERENCES_DATASTORE_FILE) }
+            produceFile = { appContext.dataStoreFile(MEDIA_PREFERENCES_DATASTORE_FILE) }
         )
     }
 
