@@ -13,9 +13,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.feature.player.PlayerViewModel
+import com.arcticoss.feature.player.hideBrightnessBar
+import com.arcticoss.feature.player.hideVolumeBar
+import com.arcticoss.feature.player.setVolume
 import com.arcticoss.feature.player.utils.findActivity
 import com.arcticoss.feature.player.utils.setBrightness
 import com.arcticoss.feature.player.utils.setVolume
+import kotlinx.coroutines.delay
+
+private const val DELAY = 1000L
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -39,9 +45,13 @@ fun EventHandler(
         val activity = context.findActivity()
         val level = 1.0f / playerState.maxLevel * uiPreferences.brightnessLevel
         activity?.setBrightness(level)
+        delay(DELAY)
+        viewModel.hideBrightnessBar()
     }
 
     LaunchedEffect(playerState.volumeLevel) {
         audioManager.setVolume(playerState.volumeLevel)
+        delay(DELAY)
+        viewModel.hideVolumeBar()
     }
 }

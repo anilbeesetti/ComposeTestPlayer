@@ -68,53 +68,28 @@ class PlayerViewModel @Inject constructor(
         )
     }
 
-    fun setVolume(level: Int) {
-        _playerState.value = playerState.value.copy(
-            volumeLevel = level
-        )
-    }
-
     fun onUiEvent(event: PlayerUiEvent) {
-        when(event) {
-            is PlayerUiEvent.ShowUi -> _playerUiState.value = playerUiState.value.copy(showUi = event.value)
-            is PlayerUiEvent.ShowBrightnessBar -> _playerUiState.value = playerUiState.value.copy(showBrightnessBar = event.value)
-            is PlayerUiEvent.ShowVolumeBar -> _playerUiState.value = playerUiState.value.copy(showVolumeBar = event.value)
+        when (event) {
+            is PlayerUiEvent.ShowUi -> _playerUiState.value =
+                playerUiState.value.copy(showUi = event.value)
+            is PlayerUiEvent.ShowVolumeBar -> _playerUiState.value =
+                playerUiState.value.copy(showVolumeBar = event.value)
+            is PlayerUiEvent.ShowBrightnessBar -> _playerUiState.value =
+                playerUiState.value.copy(showBrightnessBar = event.value)
         }
     }
 
     fun onEvent(event: PlayerEvent) {
-        when(event) {
-            is PlayerEvent.ChangeOrientation -> _playerState.value = playerState.value.copy(screenOrientation = event.value)
-            PlayerEvent.IncreaseBrightness -> {
-                val brightness = uiPreferencesFlow.value.brightnessLevel
-                if (brightness < 25) {
-                    viewModelScope.launch {
-                        playerPreferencesDataSource.updateUiPref(
-                            uiPreferencesFlow.value.copy(brightnessLevel = brightness + 1)
-                        )
-                    }
-                }
-            }
-            PlayerEvent.DecreaseBrightness -> {
-                val brightness = uiPreferencesFlow.value.brightnessLevel
-                if (brightness > 0) {
-                    viewModelScope.launch {
-                        playerPreferencesDataSource.updateUiPref(
-                            uiPreferencesFlow.value.copy(brightnessLevel = brightness - 1)
-                        )
-                    }
-                }
-            }
-            PlayerEvent.IncreaseVolume -> {
-                val volume = playerState.value.volumeLevel
-                if (volume < 25) {
-                    _playerState.value = playerState.value.copy(volumeLevel = volume + 1)
-                }
-            }
-            PlayerEvent.DecreaseVolume -> {
-                val volume = playerState.value.volumeLevel
-                if (volume > 0) {
-                    _playerState.value = playerState.value.copy(volumeLevel = volume - 1)
+        when (event) {
+            is PlayerEvent.ChangeOrientation -> _playerState.value =
+                playerState.value.copy(screenOrientation = event.value)
+            is PlayerEvent.SetVolume -> _playerState.value =
+                playerState.value.copy(volumeLevel = event.value)
+            is PlayerEvent.SetBrightness -> {
+                viewModelScope.launch {
+                    playerPreferencesDataSource.updateUiPref(
+                        uiPreferencesFlow.value.copy(brightnessLevel = event.value)
+                    )
                 }
             }
         }
@@ -136,19 +111,21 @@ data class PlayerState(
 data class PlayerUiState(
     val showUi: Boolean = false,
     val showBrightnessBar: Boolean = false,
-    val showVolumeBar: Boolean = false
+    val showVolumeBar: Boolean = false,
 )
 
 sealed class PlayerUiEvent {
-    data class ShowUi(val value: Boolean): PlayerUiEvent()
-    data class ShowBrightnessBar(val value: Boolean): PlayerUiEvent()
-    data class ShowVolumeBar(val value: Boolean): PlayerUiEvent()
+    data class ShowUi(val value: Boolean) : PlayerUiEvent()
+    data class ShowBrightnessBar(val value: Boolean) : PlayerUiEvent()
+    data class ShowVolumeBar(val value: Boolean) : PlayerUiEvent()
 }
 
 sealed interface PlayerEvent {
-    object IncreaseBrightness: PlayerEvent
-    object DecreaseBrightness: PlayerEvent
-    object IncreaseVolume: PlayerEvent
-    object DecreaseVolume: PlayerEvent
-    data class ChangeOrientation(val value: Int): PlayerEvent
+    data class SetVolume(val value: Int) : PlayerEvent
+    data class SetBrightness(val value: Int) : PlayerEvent
+    data class ChangeOrientation(val value: Int) : PlayerEvent
+}
+
+enum class Bar {
+    Brightness, Volume
 }
