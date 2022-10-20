@@ -55,6 +55,12 @@ private fun DrawScope.drawLinearIndicator(
 
     // Progress line
     if (endFraction > 0) {
-        drawLine(color, Offset(xOffset, barStart), Offset(xOffset, barEnd), strokeWidth, cap = StrokeCap.Round)
+        drawLine(
+            color,
+            Offset(xOffset, barStart),
+            Offset(xOffset, barEnd),
+            strokeWidth,
+            cap = StrokeCap.Round
+        )
     }
 }

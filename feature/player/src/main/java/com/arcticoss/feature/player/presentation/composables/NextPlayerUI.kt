@@ -55,7 +55,7 @@ fun NextPlayerUI(
         modifier = modifier
             .fillMaxSize()
     ) {
-        if(playerUiState.showUi) {
+        if (playerUiState.showUi) {
             PlayerUIHeader(
                 title = "TODO",
                 onBackPressed = onBackPressed,
