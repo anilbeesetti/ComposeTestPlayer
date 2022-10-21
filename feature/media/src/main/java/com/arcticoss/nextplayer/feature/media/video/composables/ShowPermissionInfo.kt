@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.media.presentation.composables
+package com.arcticoss.nextplayer.feature.media.video.composables
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*

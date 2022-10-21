@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import com.arcticoss.nextplayer.feature.media.presentation.composables.*
 import com.arcticoss.nextplayer.feature.media.settings.navigation.navigateToSettings
+import com.arcticoss.nextplayer.feature.media.video.composables.*
 
 
 @OptIn(ExperimentalMaterial3Api::class)

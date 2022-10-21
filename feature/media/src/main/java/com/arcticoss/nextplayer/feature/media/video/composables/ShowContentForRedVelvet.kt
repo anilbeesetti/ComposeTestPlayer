@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.media.presentation.composables
+package com.arcticoss.nextplayer.feature.media.video.composables
 
 import android.content.Intent
 import android.net.Uri
