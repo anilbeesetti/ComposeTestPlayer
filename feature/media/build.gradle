@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.arcticoss.feature.media'
+    namespace 'com.arcticoss.nextplayer.feature.media'
     compileSdk 33
 
     defaultConfig {

@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media.presentation.composables
+package com.arcticoss.nextplayer.feature.media.presentation.composables
 
 import android.content.Context
 import android.content.Intent
@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.feature.media.MediaScreenViewModel
+import com.arcticoss.nextplayer.feature.media.MediaScreenViewModel
 import com.arcticoss.feature.player.PlayerActivity
 
 private const val TAG = "ShowVideoFiles"

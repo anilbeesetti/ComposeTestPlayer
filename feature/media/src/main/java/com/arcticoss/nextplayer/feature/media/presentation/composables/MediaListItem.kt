@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media.presentation.composables
+package com.arcticoss.nextplayer.feature.media.presentation.composables
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -25,7 +25,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.arcticoss.feature.media.utils.TimeUtils
+import com.arcticoss.nextplayer.feature.media.utils.TimeUtils
 import com.arcticoss.model.MediaItem
 
 @OptIn(ExperimentalFoundationApi::class)

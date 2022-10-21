@@ -6,8 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.arcticoss.feature.media.MediaScreen
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.arcticoss.nextplayer.feature.media.MediaScreen
+import com.arcticoss.nextplayer.feature.media.settings.navigation.settingsScreen
+import com.arcticoss.nextplayer.feature.media.video.navigation.videosNavigationRoute
+import com.arcticoss.nextplayer.feature.media.video.navigation.videosScreen
 import com.arcticoss.nextplayer.ui.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,9 +34,23 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MediaScreen()
+                    NextPlayerNavHost(navController = rememberNavController())
                 }
             }
         }
     }
 }
+
+@Composable
+fun NextPlayerNavHost(
+    navController: NavHostController
+) {
+    NavHost(
+        navController = navController,
+        startDestination = videosNavigationRoute
+    ) {
+        videosScreen(navController)
+        settingsScreen(navController)
+    }
+}
+

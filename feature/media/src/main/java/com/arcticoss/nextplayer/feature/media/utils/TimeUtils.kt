@@ -1,7 +1,7 @@
-package com.arcticoss.feature.media.utils
+package com.arcticoss.nextplayer.feature.media.utils
 
 import android.content.Context
-import com.arcticoss.feature.media.R
+import com.arcticoss.nextplayer.feature.media.R
 import java.util.concurrent.TimeUnit
 
 object TimeUtils {

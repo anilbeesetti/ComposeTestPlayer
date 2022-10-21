@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media.domain
+package com.arcticoss.nextplayer.feature.media.domain
 
 import com.arcticoss.data.repository.IMediaRepository
 import com.arcticoss.model.MediaItem

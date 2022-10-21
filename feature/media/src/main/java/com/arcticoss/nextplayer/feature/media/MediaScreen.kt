@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media
+package com.arcticoss.nextplayer.feature.media
 
 import android.os.Build
 import androidx.compose.foundation.layout.padding
@@ -12,12 +12,15 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import com.arcticoss.feature.media.presentation.composables.*
+import androidx.navigation.NavController
+import com.arcticoss.nextplayer.feature.media.presentation.composables.*
+import com.arcticoss.nextplayer.feature.media.settings.navigation.navigateToSettings
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaScreen(
+    navController: NavController,
     viewModel: MediaScreenViewModel = hiltViewModel(),
 ) {
     val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -41,7 +44,7 @@ fun MediaScreen(
                 },
                 scrollBehavior = scrollBehaviour,
                 navigationIcon = {
-                    IconButton(onClick = { viewModel.toggleMediaView() }) {
+                    IconButton(onClick = { navController.navigateToSettings() }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = stringResource(id = R.string.settings))

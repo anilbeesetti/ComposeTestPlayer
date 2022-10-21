@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media.presentation.composables
+package com.arcticoss.nextplayer.feature.media.presentation.composables
 
 import android.Manifest
 import android.content.Intent
@@ -13,7 +13,7 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.arcticoss.feature.media.R
+import com.arcticoss.nextplayer.feature.media.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi

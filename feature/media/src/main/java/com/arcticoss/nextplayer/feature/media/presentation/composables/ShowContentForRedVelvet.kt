@@ -1,4 +1,4 @@
-package com.arcticoss.feature.media.presentation.composables
+package com.arcticoss.nextplayer.feature.media.presentation.composables
 
 import android.content.Intent
 import android.net.Uri
@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.arcticoss.feature.media.R
+import com.arcticoss.nextplayer.feature.media.R
 
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable

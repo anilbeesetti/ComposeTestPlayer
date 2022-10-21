@@ -1,11 +1,11 @@
-package com.arcticoss.feature.media
+package com.arcticoss.nextplayer.feature.media
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.data.repository.IMediaRepository
-import com.arcticoss.feature.media.domain.MediaFolderStreamUseCase
-import com.arcticoss.feature.media.domain.MediaItemStreamUseCase
+import com.arcticoss.nextplayer.feature.media.domain.MediaFolderStreamUseCase
+import com.arcticoss.nextplayer.feature.media.domain.MediaItemStreamUseCase
 import com.arcticoss.model.*
 import com.arcticoss.nextplayer.core.datastore.datasource.MediaPreferencesDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
