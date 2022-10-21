@@ -12,7 +12,7 @@
     <string name="open_settings">Open Settings</string>
     <string name="settings_screen">Settings</string>
     <string name="next_player">NextPlayer</string>
-    <string name="all_videos">All Videos</string>
+    <string name="videos">Videos</string>
     <string name="list">List</string>
     <string name="list_description">Appearance, scan</string>
     <string name="player_description">Player appearance, playback controls</string>

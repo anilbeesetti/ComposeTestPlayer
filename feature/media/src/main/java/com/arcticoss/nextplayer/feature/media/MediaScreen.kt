@@ -38,7 +38,7 @@ fun MediaScreen(
             MediaLargeTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.all_videos),
+                        text = stringResource(id = R.string.videos),
                         modifier = Modifier.padding()
                     )
                 },
