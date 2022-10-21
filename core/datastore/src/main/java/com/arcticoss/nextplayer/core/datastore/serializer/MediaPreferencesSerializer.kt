@@ -1,9 +1,8 @@
-package com.arcticoss.nextplayer.core.datastore
+package com.arcticoss.nextplayer.core.datastore.serializer
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import com.arcticoss.model.MediaPreferences
-import com.arcticoss.model.PlayerUiPreferences
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream

@@ -6,8 +6,8 @@ import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
 import com.arcticoss.model.MediaPreferences
 import com.arcticoss.model.PlayerUiPreferences
-import com.arcticoss.nextplayer.core.datastore.MediaPreferencesSerializer
-import com.arcticoss.nextplayer.core.datastore.PlayerUiPreferencesSerializer
+import com.arcticoss.nextplayer.core.datastore.serializer.MediaPreferencesSerializer
+import com.arcticoss.nextplayer.core.datastore.serializer.PlayerUiPreferencesSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

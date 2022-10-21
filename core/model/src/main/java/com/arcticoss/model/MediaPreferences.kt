@@ -11,14 +11,14 @@ data class MediaPreferences(
     val sortBy: SortBy = SortBy.Title
 )
 
-enum class ViewOption {
-    Videos, Folders
-}
-
-enum class SortBy {
-    Title, Length
-}
-
-enum class SortOrder {
-    Ascending, Descending
-}
+//enum class ViewOption {
+//    Videos, Folders
+//}
+//
+//enum class SortBy {
+//    Title, Length
+//}
+//
+//enum class SortOrder {
+//    Ascending, Descending
+//}

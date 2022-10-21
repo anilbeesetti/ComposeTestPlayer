@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.core.datastore
+package com.arcticoss.nextplayer.core.datastore.serializer
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
