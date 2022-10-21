@@ -13,7 +13,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
-import com.arcticoss.nextplayer.feature.media.presentation.composables.*
 import com.arcticoss.nextplayer.feature.media.settings.navigation.navigateToSettings
 import com.arcticoss.nextplayer.feature.media.video.composables.*
 
