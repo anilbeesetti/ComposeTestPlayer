@@ -1,16 +1,18 @@
 package com.arcticoss.nextplayer.feature.media
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.data.repository.IMediaRepository
 import com.arcticoss.model.*
-import com.arcticoss.nextplayer.core.datastore.datasource.MediaPreferencesDataSource
+import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.MediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.domain.MediaItemStreamUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +24,7 @@ class MediaScreenViewModel @Inject constructor(
     private val mediaRepository: IMediaRepository,
     private val mediaItemStreamUseCase: MediaItemStreamUseCase,
     private val mediaFolderStreamUseCase: MediaFolderStreamUseCase,
-    private val mediaPreferencesDataSource: MediaPreferencesDataSource
+    private val interfacePreferencesDataSource: InterfacePreferencesDataSource
 ) : ViewModel() {
 
     private var syncMediaJob: Job? = null
@@ -30,29 +32,33 @@ class MediaScreenViewModel @Inject constructor(
     private val _mediaUiState = MutableStateFlow(MediaUiState())
     val mediaUiState = _mediaUiState.asStateFlow()
 
-    private val _mediaPreferencesFlow = MutableStateFlow(MediaPreferences())
-    val mediaPreferencesFlow = _mediaPreferencesFlow.asStateFlow()
+
+    private val _interfacePreferencesFlow = MutableStateFlow(InterfacePreferences())
+    val interfacePreferencesFlow = _interfacePreferencesFlow.asStateFlow()
+
+//    TODO: this way flow is not working
+//    private val interfacePreferences = interfacePreferencesDataSource
+//        .interfacePreferencesStream
+//        .onEach {
+//            getMediaItemFlow()
+//        }.stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(5000),
+//            initialValue = InterfacePreferences()
+//        )
 
     init {
-        getMediaPreferencesFlow()
+        getInterfacePreferencesFlow()
     }
 
-    private fun getMediaPreferencesFlow() {
-        mediaPreferencesDataSource.mediaPrefStream.onEach {
-            _mediaPreferencesFlow.value = it
-            when(it.viewOption) {
-                ViewOption.Videos -> getMediaItemFlow()
-                ViewOption.Folders -> getMediaFolderFlow()
-            }
+    private fun getInterfacePreferencesFlow() {
+        interfacePreferencesDataSource.interfacePreferencesStream.onEach {
+            getMediaItemFlow(it.showHidden, it.sortBy, it.sortOrder)
         }.launchIn(viewModelScope)
     }
 
-    private fun getMediaItemFlow() {
-        mediaItemStreamUseCase(
-            mediaPreferencesFlow.value.showHidden,
-            mediaPreferencesFlow.value.sortBy,
-            mediaPreferencesFlow.value.sortOrder
-        ).onEach {
+    private fun getMediaItemFlow(showHidden:Boolean, sortBy: SortBy, sortOrder: SortOrder) {
+        mediaItemStreamUseCase(showHidden, sortBy, sortOrder).onEach {
             _mediaUiState.value = _mediaUiState.value.copy(
                 isLoading = false,
                 mediaItemList = it
@@ -60,12 +66,8 @@ class MediaScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun getMediaFolderFlow() {
-        mediaFolderStreamUseCase(
-            mediaPreferencesFlow.value.showHidden,
-            mediaPreferencesFlow.value.sortBy,
-            mediaPreferencesFlow.value.sortOrder
-        ).onEach {
+    private fun getMediaFolderFlow(showHidden:Boolean, sortBy: SortBy, sortOrder: SortOrder) {
+        mediaFolderStreamUseCase(showHidden, sortBy, sortOrder).onEach {
             _mediaUiState.value = _mediaUiState.value.copy(
                 isLoading = false,
                 mediaFolderList = it
@@ -86,17 +88,6 @@ class MediaScreenViewModel @Inject constructor(
                 mediaRepository.syncMedia()
                 _mediaUiState.value = _mediaUiState.value.copy(isLoading = false)
             }
-        }
-    }
-
-    fun toggleMediaView() {
-        Log.d(TAG, "toggleMediaView: MediaScreen...toggle")
-        viewModelScope.launch {
-            mediaPreferencesDataSource.updateMediaPreferences(
-                mediaPreferencesFlow.value.copy(
-                    sortBy = if (mediaPreferencesFlow.value.sortBy == SortBy.Title) SortBy.Length else SortBy.Title
-                )
-            )
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.arcticoss.nextplayer.feature.media
 
 import android.os.Build
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
@@ -38,8 +37,7 @@ fun MediaScreen(
             MediaLargeTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.videos),
-                        modifier = Modifier.padding()
+                        text = stringResource(id = R.string.videos)
                     )
                 },
                 scrollBehavior = scrollBehaviour,
