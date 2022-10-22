@@ -1,5 +1,7 @@
 package com.arcticoss.nextplayer
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,10 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.arcticoss.nextplayer.feature.media.MediaScreen
+import com.arcticoss.feature.player.PlayerActivity
+import com.arcticoss.nextplayer.feature.media.NavigateTo
+import com.arcticoss.nextplayer.feature.media.settings.SettingsNavigateTo
+import com.arcticoss.nextplayer.feature.media.settings.navigation.interfacePreferencesScreen
+import com.arcticoss.nextplayer.feature.media.settings.navigation.navigateToInterfacePreferences
+import com.arcticoss.nextplayer.feature.media.settings.navigation.navigateToSettings
 import com.arcticoss.nextplayer.feature.media.settings.navigation.settingsScreen
-import com.arcticoss.nextplayer.feature.media.video.navigation.videosNavigationRoute
-import com.arcticoss.nextplayer.feature.media.video.navigation.videosScreen
+import com.arcticoss.nextplayer.feature.media.video.navigation.mediaNavigationRoute
+import com.arcticoss.nextplayer.feature.media.video.navigation.mediaScreen
 import com.arcticoss.nextplayer.ui.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,10 +54,41 @@ fun NextPlayerNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = videosNavigationRoute
+        startDestination = mediaNavigationRoute
     ) {
-        videosScreen(navController)
-        settingsScreen(navController)
+        mediaScreen(
+            onNavigate = { navigateTo ->
+                when (navigateTo) {
+                    NavigateTo.Settings -> navController.navigateToSettings()
+                    is NavigateTo.Player -> {}
+                }
+            }
+        )
+        settingsScreen(
+            onNavigate = { navigateTo ->
+                when (navigateTo) {
+                    SettingsNavigateTo.Interface -> navController.navigateToInterfacePreferences()
+                    SettingsNavigateTo.Player -> TODO()
+                    SettingsNavigateTo.About -> TODO()
+                }
+            },
+            onBackClick = {
+                navController.popBackStack()
+            }
+        )
+        interfacePreferencesScreen(
+            onBackClick = {
+                navController.popBackStack()
+            }
+        )
     }
+}
+
+
+fun startPlayerActivity(context: Context, path: String) {
+    val intent = Intent(context, PlayerActivity::class.java).also {
+        it.putExtra("videoFilePath", path)
+    }
+    context.startActivity(intent)
 }
 

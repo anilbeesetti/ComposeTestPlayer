@@ -8,48 +8,52 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.arcticoss.nextplayer.feature.media.R
 import com.arcticoss.nextplayer.feature.media.settings.composables.SettingGroupItem
+import com.arcticoss.nextplayer.feature.media.video.composables.MediaLargeTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    navController: NavHostController
+    onNavigate: (SettingsNavigateTo) -> Unit,
+    onBackClick: () -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column() {
-            TopAppBar(
-                title = {},
+    val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
+        topBar = {
+            MediaLargeTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.settings_screen)
+                    )
+                },
+                scrollBehavior = scrollBehaviour,
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Rounded.ArrowBack,
-                            contentDescription = ""
-                        )
+                            contentDescription = "")
                     }
                 }
             )
-            LazyColumn() {
-                item {
-                    Text(
-                        modifier = Modifier.padding(start = 24.dp, top = 48.dp, bottom = 24.dp),
-                        text = stringResource(id = R.string.settings_screen),
-                        style = MaterialTheme.typography.headlineLarge
-                    )
-                }
-                items(settingGroupList) { settingGroup ->
-                    SettingGroupItem(
-                        title = stringResource(id = settingGroup.title),
-                        description = stringResource(id = settingGroup.description),
-                        icon = settingGroup.icon,
-                        onClick = {}
-                    )
-                }
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            contentPadding = innerPadding,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(settingGroupList) { settingGroup ->
+                SettingGroupItem(
+                    title = stringResource(id = settingGroup.title),
+                    description = stringResource(id = settingGroup.description),
+                    icon = settingGroup.icon,
+                    onClick = { onNavigate(settingGroup.navigateTo) }
+                )
             }
         }
     }
 }
-
