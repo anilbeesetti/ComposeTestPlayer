@@ -28,12 +28,10 @@ class MediaItemStreamUseCase @Inject constructor(
                 false -> {
                     mediaFolderList.filter { mediaFolder ->
                         mediaFolder.mediaItems.isNotEmpty() && !mediaFolder.name.startsWith(".")
-                    }.onEach { mediaFolder ->
+                    }.forEach { mediaFolder ->
                         mediaFolder.mediaItems.filter {
                             !it.title.startsWith(".")
-                        }
-                    }.forEach {
-                        mediaItemList.addAll(it.mediaItems)
+                        }.also { mediaItemList.addAll(it) }
                     }
                 }
             }
