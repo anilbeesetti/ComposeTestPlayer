@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.settings.list
+package com.arcticoss.nextplayer.feature.settings.screens.display
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,7 +45,8 @@ fun InterfacePreferencesScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Rounded.ArrowBack,
-                            contentDescription = "")
+                            contentDescription = ""
+                        )
                     }
                 }
             )

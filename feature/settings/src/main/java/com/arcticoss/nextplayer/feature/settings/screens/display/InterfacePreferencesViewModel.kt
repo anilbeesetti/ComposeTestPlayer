@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.settings.list
+package com.arcticoss.nextplayer.feature.settings.screens.display
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
