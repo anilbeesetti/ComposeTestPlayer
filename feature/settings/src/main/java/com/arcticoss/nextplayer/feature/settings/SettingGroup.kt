@@ -1,13 +1,11 @@
-package com.arcticoss.nextplayer.feature.media.settings
+package com.arcticoss.nextplayer.feature.settings
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Aod
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.arcticoss.nextplayer.feature.media.R
 
 data class SettingGroup(
     @StringRes val title: Int,

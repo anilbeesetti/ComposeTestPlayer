@@ -1,10 +1,10 @@
-package com.arcticoss.nextplayer.feature.media.settings.navigation
+package com.arcticoss.nextplayer.feature.settings.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.arcticoss.nextplayer.feature.media.settings.list.InterfacePreferencesScreen
+import com.arcticoss.nextplayer.feature.settings.list.InterfacePreferencesScreen
 
 const val interfacePreferencesNavigationRoute = "interface_preferences_route"
 

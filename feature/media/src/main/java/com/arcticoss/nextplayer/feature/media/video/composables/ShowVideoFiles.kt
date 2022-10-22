@@ -27,6 +27,7 @@ private const val TAG = "ShowVideoFiles"
 fun ShowVideoFiles(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    onMediaItemClick: (path: String) -> Unit = {},
     viewModel: MediaScreenViewModel = hiltViewModel()
 ) {
     val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
@@ -55,7 +56,7 @@ fun ShowVideoFiles(
     } else {
         LazyColumn(
             contentPadding = contentPadding,
-            modifier = modifier.fillMaxWidth()
+            modifier = modifier.fillMaxSize()
         ) {
             item {
                 Spacer(modifier = Modifier.height(5.dp))

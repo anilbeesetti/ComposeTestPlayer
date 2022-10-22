@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.media.settings.composables
+package com.arcticoss.nextplayer.feature.settings.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

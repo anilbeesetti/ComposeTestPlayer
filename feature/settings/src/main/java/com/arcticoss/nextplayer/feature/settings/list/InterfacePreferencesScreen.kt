@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.media.settings.list
+package com.arcticoss.nextplayer.feature.settings.list
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,10 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.nextplayer.feature.media.R
-import com.arcticoss.nextplayer.feature.media.settings.composables.ClickablePreferenceItem
-import com.arcticoss.nextplayer.feature.media.settings.composables.PreferenceSwitch
-import com.arcticoss.nextplayer.feature.media.video.composables.MediaLargeTopAppBar
+import com.arcticoss.nextplayer.feature.settings.R
+import com.arcticoss.nextplayer.feature.settings.composables.ClickablePreferenceItem
+import com.arcticoss.nextplayer.feature.settings.composables.PreferenceSwitch
 
 @OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +34,7 @@ fun InterfacePreferencesScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
-            MediaLargeTopAppBar(
+            LargeTopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.interface_name)

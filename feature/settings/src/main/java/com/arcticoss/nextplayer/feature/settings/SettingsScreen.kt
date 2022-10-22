@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.media.settings
+package com.arcticoss.nextplayer.feature.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,9 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import com.arcticoss.nextplayer.feature.media.R
-import com.arcticoss.nextplayer.feature.media.settings.composables.SettingGroupItem
-import com.arcticoss.nextplayer.feature.media.video.composables.MediaLargeTopAppBar
+import com.arcticoss.nextplayer.feature.settings.composables.SettingGroupItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +23,7 @@ fun SettingsScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
-            MediaLargeTopAppBar(
+            LargeTopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.settings_screen)

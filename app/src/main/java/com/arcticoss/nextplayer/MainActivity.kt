@@ -15,13 +15,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.arcticoss.feature.player.PlayerActivity
 import com.arcticoss.nextplayer.feature.media.NavigateTo
-import com.arcticoss.nextplayer.feature.media.settings.SettingsNavigateTo
-import com.arcticoss.nextplayer.feature.media.settings.navigation.interfacePreferencesScreen
-import com.arcticoss.nextplayer.feature.media.settings.navigation.navigateToInterfacePreferences
-import com.arcticoss.nextplayer.feature.media.settings.navigation.navigateToSettings
-import com.arcticoss.nextplayer.feature.media.settings.navigation.settingsScreen
 import com.arcticoss.nextplayer.feature.media.video.navigation.mediaNavigationRoute
 import com.arcticoss.nextplayer.feature.media.video.navigation.mediaScreen
+import com.arcticoss.nextplayer.feature.settings.SettingsNavigateTo
+import com.arcticoss.nextplayer.feature.settings.navigation.interfacePreferencesScreen
+import com.arcticoss.nextplayer.feature.settings.navigation.navigateToInterfacePreferences
+import com.arcticoss.nextplayer.feature.settings.navigation.navigateToSettings
+import com.arcticoss.nextplayer.feature.settings.navigation.settingsScreen
 import com.arcticoss.nextplayer.ui.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 

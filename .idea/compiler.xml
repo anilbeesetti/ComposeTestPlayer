@@ -5,7 +5,6 @@
       <module name="NextPlayer.core.common" target="11" />
       <module name="NextPlayer.core.datas" target="11" />
       <module name="NextPlayer.core.protodatastore" target="11" />
-      <module name="NextPlayer.feature.settings" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
