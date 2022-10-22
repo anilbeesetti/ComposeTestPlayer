@@ -13,11 +13,21 @@
     <string name="settings_screen">Settings</string>
     <string name="next_player">NextPlayer</string>
     <string name="videos">Videos</string>
-    <string name="list">List</string>
-    <string name="list_description">Appearance, scan</string>
-    <string name="player_description">Player appearance, playback controls</string>
+    <string name="interface_name">Interface</string>
+    <string name="interface_description">Appearance, scan</string>
     <string name="player">Player</string>
-    <string name="about_description">Version, releases, credits</string>
+    <string name="player_description">Player appearance, playback controls</string>
     <string name="about">About</string>
+    <string name="about_description">Version, releases, credits</string>
     <string name="settings">settings</string>
+    <string name="play">Play video</string>
+    <string name="appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="floating_button">Floating Button</string>
+    <string name="floating_button_description">Place a floating button on the bottom right corner of the screen to start last played media</string>
+    <string name="scan">Scan</string>
+    <string name="show_hidden">Show hidden files and folders</string>
+    <string name="show_hidden_description">Show hidden files and folders starting with "." (dot)</string>
+    <string name="group_videos">Group videos</string>
+    <string name="group_videos_description">Group videos into folders</string>
 </resources>
