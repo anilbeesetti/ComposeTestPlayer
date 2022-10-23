@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -18,9 +19,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.feature.media.R
-import com.arcticoss.nextplayer.feature.media.composables.*
+import com.arcticoss.nextplayer.feature.media.composables.AddLifecycleEventObserver
+import com.arcticoss.nextplayer.feature.media.composables.CheckPermissionAndSetContent
+import com.arcticoss.nextplayer.feature.media.composables.FolderItem
+import com.arcticoss.nextplayer.feature.media.composables.MediaListItem
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
+@OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MediaScreen(
     onNavigate: (NavigateTo) -> Unit,
@@ -30,6 +34,8 @@ fun MediaScreen(
     val interfacePreferences by viewModel.interfacePreferences.collectAsStateWithLifecycle()
     val uiState by viewModel.mediaUIState.collectAsStateWithLifecycle()
 
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
         if (event == Lifecycle.Event.ON_START) {
             viewModel.syncMedia()
@@ -37,18 +43,22 @@ fun MediaScreen(
     }
 
     CheckPermissionAndSetContent(
-        title = {
-            Text(
-                text = stringResource(id = if (interfacePreferences.groupVideos) R.string.folders else R.string.videos)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                title = {
+                    Text(text = stringResource(id = if (interfacePreferences.groupVideos) R.string.folders else R.string.videos))
+                },
+                scrollBehavior = scrollBehavior,
+                navigationIcon = {
+                    IconButton(onClick = { onNavigate(NavigateTo.Settings) }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = stringResource(id = R.string.settings)
+                        )
+                    }
+                }
             )
-        },
-        navigationIcon = {
-            IconButton(onClick = { onNavigate(NavigateTo.Settings) }) {
-                Icon(
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = stringResource(id = R.string.settings)
-                )
-            }
         }
     ) { innerPadding ->
         /**

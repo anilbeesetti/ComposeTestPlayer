@@ -5,12 +5,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,8 +21,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.feature.media.R
 import com.arcticoss.nextplayer.feature.media.composables.CheckPermissionAndSetContent
 import com.arcticoss.nextplayer.feature.media.composables.MediaListItem
+import com.arcticoss.nextplayer.feature.media.screens.media.NavigateTo
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
+@OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun VideosScreen(
     onNavItemClick: () -> Unit = {},
@@ -28,20 +31,25 @@ fun VideosScreen(
     viewModel: VideosViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.videosUiState.collectAsStateWithLifecycle()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     CheckPermissionAndSetContent(
-        title = {
-            Text(
-                text = uiState.mediaFolder.name
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                title = {
+                    Text(text = uiState.mediaFolder.name)
+                },
+                scrollBehavior = scrollBehavior,
+                navigationIcon = {
+                    IconButton(onClick = onNavItemClick) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = stringResource(R.string.back_arrow)
+                        )
+                    }
+                }
             )
-        },
-        navigationIcon = {
-            IconButton(onClick = onNavItemClick) {
-                Icon(
-                    imageVector = Icons.Rounded.ArrowBack,
-                    contentDescription = stringResource(R.string.back_arrow)
-                )
-            }
         }
     ) { innerPadding ->
         if (uiState.isLoading && uiState.mediaFolder.mediaItems.isEmpty()) {

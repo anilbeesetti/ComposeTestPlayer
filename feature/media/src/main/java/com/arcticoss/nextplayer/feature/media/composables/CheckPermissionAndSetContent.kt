@@ -27,12 +27,11 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CheckPermissionAndSetContent(
-    title: @Composable () -> Unit,
-    navigationIcon: @Composable () -> Unit = {},
+    topBar: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
-    val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
@@ -59,14 +58,8 @@ fun CheckPermissionAndSetContent(
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
-        topBar = {
-            MediaLargeTopAppBar(
-                title = title,
-                scrollBehavior = scrollBehaviour,
-                navigationIcon = navigationIcon
-            )
-        },
+        modifier = modifier,
+        topBar = topBar,
         floatingActionButton = floatingActionButton
     ) { innerPadding ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !hasPermission) {
