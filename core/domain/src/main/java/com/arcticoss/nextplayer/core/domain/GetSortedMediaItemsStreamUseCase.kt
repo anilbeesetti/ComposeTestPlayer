@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class MediaItemStreamUseCase @Inject constructor(
+class GetSortedMediaItemsStreamUseCase @Inject constructor(
     private val mediaRepository: IMediaRepository
 ) {
 
-    operator fun invoke(
+    fun getAllMedia(
         showHidden: Boolean,
         sortBy: SortBy,
         sortOrder: SortOrder
