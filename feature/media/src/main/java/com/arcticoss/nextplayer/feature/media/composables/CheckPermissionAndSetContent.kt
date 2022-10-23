@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.media.video.composables
+package com.arcticoss.nextplayer.feature.media.composables
 
 import android.Manifest
 import android.content.Intent
@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
-import com.arcticoss.nextplayer.feature.media.IconTextButton
 import com.arcticoss.nextplayer.feature.media.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState

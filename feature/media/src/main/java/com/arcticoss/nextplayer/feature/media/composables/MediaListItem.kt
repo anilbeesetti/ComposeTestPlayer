@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.media.video.composables
+package com.arcticoss.nextplayer.feature.media.composables
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -57,16 +57,17 @@ fun MediaListItem(
                     .fillMaxWidth(0.45f)
                     .aspectRatio(16f / 10f)
             ) {
-                if (mediaItem.thumbnailPath.isNotEmpty()) {
-                    Image(
-                        bitmap = remember {
-                            BitmapFactory.decodeFile(mediaItem.thumbnailPath).asImageBitmap()
-                        },
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+//                TODO: "Images make lazy column laggy"
+//                if (mediaItem.thumbnailPath.isNotEmpty()) {
+//                    Image(
+//                        bitmap = remember {
+//                            BitmapFactory.decodeFile(mediaItem.thumbnailPath).asImageBitmap()
+//                        },
+//                        contentDescription = "",
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier.fillMaxSize()
+//                    )
+//                }
             }
             Column(
                 modifier = Modifier

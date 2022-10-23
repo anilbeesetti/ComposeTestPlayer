@@ -53,6 +53,7 @@ dependencies {
 
     implementation project(':feature:media')
     implementation project(':feature:player')
+    implementation project(':feature:settings')
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
@@ -62,7 +63,6 @@ dependencies {
     implementation 'androidx.compose.material3:material3:1.0.0-rc01'
 
     implementation "com.google.dagger:hilt-android:2.44"
-    implementation project(path: ':feature:settings')
     kapt "com.google.dagger:hilt-compiler:2.44"
 
     implementation "androidx.navigation:navigation-compose:2.5.2"

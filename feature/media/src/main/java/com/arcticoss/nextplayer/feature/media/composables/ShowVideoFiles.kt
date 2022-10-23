@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.media.video.composables
+package com.arcticoss.nextplayer.feature.media.composables
 
 import android.content.Context
 import android.content.Intent
@@ -9,31 +9,27 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.nextplayer.feature.media.MediaScreenViewModel
 import com.arcticoss.feature.player.PlayerActivity
+import com.arcticoss.model.MediaItem
 
 private const val TAG = "ShowVideoFiles"
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ShowVideoFiles(
+    isLoading: Boolean,
+    mediaItems: List<MediaItem>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     onMediaItemClick: (path: String) -> Unit = {},
-    viewModel: MediaScreenViewModel = hiltViewModel()
 ) {
-    val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
 
-    if (mediaUiState.isLoading && mediaUiState.mediaItemList.isEmpty()) {
+    if (isLoading && mediaItems.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -43,7 +39,7 @@ fun ShowVideoFiles(
         ) {
             CircularProgressIndicator()
         }
-    } else if (mediaUiState.mediaItemList.isEmpty()) {
+    } else if (mediaItems.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -61,20 +57,12 @@ fun ShowVideoFiles(
             item {
                 Spacer(modifier = Modifier.height(5.dp))
             }
-            items(mediaUiState.mediaItemList, key = { it.id }) { mediaItem ->
-                MediaListItem(
-                    mediaItem = mediaItem,
-                    onClick = { startPlayerActivity(context, mediaItem.path) }
-                )
-            }
+                items(mediaItems, key = { it.id }) { mediaItem ->
+                    MediaListItem(
+                        mediaItem = mediaItem,
+                        onClick = { onMediaItemClick(mediaItem.path) }
+                    )
+                }
         }
     }
-
-}
-
-fun startPlayerActivity(context: Context, path: String) {
-    val intent = Intent(context, PlayerActivity::class.java).also {
-        it.putExtra("videoFilePath", path)
-    }
-    context.startActivity(intent)
 }
