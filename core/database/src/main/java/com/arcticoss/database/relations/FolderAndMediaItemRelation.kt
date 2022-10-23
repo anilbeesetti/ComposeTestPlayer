@@ -20,5 +20,6 @@ data class FolderAndMediaItemRelation(
 fun FolderAndMediaItemRelation.asExternalModel() = MediaFolder(
     id = folderEntity.id,
     name = folderEntity.name,
+    path = folderEntity.path,
     mediaItems = mediaItems.map { it.asExternalModel() }
 )

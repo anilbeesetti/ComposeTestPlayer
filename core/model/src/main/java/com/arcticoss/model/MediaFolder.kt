@@ -1,7 +1,8 @@
 package com.arcticoss.model
 
 data class MediaFolder(
-    val id: Long,
-    val name: String,
-    val mediaItems: List<MediaItem>
+    val id: Long = 0,
+    val name: String = "",
+    val path: String = "",
+    val mediaItems: List<MediaItem> = emptyList()
 )
