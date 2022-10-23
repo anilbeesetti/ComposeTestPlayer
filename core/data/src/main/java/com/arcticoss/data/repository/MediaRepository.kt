@@ -8,12 +8,10 @@ import com.arcticoss.database.daos.*
 import com.arcticoss.database.entities.FolderEntity
 import com.arcticoss.database.entities.ThumbnailEntity
 import com.arcticoss.database.relations.FolderAndMediaItemRelation
-import com.arcticoss.database.relations.MediaItemAndThumbnailRelation
 import com.arcticoss.database.relations.asExternalModel
 import com.arcticoss.mediainfo.FrameLoader
 import com.arcticoss.mediainfo.MediaInfoBuilder
 import com.arcticoss.model.MediaFolder
-import com.arcticoss.model.MediaItem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,9 +35,9 @@ class MediaRepository @Inject constructor(
     private val storageDir = Environment.getExternalStorageDirectory()
     private val dataDir = context.getExternalFilesDir(null)
 
-    override fun getMediaStream(): Flow<List<MediaItem>> =
-        mediaItemDao.getMediaItemEntitiesStream()
-            .map { it.map(MediaItemAndThumbnailRelation::asExternalModel) }
+    override fun getMediaFolderStream(id: Long): Flow<MediaFolder> =
+        folderDao.getFolderAndMediaItemStream(id)
+            .map { it.asExternalModel() }
 
 
     override fun getFolderMediaStream(): Flow<List<MediaFolder>> =

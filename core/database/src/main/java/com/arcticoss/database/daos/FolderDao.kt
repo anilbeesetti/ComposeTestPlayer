@@ -24,4 +24,8 @@ interface FolderDao {
     @Query("SELECT * FROM folder")
     fun getFolderAndMediaItemStream(): Flow<List<FolderAndMediaItemRelation>>
 
+    @Transaction
+    @Query("SELECT * FROM folder WHERE id = :folderId")
+    fun getFolderAndMediaItemStream(folderId: Long): Flow<FolderAndMediaItemRelation>
+
 }
