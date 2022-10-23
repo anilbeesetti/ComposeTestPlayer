@@ -1,21 +1,24 @@
 package com.arcticoss.nextplayer.feature.media.screens.media
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import com.arcticoss.nextplayer.feature.media.R
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.nextplayer.feature.media.composables.AddLifecycleEventObserver
-import com.arcticoss.nextplayer.feature.media.composables.CheckPermissionAndSetContent
-import com.arcticoss.nextplayer.feature.media.composables.ShowVideoFiles
-import com.arcticoss.nextplayer.feature.media.composables.ShowFolderItems
+import com.arcticoss.nextplayer.feature.media.R
+import com.arcticoss.nextplayer.feature.media.composables.*
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -48,25 +51,96 @@ fun MediaScreen(
             }
         }
     ) { innerPadding ->
-        when(interfacePreferences.groupVideos) {
-            true -> ShowFolderItems(
-                isLoading = uiState.isLoading,
-                mediaFolderList = uiState.mediaFolderList,
-                contentPadding = innerPadding,
-                onFolderItemClick = { onNavigate(NavigateTo.Videos(it)) }
-            )
-            false -> ShowVideoFiles(
-                isLoading = uiState.isLoading,
-                mediaItems = uiState.mediaItemList,
-                contentPadding = innerPadding,
-                onMediaItemClick = { onNavigate(NavigateTo.Player(it)) }
-            )
+        /**
+         * NOTE:-
+         * 1. Passing innerPadding [PaddingValues] to other user defined composables
+         *  containing [LazyColumn] causes to many recompositions
+         * 2. This leads to a laggy [LazyColumn] experience
+         */
+        when (interfacePreferences.groupVideos) {
+            true ->
+                if (uiState.isLoading && uiState.mediaFolderList.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else if (uiState.mediaFolderList.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "No folders with videos found.",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        contentPadding = innerPadding,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item {
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        items(uiState.mediaFolderList, key = { it.id }) { mediaFolder ->
+                            FolderItem(
+                                mediaFolder = mediaFolder,
+                                onClick = { onNavigate(NavigateTo.Videos(mediaFolder.id)) }
+                            )
+                        }
+                    }
+                }
+            false ->
+                if (uiState.isLoading && uiState.mediaItemList.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else if (uiState.mediaItemList.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
+                    }
+                } else {
+                    LazyColumn(
+                        contentPadding = innerPadding,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item {
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        items(uiState.mediaItemList, key = { it.id }) { mediaItem ->
+                            MediaListItem(
+                                mediaItem = mediaItem,
+                                onClick = { onNavigate(NavigateTo.Player(mediaItem.path)) }
+                            )
+                        }
+                    }
+                }
         }
     }
 }
 
-sealed interface NavigateTo{
-    object Settings: NavigateTo
-    data class Player(val path: String): NavigateTo
-    data class Videos(val folderId: Long): NavigateTo
+sealed interface NavigateTo {
+    object Settings : NavigateTo
+    data class Player(val path: String) : NavigateTo
+    data class Videos(val folderId: Long) : NavigateTo
 }

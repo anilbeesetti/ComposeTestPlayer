@@ -1,6 +1,5 @@
 package com.arcticoss.nextplayer.feature.media.screens.media
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.data.repository.IMediaRepository
@@ -17,7 +16,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MediaScreenViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     interfacePreferencesDataSource: InterfacePreferencesDataSource,
     private val mediaRepository: IMediaRepository,
     private val getSortedMediaFoldersStream: GetSortedMediaFoldersStreamUseCase,

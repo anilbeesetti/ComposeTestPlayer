@@ -25,8 +25,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.arcticoss.nextplayer.feature.media.utils.TimeUtils
 import com.arcticoss.model.MediaItem
+import com.arcticoss.nextplayer.feature.media.utils.TimeUtils
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -57,17 +57,16 @@ fun MediaListItem(
                     .fillMaxWidth(0.45f)
                     .aspectRatio(16f / 10f)
             ) {
-//                TODO: "Images make lazy column laggy"
-//                if (mediaItem.thumbnailPath.isNotEmpty()) {
-//                    Image(
-//                        bitmap = remember {
-//                            BitmapFactory.decodeFile(mediaItem.thumbnailPath).asImageBitmap()
-//                        },
-//                        contentDescription = "",
-//                        contentScale = ContentScale.Crop,
-//                        modifier = Modifier.fillMaxSize()
-//                    )
-//                }
+                if (mediaItem.thumbnailPath.isNotEmpty()) {
+                    Image(
+                        bitmap = remember {
+                            BitmapFactory.decodeFile(mediaItem.thumbnailPath).asImageBitmap()
+                        },
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
             Column(
                 modifier = Modifier
