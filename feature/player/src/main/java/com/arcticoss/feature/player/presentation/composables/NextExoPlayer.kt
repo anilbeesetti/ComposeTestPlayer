@@ -71,7 +71,7 @@ fun NextExoPlayer(
     lateinit var playbackStateListener: Player.Listener
     Box(
         modifier = Modifier
-            .background(Color.Red)
+            .background(Color.Black)
             .fillMaxSize()
     ) {
         DisposableEffect(

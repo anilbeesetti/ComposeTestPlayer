@@ -27,8 +27,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.feature.player.presentation.composables.NextExoPlayer
 import com.arcticoss.feature.player.presentation.composables.NextPlayerUI
 import com.arcticoss.feature.player.utils.findActivity
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs
 
 
@@ -41,7 +39,7 @@ fun PlayerScreen(
     onBackPressed: () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
-    val player = viewModel.player as ExoPlayer
+    val player = viewModel.player
     val context = LocalContext.current
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
