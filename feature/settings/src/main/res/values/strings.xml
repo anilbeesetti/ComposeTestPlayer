@@ -21,4 +21,8 @@
     <string name="playback">Playback</string>
     <string name="save_brightness">Save brightness level</string>
     <string name="save_brightness_description">Keep brightness level between media</string>
+    <string name="fast_seeking">Fast seeking</string>
+    <string name="fast_seeking_description">Seek to nearest key frame position, Seek is faster but may be less precise</string>
+    <string name="resume">Resume</string>
+    <string name="resume_description">Select whether to resume played videos from the point where you stopped</string>
 </resources>

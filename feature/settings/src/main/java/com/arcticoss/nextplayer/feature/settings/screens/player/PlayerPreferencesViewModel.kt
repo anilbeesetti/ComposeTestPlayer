@@ -28,4 +28,10 @@ class PlayerPreferencesViewModel @Inject constructor(
             preferencesDataSource.toggleSaveBrightness()
         }
     }
+
+    fun toggleFastSeeking() {
+        viewModelScope.launch {
+            preferencesDataSource.toggleFastSeeking()
+        }
+    }
 }

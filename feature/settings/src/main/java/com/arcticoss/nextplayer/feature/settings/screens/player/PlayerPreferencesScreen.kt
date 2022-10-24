@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.feature.settings.R
+import com.arcticoss.nextplayer.feature.settings.composables.ClickablePreferenceItem
 import com.arcticoss.nextplayer.feature.settings.composables.PreferenceSwitch
 import com.arcticoss.nextplayer.feature.settings.screens.display.PreferenceGroupTitle
 
@@ -56,12 +57,27 @@ fun PlayerPreferencesScreen(
             item {
                 PreferenceGroupTitle(text = stringResource(id = R.string.playback))
             }
+            item { 
+                ClickablePreferenceItem(
+                    title = stringResource(id = R.string.resume),
+                    description = stringResource(id = R.string.resume_description),
+                    onClick = {}
+                )
+            }
             item {
                 PreferenceSwitch(
                     title = stringResource(id = R.string.save_brightness),
                     description = stringResource(id = R.string.save_brightness_description),
                     isChecked = preferences.saveBrightnessLevel,
                     onClick = viewModel::toggleSaveBrightnessLevel
+                )
+            }
+            item {
+                PreferenceSwitch(
+                    title = stringResource(id = R.string.fast_seeking),
+                    description = stringResource(id = R.string.fast_seeking_description),
+                    isChecked = preferences.fastSeeking,
+                    onClick = viewModel::toggleFastSeeking
                 )
             }
         }
