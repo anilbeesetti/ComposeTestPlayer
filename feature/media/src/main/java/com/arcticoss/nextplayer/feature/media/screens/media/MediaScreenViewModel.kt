@@ -28,7 +28,7 @@ class MediaScreenViewModel @Inject constructor(
     private var syncMediaJob: Job? = null
 
     val interfacePreferences = interfacePreferencesDataSource
-        .interfacePreferencesStream
+        .preferencesFlow
         .onEach {
             when(it.groupVideos) {
                 true -> getAllFolders(it.showHidden, it.sortBy, it.sortOrder)
