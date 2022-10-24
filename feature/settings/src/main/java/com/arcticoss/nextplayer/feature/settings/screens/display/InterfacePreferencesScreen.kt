@@ -27,7 +27,7 @@ fun InterfacePreferencesScreen(
     onBackClick: () -> Unit,
     viewModel: InterfacePreferencesViewModel = hiltViewModel()
 ) {
-    val interfacePreferences by viewModel.interfacePreferences.collectAsStateWithLifecycle()
+    val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
 
     val scrollBehaviour = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -62,7 +62,7 @@ fun InterfacePreferencesScreen(
             item {
                 ClickablePreferenceItem(
                     title = stringResource(id = R.string.theme),
-                    description = interfacePreferences.theme.name,
+                    description = preferences.theme.title,
                     onClick = { }
                 )
             }
@@ -70,7 +70,7 @@ fun InterfacePreferencesScreen(
                 PreferenceSwitch(
                     title = stringResource(id = R.string.floating_button),
                     description = stringResource(id = R.string.floating_button_description),
-                    isChecked = interfacePreferences.showFloatingButton,
+                    isChecked = preferences.showFloatingButton,
                     onClick = viewModel::toggleFloatingButton
                 )
             }
@@ -78,7 +78,7 @@ fun InterfacePreferencesScreen(
                 PreferenceSwitch(
                     title = stringResource(id = R.string.group_videos),
                     description = stringResource(id = R.string.group_videos_description),
-                    isChecked = interfacePreferences.groupVideos,
+                    isChecked = preferences.groupVideos,
                     onClick = viewModel::toggleGroupVideos
                 )
             }
@@ -89,7 +89,7 @@ fun InterfacePreferencesScreen(
                 PreferenceSwitch(
                     title = stringResource(id = R.string.show_hidden),
                     description = stringResource(id = R.string.show_hidden_description),
-                    isChecked = interfacePreferences.showHidden,
+                    isChecked = preferences.showHidden,
                     onClick = viewModel::toggleShowHidden
                 )
             }

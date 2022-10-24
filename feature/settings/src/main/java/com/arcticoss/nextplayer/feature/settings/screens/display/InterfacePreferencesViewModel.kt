@@ -12,11 +12,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InterfacePreferencesViewModel @Inject constructor(
-    private val interfacePreferencesDataSource: InterfacePreferencesDataSource
+    private val preferencesDataSource: InterfacePreferencesDataSource
 ) : ViewModel() {
 
-    val interfacePreferences = interfacePreferencesDataSource
-        .interfacePreferencesStream
+    val preferencesFlow = preferencesDataSource
+        .preferencesFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -25,21 +25,20 @@ class InterfacePreferencesViewModel @Inject constructor(
 
     fun toggleFloatingButton(){
         viewModelScope.launch {
-            interfacePreferencesDataSource.toggleShowFloatingButton()
+            preferencesDataSource.toggleShowFloatingButton()
         }
     }
 
     fun toggleShowHidden() {
         viewModelScope.launch {
-            interfacePreferencesDataSource.toggleShowHidden()
+            preferencesDataSource.toggleShowHidden()
         }
     }
 
     fun toggleGroupVideos() {
         viewModelScope.launch {
-            interfacePreferencesDataSource.toggleGroupVideos()
+            preferencesDataSource.toggleGroupVideos()
         }
     }
-
 }
 

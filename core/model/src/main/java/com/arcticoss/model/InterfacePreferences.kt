@@ -12,8 +12,10 @@ data class InterfacePreferences(
     val sortOrder: SortOrder = SortOrder.Ascending
 )
 
-enum class Theme {
-    Dark, Light, FollowSystem
+enum class Theme(val title: String) {
+    Dark(title = "Dark"),
+    Light(title = "Light"),
+    FollowSystem(title = "Follow system");
 }
 
 enum class ViewOption {

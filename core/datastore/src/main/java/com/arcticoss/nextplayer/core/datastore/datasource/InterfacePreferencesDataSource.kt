@@ -11,10 +11,10 @@ class InterfacePreferencesDataSource @Inject constructor(
     private val interfacePreferences: DataStore<InterfacePreferences>
 ) {
 
-    val interfacePreferencesStream = interfacePreferences.data
+    val preferencesFlow = interfacePreferences.data
 
-    suspend fun updateInterfacePreferences(interfacePref: InterfacePreferences) {
-        interfacePreferences.updateData { interfacePref }
+    suspend fun updatePreferences(preferences: InterfacePreferences) {
+        interfacePreferences.updateData { preferences }
     }
 
     suspend fun updateTheme(theme: Theme) {
