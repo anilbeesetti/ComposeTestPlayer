@@ -12,10 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.feature.player.PlayerViewModel
-import com.arcticoss.feature.player.hideBrightnessBar
-import com.arcticoss.feature.player.hideVolumeBar
-import com.arcticoss.feature.player.setVolume
+import com.arcticoss.feature.player.*
 import com.arcticoss.feature.player.utils.findActivity
 import com.arcticoss.feature.player.utils.setBrightness
 import com.arcticoss.feature.player.utils.setVolume
@@ -29,7 +26,6 @@ fun EventHandler(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
-    val uiPreferences by viewModel.uiPreferencesFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -41,9 +37,9 @@ fun EventHandler(
     }
 
 
-    LaunchedEffect(uiPreferences.brightnessLevel) {
+    LaunchedEffect(playerState.brightnessLevel) {
         val activity = context.findActivity()
-        val level = 1.0f / playerState.maxLevel * uiPreferences.brightnessLevel
+        val level = 1.0f / playerState.maxLevel * playerState.brightnessLevel
         activity?.setBrightness(level)
         delay(DELAY)
         viewModel.hideBrightnessBar()

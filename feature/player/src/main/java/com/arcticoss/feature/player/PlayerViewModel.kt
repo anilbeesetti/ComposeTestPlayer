@@ -4,15 +4,12 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.model.PlayerUiPreferences
+import com.arcticoss.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,15 +22,20 @@ class PlayerViewModel @Inject constructor(
     val player: Player
 ) : ViewModel() {
 
-    val uiPreferencesFlow = playerPreferencesDataSource.uiPrefStream
+    private val _playerState = MutableStateFlow(PlayerState())
+    val playerState = _playerState.asStateFlow()
+
+    val preferencesFlow = playerPreferencesDataSource.preferencesFlow
+        .onEach {
+            if (it.saveBrightnessLevel) {
+                _playerState.value = _playerState.value.copy(brightnessLevel = it.brightnessLevel)
+            }
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = PlayerUiPreferences()
+            initialValue = PlayerPreferences()
         )
-
-    private val _playerState = MutableStateFlow(PlayerState())
-    val playerState = _playerState.asStateFlow()
 
     private val _playerUiState = MutableStateFlow(PlayerUiState())
     val playerUiState = _playerUiState.asStateFlow()
@@ -81,15 +83,15 @@ class PlayerViewModel @Inject constructor(
 
     fun onEvent(event: PlayerEvent) {
         when (event) {
-            is PlayerEvent.ChangeOrientation -> _playerState.value =
-                playerState.value.copy(screenOrientation = event.value)
-            is PlayerEvent.SetVolume -> _playerState.value =
-                playerState.value.copy(volumeLevel = event.value)
+            is PlayerEvent.ChangeOrientation ->
+                _playerState.value = playerState.value.copy(screenOrientation = event.value)
+            is PlayerEvent.SetVolume ->
+                _playerState.value = playerState.value.copy(volumeLevel = event.value)
             is PlayerEvent.SetBrightness -> {
-                viewModelScope.launch {
-                    playerPreferencesDataSource.updateUiPref(
-                        uiPreferencesFlow.value.copy(brightnessLevel = event.value)
-                    )
+                if (preferencesFlow.value.saveBrightnessLevel) {
+                    viewModelScope.launch { playerPreferencesDataSource.updateBrightnessLevel(event.value) }
+                } else {
+                    _playerState.value = playerState.value.copy(brightnessLevel = event.value)
                 }
             }
         }
@@ -99,7 +101,7 @@ class PlayerViewModel @Inject constructor(
 data class PlayerState(
     val currentPosition: Long = 0,
     val currentMediaItemDuration: Long = 0,
-    val currentBrightness: Int = 5,
+    val brightnessLevel: Int = 5,
     val volumeLevel: Int = 0,
     val screenOrientation: Int = 1,
     val isPlaying: Boolean = true,
