@@ -5,9 +5,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
 import com.arcticoss.model.InterfacePreferences
-import com.arcticoss.model.PlayerUiPreferences
+import com.arcticoss.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.datastore.serializer.InterfacePreferencesSerializer
-import com.arcticoss.nextplayer.core.datastore.serializer.PlayerUiPreferencesSerializer
+import com.arcticoss.nextplayer.core.datastore.serializer.PlayerPreferencesSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 
 
 private const val INTERFACE_PREFERENCES_DATASTORE_FILE = "interface_preferences.json"
-private const val PLAYER_UI_PREFERENCES_DATASTORE_FILE = "player_ui_preferences.json"
+private const val PLAYER_PREFERENCES_DATASTORE_FILE = "player_preferences.json"
 
 
 @Module
@@ -37,12 +37,12 @@ object DataStoreModule {
 
     @Provides
     @Singleton
-    fun providePlayerUiPreferencesDataStore(
+    fun providePlayerPreferencesDataStore(
         @ApplicationContext appContext: Context
-    ): DataStore<PlayerUiPreferences> {
+    ): DataStore<PlayerPreferences> {
         return DataStoreFactory.create(
-            serializer = PlayerUiPreferencesSerializer,
-            produceFile = { appContext.dataStoreFile(PLAYER_UI_PREFERENCES_DATASTORE_FILE) }
+            serializer = PlayerPreferencesSerializer,
+            produceFile = { appContext.dataStoreFile(PLAYER_PREFERENCES_DATASTORE_FILE) }
         )
     }
 
