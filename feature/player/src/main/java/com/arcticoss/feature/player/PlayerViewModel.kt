@@ -20,7 +20,7 @@ private const val TAG = "NextPlayerViewModel"
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val playerPreferencesDataSource: PlayerPreferencesDataSource,
+    private val preferencesDataSource: PlayerPreferencesDataSource,
     normalPlayer: Player
 ) : ViewModel() {
 
@@ -29,7 +29,7 @@ class PlayerViewModel @Inject constructor(
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
 
-    val preferencesFlow = playerPreferencesDataSource.preferencesFlow
+    val preferencesFlow = preferencesDataSource.preferencesFlow
         .onEach {
             if (it.saveBrightnessLevel) {
                 _playerState.value = _playerState.value.copy(brightnessLevel = it.brightnessLevel)
@@ -102,16 +102,26 @@ class PlayerViewModel @Inject constructor(
                 _playerState.value = playerState.value.copy(volumeLevel = event.value)
             is PlayerEvent.SetBrightness -> {
                 if (preferencesFlow.value.saveBrightnessLevel) {
-                    viewModelScope.launch { playerPreferencesDataSource.updateBrightnessLevel(event.value) }
+                    viewModelScope.launch { preferencesDataSource.updateBrightnessLevel(event.value) }
                 } else {
                     _playerState.value = playerState.value.copy(brightnessLevel = event.value)
                 }
             }
         }
     }
+
+    fun switchAspectRatio() {
+        viewModelScope.launch { preferencesDataSource.switchAspectRatio() }
+    }
+
+    fun setVideoSize(width: Int, height: Int) {
+        _playerState.value = _playerState.value.copy(width = width, height = height)
+    }
 }
 
 data class PlayerState(
+    val width: Int = 0,
+    val height: Int = 0,
     val currentPosition: Long = 0,
     val currentMediaItemDuration: Long = 0,
     val brightnessLevel: Int = 5,

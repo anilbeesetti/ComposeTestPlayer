@@ -19,7 +19,6 @@ import com.arcticoss.feature.player.PlayerViewModel
 import com.arcticoss.feature.player.utils.findActivity
 import com.arcticoss.feature.player.utils.hideSystemBars
 import com.arcticoss.feature.player.utils.showSystemBars
-import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.delay
 
 
@@ -34,6 +33,7 @@ fun NextPlayerUI(
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
+    val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val player = viewModel.player
 
@@ -77,12 +77,15 @@ fun NextPlayerUI(
                     .align(Alignment.Center)
             )
             PlayerUIFooter(
+                preferences = preferences,
                 duration = playerState.currentMediaItemDuration,
                 currentPosition = playerState.currentPosition,
-                onSeek = { viewModel.seekTo(it.toLong()) },
                 modifier = Modifier
                     .navigationBarsPadding()
-                    .align(Alignment.BottomCenter)
+                    .align(Alignment.BottomCenter),
+                onSeek = { viewModel.seekTo(it.toLong()) },
+                onAspectRatioClick = { viewModel.switchAspectRatio() },
+                onLockClick = {  }
             )
         }
         if (playerUiState.showVolumeBar) {

@@ -3,11 +3,13 @@ package com.arcticoss.feature.player.presentation.composables
 import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -17,11 +19,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.feature.player.PlayerViewModel
+import com.arcticoss.model.AspectRatio
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,7 +39,8 @@ fun NextExoPlayer(
     changeOrientation: (requestedOrientation: Int) -> Unit
 ) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
-    val exoPlayer = viewModel.player as ExoPlayer
+    val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
+    val exoPlayer = viewModel.player
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -62,76 +67,108 @@ fun NextExoPlayer(
             }
         }
     )
-
-
-    lateinit var playerView: StyledPlayerView
+    var playerView: StyledPlayerView? = null
     lateinit var playbackStateListener: Player.Listener
-    DisposableEffect(
-        AndroidView(
-            factory = { androidContext ->
-                playerView = StyledPlayerView(androidContext).apply {
-                    hideController()
-                    useController = false
-                    player = exoPlayer
-                }
-                playerView
-            },
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-        )
+    Box(
+        modifier = Modifier
+            .background(Color.Red)
+            .fillMaxSize()
     ) {
-        playbackStateListener = object : Player.Listener {
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                when (playbackState) {
-                    Player.STATE_BUFFERING -> {
-                        Log.d(TAG, "onPlaybackStateChanged: buffering")
+        DisposableEffect(
+            AndroidView(
+                factory = { androidContext ->
+                    StyledPlayerView(androidContext).apply {
+                        hideController()
+                        useController = false
+                        player = exoPlayer
                     }
-                    Player.STATE_ENDED -> {
-                        if (!exoPlayer.hasNextMediaItem()) run {
-                            onBackPressed()
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center)
+                    .background(Color.Black),
+                update = {
+                    playerView = it
+                }
+            )
+        ) {
+            playbackStateListener = object : Player.Listener {
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    when (playbackState) {
+                        Player.STATE_BUFFERING -> {
+                            Log.d(TAG, "onPlaybackStateChanged: buffering")
                         }
-                        Log.d(TAG, "onPlaybackStateChanged: ended")
-                    }
-                    Player.STATE_IDLE -> {
-                        Log.d(TAG, "onPlaybackStateChanged: idle")
-                    }
-                    Player.STATE_READY -> {
-                        viewModel.setDuration(exoPlayer.duration)
+                        Player.STATE_ENDED -> {
+                            if (!exoPlayer.hasNextMediaItem()) run {
+                                onBackPressed()
+                            }
+                            Log.d(TAG, "onPlaybackStateChanged: ended")
+                        }
+                        Player.STATE_IDLE -> {
+                            Log.d(TAG, "onPlaybackStateChanged: idle")
+                        }
+                        Player.STATE_READY -> {
+                            viewModel.setDuration(exoPlayer.duration)
+                        }
                     }
                 }
-            }
 
-            override fun onTracksChanged(tracks: Tracks) {
-                tracks.groups.forEach {
-                    if (it.type == C.TRACK_TYPE_VIDEO) {
-                        for (i in 0 until it.length) {
-                            val trackFormat = it.getTrackFormat(i)
-                            if (trackFormat.height >= trackFormat.width) {
-                                changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                            } else {
-                                if (trackFormat.rotationDegrees < 90) {
-                                    changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE)
-                                } else {
+                override fun onTracksChanged(tracks: Tracks) {
+                    tracks.groups.forEach {
+                        if (it.type == C.TRACK_TYPE_VIDEO) {
+                            for (i in 0 until it.length) {
+                                val trackFormat = it.getTrackFormat(i)
+                                if (trackFormat.height >= trackFormat.width) {
                                     changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                                } else {
+                                    if (trackFormat.rotationDegrees < 90) {
+                                        changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE)
+                                    } else {
+                                        changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                                    }
                                 }
                             }
                         }
                     }
+                    super.onTracksChanged(tracks)
                 }
-                super.onTracksChanged(tracks)
-            }
 
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                viewModel.updatePlayWhenReady(exoPlayer.playWhenReady)
-                viewModel.updatePlayingState(isPlaying)
-                playerView.keepScreenOn = isPlaying
+                override fun onVideoSizeChanged(videoSize: VideoSize) {
+                    viewModel.setVideoSize(videoSize.width, videoSize.height)
+                    super.onVideoSizeChanged(videoSize)
+                }
+                
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    viewModel.updatePlayWhenReady(exoPlayer.playWhenReady)
+                    viewModel.updatePlayingState(isPlaying)
+                    playerView?.keepScreenOn = isPlaying
+                }
+            }
+            exoPlayer.addListener(playbackStateListener)
+            onDispose {
+                exoPlayer.removeListener(playbackStateListener)
+                exoPlayer.release()
             }
         }
-        exoPlayer.addListener(playbackStateListener)
-        onDispose {
-            exoPlayer.removeListener(playbackStateListener)
-            exoPlayer.release()
+    }
+    LaunchedEffect(key1 = preferences.aspectRatio, key2 = playerState.width) {
+        Log.d(TAG, "NextExoPlayer: ${preferences.aspectRatio}")
+        when(preferences.aspectRatio) {
+            AspectRatio.FitScreen -> {
+                playerView?.let {
+                    it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                }
+            }
+            AspectRatio.Stretch -> {
+                playerView?.let {
+                    it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+                }
+            }
+            AspectRatio.Crop -> {
+                playerView?.let {
+                    it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                }
+            }
         }
     }
 }

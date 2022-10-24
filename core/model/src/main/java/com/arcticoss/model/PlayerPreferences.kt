@@ -23,6 +23,11 @@ enum class Resume(val title: String) {
 enum class AspectRatio(val title: String) {
     FitScreen(title = "Fit to Screen"),
     Stretch(title = "Stretch"),
-    Crop(title = "Crop"),
-    HundredPercent(title = "100%")
+    Crop(title = "Crop")
+}
+
+inline fun <reified T: Enum<T>> T.next(): T {
+    val values = enumValues<T>()
+    val nextOrdinal = (ordinal + 1) % values.size
+    return values[nextOrdinal]
 }

@@ -2,6 +2,9 @@ package com.arcticoss.feature.player.presentation.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AspectRatio
+import androidx.compose.material.icons.rounded.Crop
+import androidx.compose.material.icons.rounded.FitScreen
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -10,13 +13,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.feature.player.utils.TimeUtils
+import com.arcticoss.model.AspectRatio
+import com.arcticoss.model.PlayerPreferences
 
 @Composable
 fun PlayerUIFooter(
     duration: Long,
     currentPosition: Long,
     onSeek: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    onLockClick: () -> Unit,
+    onAspectRatioClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    preferences: PlayerPreferences
 ) {
     val context = LocalContext.current
     Column(
@@ -51,6 +59,18 @@ fun PlayerUIFooter(
         Row(modifier = Modifier.fillMaxWidth()) {
             IconButton(onClick = { /*TODO*/ }) {
                 Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
+            }
+            Row {
+               IconButton(onClick = onAspectRatioClick) {
+                   Icon(
+                       imageVector = when(preferences.aspectRatio) {
+                           AspectRatio.FitScreen -> Icons.Rounded.FitScreen
+                           AspectRatio.Stretch -> Icons.Rounded.AspectRatio
+                           AspectRatio.Crop -> Icons.Rounded.Crop
+                       },
+                       contentDescription = ""
+                   )
+               } 
             }
         }
     }
