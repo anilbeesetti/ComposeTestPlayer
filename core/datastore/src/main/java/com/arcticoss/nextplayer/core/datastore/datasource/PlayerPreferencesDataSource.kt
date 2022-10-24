@@ -1,21 +1,40 @@
 package com.arcticoss.nextplayer.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
-import com.arcticoss.model.PlayerUiPreferences
+import com.arcticoss.model.PlayerPreferences
 import javax.inject.Inject
 
 class PlayerPreferencesDataSource @Inject constructor(
-    private val playerUiPreferences: DataStore<PlayerUiPreferences>
+    private val playerPreferences: DataStore<PlayerPreferences>
 ) {
 
-    val uiPrefStream = playerUiPreferences.data
+    val preferencesFlow = playerPreferences.data
 
-    suspend fun updateUiPref(uiPref: PlayerUiPreferences) {
-        playerUiPreferences.updateData {
-            it.copy(
-                brightnessLevel = uiPref.brightnessLevel
-            )
+    suspend fun updatePreferences(preferences: PlayerPreferences) {
+        playerPreferences.updateData { preferences }
+    }
+
+    suspend fun toggleSaveBrightness() {
+        playerPreferences.updateData {
+            it.copy(saveBrightnessLevel = !it.saveBrightnessLevel)
         }
     }
 
+    suspend fun toggleSavePlayBackSpeed() {
+        playerPreferences.updateData {
+            it.copy(savePlayBackSpeed = !it.savePlayBackSpeed)
+        }
+    }
+
+    suspend fun toggleFastSeeking() {
+        playerPreferences.updateData {
+            it.copy(fastSeeking = !it.fastSeeking)
+        }
+    }
+
+    suspend fun updateBrightnessLevel(brightnessLevel: Int) {
+        playerPreferences.updateData {
+            it.copy(brightnessLevel = brightnessLevel)
+        }
+    }
 }
