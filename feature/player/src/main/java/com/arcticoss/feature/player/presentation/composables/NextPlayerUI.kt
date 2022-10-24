@@ -35,7 +35,7 @@ fun NextPlayerUI(
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val player = viewModel.player as ExoPlayer
+    val player = viewModel.player
 
     LaunchedEffect(key1 = playerUiState.showUi, key2 = playerState.isPlaying) {
         if (playerUiState.showUi) {
@@ -79,9 +79,7 @@ fun NextPlayerUI(
             PlayerUIFooter(
                 duration = playerState.currentMediaItemDuration,
                 currentPosition = playerState.currentPosition,
-                onSeek = {
-                    player.seekTo(it.toLong())
-                },
+                onSeek = { viewModel.seekTo(it.toLong()) },
                 modifier = Modifier
                     .navigationBarsPadding()
                     .align(Alignment.BottomCenter)

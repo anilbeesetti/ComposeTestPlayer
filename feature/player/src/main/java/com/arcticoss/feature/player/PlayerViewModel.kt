@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SeekParameters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,8 +21,10 @@ private const val TAG = "NextPlayerViewModel"
 class PlayerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val playerPreferencesDataSource: PlayerPreferencesDataSource,
-    val player: Player
+    normalPlayer: Player
 ) : ViewModel() {
+
+    val player = normalPlayer as ExoPlayer
 
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
@@ -44,6 +48,15 @@ class PlayerViewModel @Inject constructor(
         val mediaItem = MediaItem.fromUri(uri)
         player.addMediaItem(mediaItem)
         player.prepare()
+    }
+
+    fun seekTo(positionMs: Long) {
+        if (preferencesFlow.value.fastSeeking) {
+            player.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+        } else {
+            player.setSeekParameters(SeekParameters.DEFAULT)
+        }
+        player.seekTo(positionMs)
     }
 
     fun updatePlayingState(isPlaying: Boolean) {

@@ -28,6 +28,7 @@ import com.arcticoss.feature.player.presentation.composables.NextExoPlayer
 import com.arcticoss.feature.player.presentation.composables.NextPlayerUI
 import com.arcticoss.feature.player.utils.findActivity
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs
 
 
@@ -92,7 +93,7 @@ fun PlayerScreen(
                         val seekAmount = abs(change.position.x - dragStartOffset) * dragAmount
                         val newPosition = (playerState.currentPosition + seekAmount.toLong())
                             .coerceIn(0..playerState.currentMediaItemDuration)
-                        player.seekTo(newPosition)
+                        viewModel.seekTo(newPosition)
                         dragStartOffset = change.position.x
                     },
                     onDragEnd = {
