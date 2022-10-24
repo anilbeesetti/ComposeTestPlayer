@@ -18,4 +18,7 @@
     <string name="show_hidden_description">Show hidden files and folders starting with "." (dot)</string>
     <string name="group_videos">Group videos</string>
     <string name="group_videos_description">Group videos into folders</string>
+    <string name="playback">Playback</string>
+    <string name="save_brightness">Save brightness level</string>
+    <string name="save_brightness_description">Keep brightness level between media</string>
 </resources>
