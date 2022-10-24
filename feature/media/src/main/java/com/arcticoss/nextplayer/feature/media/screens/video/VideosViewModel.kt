@@ -27,7 +27,7 @@ class VideosViewModel @Inject constructor(
     val videosUiState = _videosUiState.asStateFlow()
 
     val interfacePreferences = interfacePreferencesDataSource
-        .interfacePreferencesStream
+        .preferencesFlow
         .onEach {
             folderId?.let { id ->
                 getMedia(id, it.showHidden, it.sortBy, it.sortOrder)
