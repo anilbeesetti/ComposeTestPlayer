@@ -22,10 +22,11 @@ fun PlayerUIFooter(
     duration: Long,
     playerUiState: PlayerUiState,
     currentPosition: Long,
-    onSeek: (Float) -> Unit,
-    onLockClick: () -> Unit,
-    onAspectRatioClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onLockClick: () -> Unit,
+    onSeek: (Float) -> Unit,
+    onSeekFinished: () -> Unit = {},
+    onAspectRatioClick: () -> Unit,
     preferences: PlayerPreferences
 ) {
     val context = LocalContext.current
@@ -50,7 +51,8 @@ fun PlayerUIFooter(
                     Slider(
                         value = currentPosition.toFloat(),
                         valueRange = 0f..duration.toFloat(),
-                        onValueChange = { onSeek(it) }
+                        onValueChange = onSeek,
+                        onValueChangeFinished = onSeekFinished
                     )
                 }
                 Text(

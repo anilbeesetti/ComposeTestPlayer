@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,6 @@ fun NextPlayerUI(
     onBackPressed: () -> Unit,
     onUiEvent: (UiEvent) -> Unit
 ) {
-    Log.d(TAG, "NextPlayerUI: restarting...Ui")
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -67,7 +67,8 @@ fun NextPlayerUI(
                 .navigationBarsPadding()
                 .align(Alignment.BottomCenter),
             onSeek = {
-                if (abs(it - player.currentPosition) > 1000) {
+                val offset = it -player.currentPosition
+                if (abs(offset) > 30000) {
                     player.setSeekParameters(SeekParameters.CLOSEST_SYNC)
                     player.seekTo(it.toLong())
                 }
