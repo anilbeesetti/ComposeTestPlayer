@@ -1,5 +1,6 @@
 package com.arcticoss.feature.player
 
+import android.util.Log
 import android.view.KeyEvent
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -72,7 +73,7 @@ fun PlayerScreen(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
-                        viewModel.onUiEvent(PlayerUiEvent.ShowUi(!playerUiState.showUi))
+                        viewModel.onUiEvent(PlayerUiEvent.ShowUi(!playerUiState.isControllerVisible))
                     },
                     onDoubleTap = {
                         if (player.playWhenReady) {
@@ -97,6 +98,7 @@ fun PlayerScreen(
                         seekChange = 0L
                         seekStart = player.currentPosition
                         seekMax = player.duration
+                        viewModel.onUiEvent(PlayerUiEvent.ShowSeekBar(true))
                     },
                     onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
                         val offset = gestureScrollX - change.position.x
@@ -118,11 +120,13 @@ fun PlayerScreen(
                                     player.seekTo(position)
                                 }
                             }
+                            Log.d(TAG, "PlayerScreen: $seekChange")
                             gestureScrollX = change.position.x
                         }
                     },
                     onDragEnd = {
                         player.playWhenReady = playerCurrentState
+                        viewModel.onUiEvent(PlayerUiEvent.ShowSeekBar(false))
                     }
                 )
             }
@@ -135,7 +139,13 @@ fun PlayerScreen(
                 detectVerticalDragGestures(
                     onDragStart = { offset ->
                         gestureScrollY = offset.y
-                        whichBar = (if (offset.x < (width / 2)) Bar.Brightness else Bar.Volume)
+                        if (offset.x < (width / 2)) {
+                            whichBar = Bar.Brightness
+                            viewModel.showBrightnessBar()
+                        } else {
+                            whichBar =Bar.Volume
+                            viewModel.showVolumeBar()
+                        }
                     },
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
                         change.consume()
@@ -160,6 +170,10 @@ fun PlayerScreen(
                             }
                             gestureScrollY = change.position.y
                         }
+                    },
+                    onDragEnd = {
+                        viewModel.hideVolumeBar()
+                        viewModel.hideBrightnessBar()
                     }
                 )
             }

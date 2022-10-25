@@ -5,21 +5,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.feature.player.PlayerUiEvent
 import com.arcticoss.feature.player.PlayerViewModel
-import com.arcticoss.feature.player.utils.findActivity
-import com.arcticoss.feature.player.utils.hideSystemBars
-import com.arcticoss.feature.player.utils.showSystemBars
-import kotlinx.coroutines.delay
 
 
 private const val TAG = "NextPlayerUI"
@@ -34,27 +27,13 @@ fun NextPlayerUI(
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val player = viewModel.player
-
-    LaunchedEffect(key1 = playerUiState.showUi, key2 = playerState.isPlaying) {
-        if (playerUiState.showUi) {
-            context.findActivity()?.showSystemBars()
-        } else {
-            context.findActivity()?.hideSystemBars()
-        }
-        if (playerState.isPlaying and playerUiState.showUi) {
-            delay(3000)
-            viewModel.onUiEvent(PlayerUiEvent.ShowUi(false))
-            context.findActivity()?.hideSystemBars()
-        }
-    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
     ) {
-        if (playerUiState.showUi) {
+        if (playerUiState.isControllerVisible) {
             PlayerUIHeader(
                 title = "TODO",
                 onBackPressed = onBackPressed,
@@ -76,19 +55,20 @@ fun NextPlayerUI(
                 modifier = Modifier
                     .align(Alignment.Center)
             )
-            PlayerUIFooter(
-                preferences = preferences,
-                duration = playerState.currentMediaItemDuration,
-                currentPosition = playerState.currentPosition,
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .align(Alignment.BottomCenter),
-                onSeek = { viewModel.seekTo(it.toLong()) },
-                onAspectRatioClick = { viewModel.switchAspectRatio() },
-                onLockClick = {  }
-            )
         }
-        if (playerUiState.showVolumeBar) {
+        PlayerUIFooter(
+            playerUiState = playerUiState,
+            preferences = preferences,
+            duration = playerState.currentMediaItemDuration,
+            currentPosition = playerState.currentPosition,
+            modifier = Modifier
+                .navigationBarsPadding()
+                .align(Alignment.BottomCenter),
+            onSeek = { viewModel.seekTo(it.toLong()) },
+            onAspectRatioClick = { viewModel.switchAspectRatio() },
+            onLockClick = {  }
+        )
+        if (playerUiState.isVolumeBarVisible) {
             AudioAdjustmentBar(
                 volumeLevel = playerState.volumeLevel,
                 maxVolumeLevel = playerState.maxLevel,
@@ -98,7 +78,7 @@ fun NextPlayerUI(
                     .align(Alignment.CenterStart)
             )
         }
-        if (playerUiState.showBrightnessBar) {
+        if (playerUiState.isBrightnessBarVisible) {
             BrightnessAdjustmentBar(
                 brightness = playerState.brightnessLevel,
                 maxBrightness = playerState.maxLevel,

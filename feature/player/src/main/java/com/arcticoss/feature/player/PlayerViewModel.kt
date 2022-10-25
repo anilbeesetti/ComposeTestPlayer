@@ -37,7 +37,7 @@ class PlayerViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = PlayerPreferences()
         )
 
@@ -85,12 +85,18 @@ class PlayerViewModel @Inject constructor(
 
     fun onUiEvent(event: PlayerUiEvent) {
         when (event) {
-            is PlayerUiEvent.ShowUi -> _playerUiState.value =
-                playerUiState.value.copy(showUi = event.value)
-            is PlayerUiEvent.ShowVolumeBar -> _playerUiState.value =
-                playerUiState.value.copy(showVolumeBar = event.value)
-            is PlayerUiEvent.ShowBrightnessBar -> _playerUiState.value =
-                playerUiState.value.copy(showBrightnessBar = event.value)
+            is PlayerUiEvent.ShowUi -> _playerUiState.update {
+                it.copy(isControllerVisible = event.value)
+            }
+            is PlayerUiEvent.ShowVolumeBar -> _playerUiState.update {
+                it.copy(isVolumeBarVisible = event.value)
+            }
+            is PlayerUiEvent.ShowBrightnessBar -> _playerUiState.update {
+                it.copy(isBrightnessBarVisible = event.value)
+            }
+            is PlayerUiEvent.ShowSeekBar -> _playerUiState.update {
+                it.copy(isSeekBarVisible = event.value)
+            }
         }
     }
 
@@ -134,15 +140,17 @@ data class PlayerState(
 
 
 data class PlayerUiState(
-    val showUi: Boolean = false,
-    val showBrightnessBar: Boolean = false,
-    val showVolumeBar: Boolean = false,
+    val isControllerVisible: Boolean = false,
+    val isBrightnessBarVisible: Boolean = false,
+    val isVolumeBarVisible: Boolean = false,
+    val isSeekBarVisible: Boolean = false,
 )
 
 sealed class PlayerUiEvent {
     data class ShowUi(val value: Boolean) : PlayerUiEvent()
     data class ShowBrightnessBar(val value: Boolean) : PlayerUiEvent()
     data class ShowVolumeBar(val value: Boolean) : PlayerUiEvent()
+    data class ShowSeekBar(val value: Boolean) : PlayerUiEvent()
 }
 
 sealed interface PlayerEvent {

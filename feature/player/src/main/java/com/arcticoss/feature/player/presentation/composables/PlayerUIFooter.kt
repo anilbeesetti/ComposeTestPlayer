@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.arcticoss.feature.player.PlayerUiState
 import com.arcticoss.feature.player.utils.TimeUtils
 import com.arcticoss.model.AspectRatio
 import com.arcticoss.model.PlayerPreferences
@@ -19,6 +20,7 @@ import com.arcticoss.model.PlayerPreferences
 @Composable
 fun PlayerUIFooter(
     duration: Long,
+    playerUiState: PlayerUiState,
     currentPosition: Long,
     onSeek: (Float) -> Unit,
     onLockClick: () -> Unit,
@@ -32,45 +34,49 @@ fun PlayerUIFooter(
             .fillMaxWidth()
             .navigationBarsPadding()
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = TimeUtils.formatTime(context, currentPosition),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(horizontal = 5.dp)
-            )
-            Box(
-                modifier = Modifier.weight(1f)
+        if (playerUiState.isControllerVisible || playerUiState.isSeekBarVisible) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Slider(
-                    value = currentPosition.toFloat(),
-                    valueRange = 0f..duration.toFloat(),
-                    onValueChange = { onSeek(it) }
+                Text(
+                    text = TimeUtils.formatTime(context, currentPosition),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(horizontal = 5.dp)
+                )
+                Box(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Slider(
+                        value = currentPosition.toFloat(),
+                        valueRange = 0f..duration.toFloat(),
+                        onValueChange = { onSeek(it) }
+                    )
+                }
+                Text(
+                    text = TimeUtils.formatTime(context, duration),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(horizontal = 5.dp)
                 )
             }
-            Text(
-                text = TimeUtils.formatTime(context, duration),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(horizontal = 5.dp)
-            )
         }
-        Row(modifier = Modifier.fillMaxWidth()) {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
-            }
-            Row {
-               IconButton(onClick = onAspectRatioClick) {
-                   Icon(
-                       imageVector = when(preferences.aspectRatio) {
-                           AspectRatio.FitScreen -> Icons.Rounded.FitScreen
-                           AspectRatio.Stretch -> Icons.Rounded.AspectRatio
-                           AspectRatio.Crop -> Icons.Rounded.Crop
-                       },
-                       contentDescription = ""
-                   )
-               } 
+        if (playerUiState.isControllerVisible) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
+                }
+                Row {
+                    IconButton(onClick = onAspectRatioClick) {
+                        Icon(
+                            imageVector = when(preferences.aspectRatio) {
+                                AspectRatio.FitScreen -> Icons.Rounded.FitScreen
+                                AspectRatio.Stretch -> Icons.Rounded.AspectRatio
+                                AspectRatio.Crop -> Icons.Rounded.Crop
+                            },
+                            contentDescription = ""
+                        )
+                    }
+                }
             }
         }
     }

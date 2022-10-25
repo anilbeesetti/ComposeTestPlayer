@@ -1,7 +1,6 @@
 package com.arcticoss.feature.player
 
 fun PlayerViewModel.increaseBrightness() {
-    this.showBrightnessBar()
     val brightness = playerState.value.brightnessLevel
     if (brightness < 25) {
         this.setBrightness(brightness + 1)
@@ -9,7 +8,6 @@ fun PlayerViewModel.increaseBrightness() {
 }
 
 fun PlayerViewModel.decreaseBrightness() {
-    this.showBrightnessBar()
     val brightness = playerState.value.brightnessLevel
     if (brightness > 0) {
         this.setBrightness(brightness - 1)

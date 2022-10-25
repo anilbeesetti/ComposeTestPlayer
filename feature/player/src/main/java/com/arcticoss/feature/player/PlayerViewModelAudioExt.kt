@@ -1,7 +1,6 @@
 package com.arcticoss.feature.player
 
 fun PlayerViewModel.increaseVolume() {
-    this.showVolumeBar()
     val volume = playerState.value.volumeLevel
     if (volume < 25) {
         this.setVolume(volume + 1)
@@ -9,7 +8,6 @@ fun PlayerViewModel.increaseVolume() {
 }
 
 fun PlayerViewModel.decreaseVolume() {
-    this.showVolumeBar()
     val volume = playerState.value.volumeLevel
     if (volume > 0) {
         this.setVolume(volume - 1)
