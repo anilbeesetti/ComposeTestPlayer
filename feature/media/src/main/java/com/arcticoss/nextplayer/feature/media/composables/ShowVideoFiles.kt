@@ -1,7 +1,5 @@
 package com.arcticoss.nextplayer.feature.media.composables
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.arcticoss.feature.player.PlayerActivity
 import com.arcticoss.model.MediaItem
 
 private const val TAG = "ShowVideoFiles"
