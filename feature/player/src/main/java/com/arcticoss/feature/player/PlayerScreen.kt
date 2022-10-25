@@ -8,10 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -22,11 +19,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arcticoss.feature.player.presentation.composables.EventHandler
 import com.arcticoss.feature.player.presentation.composables.NextExoPlayer
 import com.arcticoss.feature.player.presentation.composables.NextPlayerUI
 import com.arcticoss.feature.player.utils.Utils
 import com.arcticoss.feature.player.utils.findActivity
+import com.arcticoss.model.PlayerPreferences
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs
 import kotlin.math.max
@@ -35,17 +35,51 @@ import kotlin.math.min
 
 private const val TAG = "NextPlayerScreen"
 
+
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun PlayerScreen(
+    onBackPressed: () -> Unit,
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
-    val focusRequester = remember { FocusRequester() }
     val player = viewModel.player
-    val context = LocalContext.current
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
 
+    EventHandler(
+        player = player,
+        playerState = playerState,
+        playerUiState = playerUiState,
+        onEvent = viewModel::onEvent,
+        onUiEvent = viewModel::onUiEvent
+    )
+    PlayerScreen(
+        player = player,
+        playerState = playerState,
+        playerUiState = playerUiState,
+        preferences = preferences,
+        onEvent = viewModel::onEvent,
+        onUiEvent = viewModel::onUiEvent,
+        onBackPressed = onBackPressed
+    )
+}
+
+
+@Composable
+internal fun PlayerScreen(
+    player: ExoPlayer,
+    playerState: PlayerState,
+    playerUiState: PlayerUiState,
+    preferences: PlayerPreferences,
+    onEvent: (PlayerEvent) -> Unit,
+    onUiEvent: (UiEvent) -> Unit,
+    onBackPressed: () -> Unit
+) {
+
+    val focusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
+    val activity = remember { context.findActivity() }
     val SCROLL_STEP = Utils.dpToPx(16)
     val SCROLL_STEP_SEEK = Utils.dpToPx(8)
     val SEEK_STEP = 1000
@@ -56,13 +90,13 @@ fun PlayerScreen(
                 if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_UP
                     && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN
                 ) {
-                    viewModel.increaseVolume()
+                    onEvent(PlayerEvent.IncreaseVolume)
                     return@onKeyEvent true
                 }
                 if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
                     && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN
                 ) {
-                    viewModel.decreaseVolume()
+                    onEvent(PlayerEvent.DecreaseVolume)
                     return@onKeyEvent true
                 }
                 false
@@ -72,9 +106,7 @@ fun PlayerScreen(
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = {
-                        viewModel.onUiEvent(PlayerUiEvent.ShowUi(!playerUiState.isControllerVisible))
-                    },
+                    onTap = { onUiEvent(UiEvent.ToggleShowUi) },
                     onDoubleTap = {
                         if (player.playWhenReady) {
                             player.pause()
@@ -98,9 +130,10 @@ fun PlayerScreen(
                         seekChange = 0L
                         seekStart = player.currentPosition
                         seekMax = player.duration
-                        viewModel.onUiEvent(PlayerUiEvent.ShowSeekBar(true))
+                        onUiEvent(UiEvent.ShowSeekBar(true))
                     },
                     onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
+                        change.consume()
                         val offset = gestureScrollX - change.position.x
                         val position: Long
                         if (abs(offset) > SCROLL_STEP_SEEK) {
@@ -126,12 +159,11 @@ fun PlayerScreen(
                     },
                     onDragEnd = {
                         player.playWhenReady = playerCurrentState
-                        viewModel.onUiEvent(PlayerUiEvent.ShowSeekBar(false))
+                        onUiEvent(UiEvent.ShowSeekBar(false))
                     }
                 )
             }
             .pointerInput(Unit) {
-                val activity = context.findActivity()
                 val width = activity?.resources?.displayMetrics?.widthPixels ?: 0
                 val height = activity?.resources?.displayMetrics?.heightPixels ?: 0
                 var gestureScrollY = 0.0f
@@ -141,10 +173,10 @@ fun PlayerScreen(
                         gestureScrollY = offset.y
                         if (offset.x < (width / 2)) {
                             whichBar = Bar.Brightness
-                            viewModel.showBrightnessBar()
+                            onUiEvent(UiEvent.ShowBrightnessBar(true))
                         } else {
-                            whichBar =Bar.Volume
-                            viewModel.showVolumeBar()
+                            whichBar = Bar.Volume
+                            onUiEvent(UiEvent.ShowVolumeBar(true))
                         }
                     },
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
@@ -155,16 +187,16 @@ fun PlayerScreen(
                             when (whichBar) {
                                 Bar.Volume -> {
                                     if (offset > 0) {
-                                        viewModel.increaseVolume()
+                                        onEvent(PlayerEvent.IncreaseVolume)
                                     } else {
-                                        viewModel.decreaseVolume()
+                                        onEvent(PlayerEvent.DecreaseVolume)
                                     }
                                 }
                                 Bar.Brightness -> {
                                     if (offset > 0) {
-                                        viewModel.increaseBrightness()
+                                        onEvent(PlayerEvent.IncreaseBrightness)
                                     } else {
-                                        viewModel.decreaseBrightness()
+                                        onEvent(PlayerEvent.DecreaseBrightness)
                                     }
                                 }
                             }
@@ -172,28 +204,26 @@ fun PlayerScreen(
                         }
                     },
                     onDragEnd = {
-                        viewModel.hideVolumeBar()
-                        viewModel.hideBrightnessBar()
+                        onUiEvent(UiEvent.ShowBrightnessBar(false))
+                        onUiEvent(UiEvent.ShowVolumeBar(false))
                     }
                 )
             }
     ) {
         NextExoPlayer(
-            onBackPressed = {},
-            changeOrientation = { requestedOrientation ->
-                val activity = context.findActivity()
-                activity?.requestedOrientation = requestedOrientation
-                activity?.requestedOrientation?.let {
-                    viewModel.onEvent(
-                        PlayerEvent.ChangeOrientation(
-                            it
-                        )
-                    )
-                }
-            }
+            exoPlayer = player,
+            playWhenReady = playerState.playWhenReady,
+            aspectRatio = preferences.aspectRatio,
+            onBackPressed = onBackPressed,
+            onEvent = onEvent
         )
         NextPlayerUI(
-            onBackPressed = {}
+            player = player,
+            playerState = playerState,
+            playerUiState = playerUiState,
+            preferences = preferences,
+            onBackPressed = onBackPressed,
+            onUiEvent = onUiEvent
         )
     }
     LaunchedEffect(Unit) {

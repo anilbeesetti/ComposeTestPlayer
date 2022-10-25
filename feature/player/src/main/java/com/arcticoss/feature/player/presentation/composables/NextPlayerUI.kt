@@ -1,34 +1,36 @@
 package com.arcticoss.feature.player.presentation.composables
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.feature.player.PlayerViewModel
+import com.arcticoss.feature.player.PlayerState
+import com.arcticoss.feature.player.PlayerUiState
+import com.arcticoss.feature.player.UiEvent
+import com.arcticoss.model.PlayerPreferences
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.SeekParameters
+import kotlin.math.abs
 
 
 private const val TAG = "NextPlayerUI"
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun NextPlayerUI(
-    onBackPressed: () -> Unit,
+    player: ExoPlayer,
+    playerState: PlayerState,
+    playerUiState: PlayerUiState,
+    preferences: PlayerPreferences,
     modifier: Modifier = Modifier,
-    viewModel: PlayerViewModel = hiltViewModel()
+    onBackPressed: () -> Unit,
+    onUiEvent: (UiEvent) -> Unit
 ) {
-    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
-    val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
-    val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
-    val player = viewModel.player
-
+    Log.d(TAG, "NextPlayerUI: restarting...Ui")
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -42,7 +44,7 @@ fun NextPlayerUI(
                     .align(Alignment.TopCenter)
             )
             PlayerUIMainControls(
-                playPauseIcon = if (playerState.playWhenReady) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                playPauseIcon = if (playerState.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 onPlayPauseClick = {
                     if (player.playWhenReady) {
                         player.pause()
@@ -50,8 +52,8 @@ fun NextPlayerUI(
                         player.play()
                     }
                 },
-                onSkipNextClick = { player.seekToNext() },
-                onSkipPreviousClick = { player.seekToPrevious() },
+                onSkipNextClick = player::seekToNext,
+                onSkipPreviousClick = player::seekToPrevious,
                 modifier = Modifier
                     .align(Alignment.Center)
             )
@@ -64,13 +66,18 @@ fun NextPlayerUI(
             modifier = Modifier
                 .navigationBarsPadding()
                 .align(Alignment.BottomCenter),
-            onSeek = { viewModel.seekTo(it.toLong()) },
-            onAspectRatioClick = { viewModel.switchAspectRatio() },
-            onLockClick = {  }
+            onSeek = {
+                if (abs(it - player.currentPosition) > 1000) {
+                    player.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                    player.seekTo(it.toLong())
+                }
+            },
+            onAspectRatioClick = { onUiEvent(UiEvent.ToggleAspectRatio) },
+            onLockClick = { }
         )
         if (playerUiState.isVolumeBarVisible) {
             AudioAdjustmentBar(
-                volumeLevel = playerState.volumeLevel,
+                volumeLevel = playerState.volume,
                 maxVolumeLevel = playerState.maxLevel,
                 modifier = Modifier
                     .fillMaxHeight(0.6f)
@@ -80,7 +87,7 @@ fun NextPlayerUI(
         }
         if (playerUiState.isBrightnessBarVisible) {
             BrightnessAdjustmentBar(
-                brightness = playerState.brightnessLevel,
+                brightness = playerState.brightness,
                 maxBrightness = playerState.maxLevel,
                 modifier = Modifier
                     .fillMaxHeight(0.6f)

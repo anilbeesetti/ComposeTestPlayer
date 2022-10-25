@@ -4,50 +4,63 @@ import android.content.Context
 import android.media.AudioManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.feature.player.*
-import com.arcticoss.feature.player.utils.findActivity
-import com.arcticoss.feature.player.utils.setBrightness
-import com.arcticoss.feature.player.utils.setVolume
+import com.arcticoss.feature.player.PlayerEvent
+import com.arcticoss.feature.player.PlayerState
+import com.arcticoss.feature.player.PlayerUiState
+import com.arcticoss.feature.player.UiEvent
+import com.arcticoss.feature.player.utils.*
+import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
-private const val DELAY = 1000L
-
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun EventHandler(
-    viewModel: PlayerViewModel = hiltViewModel()
+    player: ExoPlayer,
+    playerState: PlayerState,
+    playerUiState: PlayerUiState,
+    onUiEvent: (UiEvent) -> Unit,
+    onEvent: (PlayerEvent) -> Unit,
 ) {
-    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     val lifecycleOwner = LocalLifecycleOwner.current
+    val activity = context.findActivity()
 
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
         if (event == Lifecycle.Event.ON_START) {
-            viewModel.setVolume(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC))
+            onEvent(PlayerEvent.SetVolume(audioManager.getVolume()))
         }
     }
 
-
-    LaunchedEffect(playerState.brightnessLevel) {
-        val activity = context.findActivity()
-        val level = 1.0f / playerState.maxLevel * playerState.brightnessLevel
-        activity?.setBrightness(level)
-        delay(DELAY)
-        viewModel.hideBrightnessBar()
+    LaunchedEffect(Unit) {
+        while (true) {
+            onEvent(PlayerEvent.SetCurrentPosition(player.currentPosition))
+            delay(1.seconds / 30)
+        }
     }
 
-    LaunchedEffect(playerState.volumeLevel) {
-        audioManager.setVolume(playerState.volumeLevel)
-        delay(DELAY)
-        viewModel.hideVolumeBar()
+    LaunchedEffect(playerState.brightness) {
+        val level = 1.0f / playerState.maxLevel * playerState.brightness
+        activity?.setBrightness(level)
+    }
+
+    LaunchedEffect(playerState.volume) {
+        audioManager.setVolume(playerState.volume)
+    }
+
+    LaunchedEffect(playerUiState.isControllerVisible, playerState.isPlaying) {
+        if (playerUiState.isControllerVisible) {
+            activity?.showSystemBars()
+            if(playerState.isPlaying) {
+                delay(5000)
+                onUiEvent(UiEvent.ToggleShowUi)
+            }
+        } else {
+            activity?.hideSystemBars()
+        }
     }
 }
