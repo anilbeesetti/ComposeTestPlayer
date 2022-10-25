@@ -29,9 +29,9 @@ class PlayerViewModel @Inject constructor(
     val playerState = _playerState.asStateFlow()
 
     val preferencesFlow = preferencesDataSource.preferencesFlow
-        .onEach {
-            if (it.saveBrightnessLevel) {
-                _playerState.value = _playerState.value.copy(brightness = it.brightnessLevel)
+        .onEach { preferences ->
+            if (preferences.saveBrightnessLevel) {
+                _playerState.update { it.copy(brightness = preferences.brightnessLevel) }
             }
         }
         .stateIn(
@@ -92,13 +92,6 @@ class PlayerViewModel @Inject constructor(
             is PlayerEvent.SetCurrentPosition -> _playerState.update {
                 it.copy(currentPosition = event.value)
             }
-            is PlayerEvent.SetBrightness -> {
-                if (preferencesFlow.value.saveBrightnessLevel) {
-                    viewModelScope.launch { preferencesDataSource.updateBrightnessLevel(event.value) }
-                } else {
-                    _playerState.value = playerState.value.copy(brightness = event.value)
-                }
-            }
             PlayerEvent.IncreaseVolume -> {
                 val volume = playerState.value.volume
                 if (volume < 25) {
@@ -114,13 +107,25 @@ class PlayerViewModel @Inject constructor(
             PlayerEvent.IncreaseBrightness -> {
                 val brightness = playerState.value.brightness
                 if (brightness < 25) {
-                    _playerState.update { it.copy(brightness = brightness + 1) }
+                    if (preferencesFlow.value.saveBrightnessLevel) {
+                        viewModelScope.launch {
+                            preferencesDataSource.updateBrightnessLevel(brightness + 1)
+                        }
+                    } else {
+                        _playerState.update { it.copy(brightness = brightness + 1) }
+                    }
                 }
             }
             PlayerEvent.DecreaseBrightness -> {
                 val brightness = playerState.value.brightness
                 if (brightness > 0) {
-                    _playerState.update { it.copy(brightness = brightness - 1) }
+                    if (preferencesFlow.value.saveBrightnessLevel) {
+                        viewModelScope.launch {
+                            preferencesDataSource.updateBrightnessLevel(brightness - 1)
+                        }
+                    } else {
+                        _playerState.update { it.copy(brightness = brightness - 1) }
+                    }
                 }
             }
         }
@@ -164,7 +169,6 @@ sealed interface PlayerEvent {
     object DecreaseBrightness: PlayerEvent
     data class SetVolume(val value: Int) : PlayerEvent
     data class SetDuration(val value: Long): PlayerEvent
-    data class SetBrightness(val value: Int) : PlayerEvent
     data class SetCurrentPosition(val value: Long): PlayerEvent
     data class SetPlaybackState(val value: Boolean): PlayerEvent
     data class SetPlayWhenReady(val value: Boolean): PlayerEvent
