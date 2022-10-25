@@ -31,8 +31,9 @@ fun MediaScreen(
     viewModel: MediaScreenViewModel = hiltViewModel(),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val interfacePreferences by viewModel.interfacePreferences.collectAsStateWithLifecycle()
-    val uiState by viewModel.mediaUIState.collectAsStateWithLifecycle()
+    val interfacePreferences by viewModel.preferencesStateFlow.collectAsStateWithLifecycle()
+    val folderUiState by viewModel.folderUiState.collectAsStateWithLifecycle()
+    val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -63,85 +64,92 @@ fun MediaScreen(
     ) { innerPadding ->
         /**
          * NOTE:-
-         * 1. Passing innerPadding [PaddingValues] to other user defined composables
+         * 1. Passing innerPadding [PaddingValues] to other user defined composable
          *  containing [LazyColumn] causes to many recompositions
          * 2. This leads to a laggy [LazyColumn] experience
          */
         when (interfacePreferences.groupVideos) {
             true ->
-                if (uiState.isLoading && uiState.mediaFolderList.isEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else if (uiState.mediaFolderList.isEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "No folders with videos found.",
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
-                } else {
-                    LazyColumn(
-                        contentPadding = innerPadding,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        item {
-                            Spacer(modifier = Modifier.height(5.dp))
+                when(folderUiState) {
+                    FolderUiState.Loading -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
-                        items(uiState.mediaFolderList, key = { it.id }) { mediaFolder ->
-                            FolderItem(
-                                mediaFolder = mediaFolder,
-                                onClick = { onNavigate(NavigateTo.Videos(mediaFolder.id)) }
-                            )
+                    }
+                    is FolderUiState.Success -> {
+                        if ((folderUiState as FolderUiState.Success).mediaFolders.isEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(innerPadding),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(text = "No folders with media found.", style = MaterialTheme.typography.labelLarge)
+                            }
+                        } else {
+                            LazyColumn(
+                                contentPadding = innerPadding,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                item {
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                }
+                                items((folderUiState as FolderUiState.Success).mediaFolders, key = { it.id }) { mediaFolder ->
+                                    FolderItem(
+                                        mediaFolder = mediaFolder,
+                                        onClick = { onNavigate(NavigateTo.Videos(mediaFolder.id)) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             false ->
-                if (uiState.isLoading && uiState.mediaItemList.isEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else if (uiState.mediaItemList.isEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
-                    }
-                } else {
-                    LazyColumn(
-                        contentPadding = innerPadding,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        item {
-                            Spacer(modifier = Modifier.height(5.dp))
+                when(mediaUiState) {
+                    MediaUiState.Loading -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
-                        items(uiState.mediaItemList, key = { it.id }) { mediaItem ->
-                            MediaListItem(
-                                mediaItem = mediaItem,
-                                onClick = { onNavigate(NavigateTo.Player(mediaItem.path)) }
-                            )
+                    }
+                    is MediaUiState.Success -> {
+                        if ((mediaUiState as MediaUiState.Success).mediaItems.isEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(innerPadding),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
+                            }
+                        } else {
+                            LazyColumn(
+                                contentPadding = innerPadding,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                item {
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                }
+                                items((mediaUiState as MediaUiState.Success).mediaItems, key = { it.id }) { mediaItem ->
+                                    MediaListItem(
+                                        mediaItem = mediaItem,
+                                        onClick = { onNavigate(NavigateTo.Player(mediaItem.path)) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
