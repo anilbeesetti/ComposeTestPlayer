@@ -1,6 +1,5 @@
 package com.arcticoss.feature.player
 
-import android.util.Log
 import android.view.KeyEvent
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -26,8 +25,11 @@ import com.arcticoss.feature.player.presentation.composables.NextExoPlayer
 import com.arcticoss.feature.player.presentation.composables.NextPlayerUI
 import com.arcticoss.feature.player.utils.Utils
 import com.arcticoss.feature.player.utils.findActivity
-import com.google.android.exoplayer2.util.Util
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 
 private const val TAG = "NextPlayerScreen"
@@ -44,6 +46,8 @@ fun PlayerScreen(
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
 
     val SCROLL_STEP = Utils.dpToPx(16)
+    val SCROLL_STEP_SEEK = Utils.dpToPx(8)
+    val SEEK_STEP = 1000
 
     Box(
         modifier = Modifier
@@ -80,20 +84,42 @@ fun PlayerScreen(
                 )
             }
             .pointerInput(Unit) {
-                var dragStartOffset = 0f
+                var gestureScrollX = 0f
                 var playerCurrentState = false
+                var seekChange = 0L
+                var seekStart = 0L
+                var seekMax = 0L
                 detectHorizontalDragGestures(
                     onDragStart = {
                         playerCurrentState = player.playWhenReady
                         player.playWhenReady = false
-                        dragStartOffset = it.x
+                        gestureScrollX = it.x
+                        seekChange = 0L
+                        seekStart = player.currentPosition
+                        seekMax = player.duration
                     },
                     onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
-                        val seekAmount = abs(change.position.x - dragStartOffset) * dragAmount
-                        val newPosition = (playerState.currentPosition + seekAmount.toLong())
-                            .coerceIn(0..playerState.currentMediaItemDuration)
-                        viewModel.seekTo(newPosition)
-                        dragStartOffset = change.position.x
+                        val offset = gestureScrollX - change.position.x
+                        val position: Long
+                        if (abs(offset) > SCROLL_STEP_SEEK) {
+                            val distanceDiff = max(0.5f, min(abs(Utils.pxToDp(offset) / 4), 10.0f))
+                            if (offset > 0) {
+                                if (seekStart + seekChange - SEEK_STEP * distanceDiff >= 0) {
+                                    player.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
+                                    seekChange -= SEEK_STEP * distanceDiff.toLong()
+                                    position = seekStart + seekChange
+                                    player.seekTo(position)
+                                }
+                            } else {
+                                if (seekMax == C.TIME_UNSET || seekStart + seekChange + SEEK_STEP * distanceDiff < seekMax) {
+                                    player.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
+                                    seekChange += SEEK_STEP * distanceDiff.toLong()
+                                    position = seekStart + seekChange
+                                    player.seekTo(position)
+                                }
+                            }
+                            gestureScrollX = change.position.x
+                        }
                     },
                     onDragEnd = {
                         player.playWhenReady = playerCurrentState
@@ -113,27 +139,26 @@ fun PlayerScreen(
                     },
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
                         change.consume()
-                        if (gestureScrollY != 0.0f) {
-                            val offset = gestureScrollY - change.position.y
-                            if (abs(offset * dragAmount) > SCROLL_STEP) {
-                                when (whichBar) {
-                                    Bar.Volume -> {
-                                        if (offset > 0) {
-                                            viewModel.increaseVolume()
-                                        } else {
-                                            viewModel.decreaseVolume()
-                                        }
-                                    }
-                                    Bar.Brightness -> {
-                                        if (offset > 0) {
-                                            viewModel.increaseBrightness()
-                                        } else {
-                                            viewModel.decreaseBrightness()
-                                        }
+                        val offset = gestureScrollY - change.position.y
+
+                        if (abs(offset * dragAmount) > SCROLL_STEP) {
+                            when (whichBar) {
+                                Bar.Volume -> {
+                                    if (offset > 0) {
+                                        viewModel.increaseVolume()
+                                    } else {
+                                        viewModel.decreaseVolume()
                                     }
                                 }
-                                gestureScrollY = change.position.y
+                                Bar.Brightness -> {
+                                    if (offset > 0) {
+                                        viewModel.increaseBrightness()
+                                    } else {
+                                        viewModel.decreaseBrightness()
+                                    }
+                                }
                             }
+                            gestureScrollY = change.position.y
                         }
                     }
                 )
