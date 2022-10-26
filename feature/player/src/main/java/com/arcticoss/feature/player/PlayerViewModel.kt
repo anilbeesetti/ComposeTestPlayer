@@ -11,9 +11,11 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 
 @HiltViewModel
@@ -28,6 +30,17 @@ class PlayerViewModel @Inject constructor(
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
 
+    private val _playerUiState = MutableStateFlow(PlayerUiState())
+    val playerUiState = _playerUiState.asStateFlow()
+
+    val playerCurrentPosition = getPlayerCurrentPosition()
+        .distinctUntilChanged()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = 0L
+        )
+
     val preferencesFlow = preferencesDataSource.preferencesFlow
         .onEach { preferences ->
             if (preferences.saveBrightnessLevel) {
@@ -40,8 +53,12 @@ class PlayerViewModel @Inject constructor(
             initialValue = PlayerPreferences()
         )
 
-    private val _playerUiState = MutableStateFlow(PlayerUiState())
-    val playerUiState = _playerUiState.asStateFlow()
+    private fun getPlayerCurrentPosition() = flow {
+        while (true) {
+            emit(player.currentPosition)
+            delay(1.seconds / 30)
+        }
+    }
 
     fun addVideoUri(uri: Uri) {
         val mediaItem = MediaItem.fromUri(uri)

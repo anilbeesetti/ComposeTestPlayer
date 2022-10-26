@@ -46,9 +46,9 @@ fun PlayerScreen(
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
+    val playerCurrentPosition by viewModel.playerCurrentPosition.collectAsStateWithLifecycle()
 
     EventHandler(
-        player = player,
         playerState = playerState,
         playerUiState = playerUiState,
         onEvent = viewModel::onEvent,
@@ -58,6 +58,7 @@ fun PlayerScreen(
         player = player,
         playerState = playerState,
         playerUiState = playerUiState,
+        currentPosition = playerCurrentPosition,
         preferences = preferences,
         onEvent = viewModel::onEvent,
         onUiEvent = viewModel::onUiEvent,
@@ -69,6 +70,7 @@ fun PlayerScreen(
 @Composable
 internal fun PlayerScreen(
     player: ExoPlayer,
+    currentPosition: Long,
     playerState: PlayerState,
     playerUiState: PlayerUiState,
     preferences: PlayerPreferences,
@@ -221,6 +223,7 @@ internal fun PlayerScreen(
             player = player,
             playerState = playerState,
             playerUiState = playerUiState,
+            currentPosition = currentPosition,
             preferences = preferences,
             onBackPressed = onBackPressed,
             onUiEvent = onUiEvent

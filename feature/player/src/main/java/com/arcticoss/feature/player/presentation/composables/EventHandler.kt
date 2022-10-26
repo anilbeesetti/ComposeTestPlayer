@@ -13,13 +13,10 @@ import com.arcticoss.feature.player.PlayerState
 import com.arcticoss.feature.player.PlayerUiState
 import com.arcticoss.feature.player.UiEvent
 import com.arcticoss.feature.player.utils.*
-import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun EventHandler(
-    player: ExoPlayer,
     playerState: PlayerState,
     playerUiState: PlayerUiState,
     onUiEvent: (UiEvent) -> Unit,
@@ -33,13 +30,6 @@ fun EventHandler(
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
         if (event == Lifecycle.Event.ON_START) {
             onEvent(PlayerEvent.SetVolume(audioManager.getVolume()))
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            onEvent(PlayerEvent.SetCurrentPosition(player.currentPosition))
-            delay(1.seconds / 30)
         }
     }
 

@@ -1,12 +1,10 @@
 package com.arcticoss.feature.player.presentation.composables
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,6 +25,7 @@ fun NextPlayerUI(
     playerState: PlayerState,
     playerUiState: PlayerUiState,
     preferences: PlayerPreferences,
+    currentPosition: Long,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
     onUiEvent: (UiEvent) -> Unit
@@ -62,7 +61,7 @@ fun NextPlayerUI(
             playerUiState = playerUiState,
             preferences = preferences,
             duration = playerState.currentMediaItemDuration,
-            currentPosition = playerState.currentPosition,
+            currentPosition = currentPosition,
             modifier = Modifier
                 .navigationBarsPadding()
                 .align(Alignment.BottomCenter),
