@@ -10,17 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.arcticoss.model.MediaFolder
+import com.arcticoss.nextplayer.core.domain.models.Folder
 
 @Composable
 fun ShowFolderItems(
     isLoading: Boolean,
-    mediaFolderList: List<MediaFolder>,
+    folderList: List<Folder>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     onFolderItemClick: (Long) -> Unit
 ) {
-    if (isLoading && mediaFolderList.isEmpty()) {
+    if (isLoading && folderList.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -30,7 +30,7 @@ fun ShowFolderItems(
         ) {
             CircularProgressIndicator()
         }
-    } else if (mediaFolderList.isEmpty()) {
+    } else if (folderList.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -51,10 +51,10 @@ fun ShowFolderItems(
             item {
                 Spacer(modifier = Modifier.height(5.dp))
             }
-            items(mediaFolderList, key = { it.id }) { mediaFolder ->
+            items(folderList, key = { it.id }) { folder ->
                 FolderItem(
-                    mediaFolder = mediaFolder,
-                    onClick = { onFolderItemClick(mediaFolder.id) }
+                    folder = folder,
+                    onClick = { onFolderItemClick(folder.id) }
                 )
             }
         }

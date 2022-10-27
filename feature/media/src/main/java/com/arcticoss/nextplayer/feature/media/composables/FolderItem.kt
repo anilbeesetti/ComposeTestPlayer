@@ -17,12 +17,12 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.arcticoss.model.MediaFolder
+import com.arcticoss.nextplayer.core.domain.models.Folder
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FolderItem(
-    mediaFolder: MediaFolder,
+    folder: Folder,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -56,7 +56,7 @@ fun FolderItem(
                 verticalArrangement = Arrangement.Top
             ) {
                 Text(
-                    text = mediaFolder.name,
+                    text = folder.name,
                     maxLines = 2,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
                     overflow = TextOverflow.Ellipsis
@@ -68,8 +68,8 @@ fun FolderItem(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val vidText = if (mediaFolder.mediaItems.size == 1) "video" else "videos"
-                    FieldChip(text = "${mediaFolder.mediaItems.size} $vidText")
+                    val vidText = if (folder.mediaItemCount == 1) "video" else "videos"
+                    FieldChip(text = "${folder.mediaItemCount} $vidText")
                 }
             }
         }

@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.arcticoss.data.repository.IMediaRepository
 import com.arcticoss.model.*
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
-import com.arcticoss.nextplayer.core.domain.GetSortedMediaFoldersStreamUseCase
+import com.arcticoss.nextplayer.core.domain.GetSortedFoldersStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
+import com.arcticoss.nextplayer.core.domain.models.Folder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -19,7 +20,7 @@ import javax.inject.Inject
 class MediaScreenViewModel @Inject constructor(
     preferencesDataSource: InterfacePreferencesDataSource,
     private val mediaRepository: IMediaRepository,
-    private val getSortedMediaFoldersStream: GetSortedMediaFoldersStreamUseCase,
+    private val getSortedFoldersStream: GetSortedFoldersStreamUseCase,
     private val getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase
 ) : ViewModel() {
 
@@ -33,18 +34,13 @@ class MediaScreenViewModel @Inject constructor(
             initialValue = InterfacePreferences()
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val folderUiState: StateFlow<FolderUiState> = preferencesDataSource
-        .preferencesFlow.flatMapLatest { preferences ->
-            getSortedMediaFoldersStream
-                .getAllMedia(preferences.showHidden, preferences.sortBy, preferences.sortOrder)
-                .map { FolderUiState.Success(it) }
-        }
-        .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = FolderUiState.Loading
-    )
+    val folderUiState: StateFlow<FolderUiState> =
+        getSortedFoldersStream().map { FolderUiState.Success(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = FolderUiState.Loading
+            )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val mediaUiState: StateFlow<MediaUiState> = preferencesDataSource
@@ -58,7 +54,6 @@ class MediaScreenViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = MediaUiState.Loading
         )
-
 
 
     fun syncMedia() {
@@ -75,11 +70,11 @@ class MediaScreenViewModel @Inject constructor(
 }
 
 sealed interface FolderUiState {
-    data class Success(val mediaFolders: List<MediaFolder>): FolderUiState
-    object Loading: FolderUiState
+    data class Success(val folders: List<Folder>) : FolderUiState
+    object Loading : FolderUiState
 }
 
 sealed interface MediaUiState {
-    data class Success(val mediaItems: List<MediaItem>): MediaUiState
-    object Loading: MediaUiState
+    data class Success(val mediaItems: List<MediaItem>) : MediaUiState
+    object Loading : MediaUiState
 }

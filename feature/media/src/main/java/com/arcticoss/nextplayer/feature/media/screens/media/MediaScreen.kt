@@ -83,7 +83,7 @@ fun MediaScreen(
                         }
                     }
                     is FolderUiState.Success -> {
-                        if ((folderUiState as FolderUiState.Success).mediaFolders.isEmpty()) {
+                        if ((folderUiState as FolderUiState.Success).folders.isEmpty()) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -101,9 +101,9 @@ fun MediaScreen(
                                 item {
                                     Spacer(modifier = Modifier.height(5.dp))
                                 }
-                                items((folderUiState as FolderUiState.Success).mediaFolders, key = { it.id }) { mediaFolder ->
+                                items((folderUiState as FolderUiState.Success).folders, key = { it.id }) { mediaFolder ->
                                     FolderItem(
-                                        mediaFolder = mediaFolder,
+                                        folder = mediaFolder,
                                         onClick = { onNavigate(NavigateTo.Videos(mediaFolder.id)) }
                                     )
                                 }
