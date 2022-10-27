@@ -66,8 +66,8 @@ fun NextPlayerUI(
                 .navigationBarsPadding()
                 .align(Alignment.BottomCenter),
             onSeek = {
-                val offset = it -player.currentPosition
-                if (abs(offset) > 30000) {
+                val offset = it - player.currentPosition
+                if (abs(offset) > 1000) {
                     player.setSeekParameters(SeekParameters.CLOSEST_SYNC)
                     player.seekTo(it.toLong())
                 }
@@ -80,6 +80,7 @@ fun NextPlayerUI(
                 volumeLevel = playerState.volume,
                 maxVolumeLevel = playerState.maxLevel,
                 modifier = Modifier
+                    .heightIn(max = 500.dp)
                     .fillMaxHeight(0.6f)
                     .padding(20.dp)
                     .align(Alignment.CenterStart)
@@ -90,6 +91,7 @@ fun NextPlayerUI(
                 brightness = playerState.brightness,
                 maxBrightness = playerState.maxLevel,
                 modifier = Modifier
+                    .heightIn(max = 500.dp)
                     .fillMaxHeight(0.6f)
                     .padding(20.dp)
                     .align(Alignment.CenterEnd)
