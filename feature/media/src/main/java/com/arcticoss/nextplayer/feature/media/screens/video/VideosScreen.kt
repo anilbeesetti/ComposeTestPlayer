@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.feature.media.R
 import com.arcticoss.nextplayer.feature.media.composables.CheckPermissionAndSetContent
 import com.arcticoss.nextplayer.feature.media.composables.MediaListItem
-import com.arcticoss.nextplayer.feature.media.screens.media.NavigateTo
 
 @OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +28,7 @@ fun VideosScreen(
     onMediaItemClick: (path: String) -> Unit,
     viewModel: VideosViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.videosUiState.collectAsStateWithLifecycle()
+    val mediaFolderState by viewModel.mediaFolder.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     CheckPermissionAndSetContent(
@@ -38,7 +36,9 @@ fun VideosScreen(
         topBar = {
             LargeTopAppBar(
                 title = {
-                    Text(text = uiState.mediaFolder.name)
+                    Text(text = if (mediaFolderState is VideoUiState.Success)
+                        (mediaFolderState as VideoUiState.Success).mediaFolder.name
+                    else "")
                 },
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
@@ -52,40 +52,44 @@ fun VideosScreen(
             )
         }
     ) { innerPadding ->
-        if (uiState.isLoading && uiState.mediaFolder.mediaItems.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.mediaFolder.mediaItems.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
-            }
-        } else {
-            LazyColumn(
-                contentPadding = innerPadding,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                item {
-                    Spacer(modifier = Modifier.height(5.dp))
+        when (mediaFolderState) {
+            is VideoUiState.Error -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
                 }
-                items(uiState.mediaFolder.mediaItems, key = { it.id }) { mediaItem ->
-                    Log.d("TAG", "ShowVideoFiles: ${mediaItem.id}")
-                    MediaListItem(
-                        mediaItem = mediaItem,
-                        onClick = { onMediaItemClick(mediaItem.path) }
-                    )
+            }
+            VideoUiState.Loading -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is VideoUiState.Success -> {
+                LazyColumn(
+                    contentPadding = innerPadding,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item {
+                        Spacer(modifier = Modifier.height(5.dp))
+                    }
+                    items((mediaFolderState as VideoUiState.Success).mediaFolder.mediaItems, key = { it.id }) { mediaItem ->
+                        Log.d("TAG", "ShowVideoFiles: ${mediaItem.id}")
+                        MediaListItem(
+                            mediaItem = mediaItem,
+                            onClick = { onMediaItemClick(mediaItem.path) }
+                        )
+                    }
                 }
             }
         }
