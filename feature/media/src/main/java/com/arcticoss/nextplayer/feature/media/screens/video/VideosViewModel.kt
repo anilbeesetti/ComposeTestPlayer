@@ -21,7 +21,7 @@ class VideosViewModel @Inject constructor(
 
     private val folderId = savedStateHandle.get<Long>(folderIdArg)
 
-    val mediaFolder: StateFlow<VideoUiState> = if (folderId == null) {
+    val videoUiState: StateFlow<VideoUiState> = if (folderId == null) {
         MutableStateFlow(VideoUiState.Error(""))
     } else {
         getSortedMediaFolderStream(folderId)

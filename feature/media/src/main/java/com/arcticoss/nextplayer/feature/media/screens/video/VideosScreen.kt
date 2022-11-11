@@ -28,7 +28,7 @@ fun VideosScreen(
     onMediaItemClick: (path: String) -> Unit,
     viewModel: VideosViewModel = hiltViewModel(),
 ) {
-    val mediaFolderState by viewModel.mediaFolder.collectAsStateWithLifecycle()
+    val mediaFolderState by viewModel.videoUiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     CheckPermissionAndSetContent(
