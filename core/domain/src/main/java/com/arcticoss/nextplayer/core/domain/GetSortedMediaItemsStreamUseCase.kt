@@ -4,48 +4,49 @@ import com.arcticoss.data.repository.IMediaRepository
 import com.arcticoss.model.MediaItem
 import com.arcticoss.model.SortBy
 import com.arcticoss.model.SortOrder
+import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class GetSortedMediaItemsStreamUseCase @Inject constructor(
-    private val mediaRepository: IMediaRepository
+    private val mediaRepository: IMediaRepository,
+    private val preferencesDataSource: InterfacePreferencesDataSource
 ) {
 
-    fun getAllMedia(
-        showHidden: Boolean,
-        sortBy: SortBy,
-        sortOrder: SortOrder
-    ): Flow<List<MediaItem>> {
-        return mediaRepository.getFolderMediaStream().map { mediaFolderList ->
-            val mediaItemList = mutableListOf<MediaItem>()
-            when(showHidden) {
-                true -> {
-                    mediaFolderList.forEach {
-                        mediaItemList.addAll(it.mediaItems)
-                    }
-                }
-                false -> {
-                    mediaFolderList.filter { mediaFolder ->
-                        mediaFolder.mediaItems.isNotEmpty() && !mediaFolder.name.startsWith(".")
-                    }.forEach { mediaFolder ->
-                        mediaFolder.mediaItems.filter {
-                            !it.title.startsWith(".")
-                        }.also { mediaItemList.addAll(it) }
-                    }
-                }
+    operator fun invoke(): Flow<List<MediaItem>> {
+        return combine(
+            mediaRepository.getFolderMediaStream(),
+            preferencesDataSource.preferencesFlow
+        ) { mediaFolders, preferences ->
+            val folders = mediaFolders.filter {
+                it.mediaItems.isNotEmpty()
+            }.filter {
+                if (preferences.showHidden) true else !it.name.startsWith(".")
             }
-            when(sortOrder) {
+
+            val mediaItemList = mutableListOf<MediaItem>()
+
+            folders.forEach {
+                mediaItemList.addAll(it.mediaItems)
+            }
+
+            val mediaItems = mediaItemList.filter {
+                if (preferences.showHidden) true else !it.title.startsWith(".")
+            }
+
+
+            when(preferences.sortOrder) {
                 SortOrder.Ascending -> {
-                    when(sortBy) {
-                        SortBy.Title -> mediaItemList.sortedBy { it.title.lowercase() }
-                        SortBy.Length -> mediaItemList.sortedBy { it.duration }
+                    when(preferences.sortBy) {
+                        SortBy.Title -> mediaItems.sortedBy { it.title.lowercase() }
+                        SortBy.Length -> mediaItems.sortedBy { it.duration }
                     }
                 }
                 SortOrder.Descending -> {
-                    when(sortBy) {
-                        SortBy.Title -> mediaItemList.sortedByDescending { it.title.lowercase() }
-                        SortBy.Length -> mediaItemList.sortedByDescending { it.duration }
+                    when(preferences.sortBy) {
+                        SortBy.Title -> mediaItems.sortedByDescending { it.title.lowercase() }
+                        SortBy.Length -> mediaItems.sortedByDescending { it.duration }
                     }
                 }
             }

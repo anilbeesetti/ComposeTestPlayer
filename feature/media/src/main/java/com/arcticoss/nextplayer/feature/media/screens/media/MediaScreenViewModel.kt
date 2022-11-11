@@ -3,15 +3,18 @@ package com.arcticoss.nextplayer.feature.media.screens.media
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.data.repository.IMediaRepository
-import com.arcticoss.model.*
+import com.arcticoss.model.InterfacePreferences
+import com.arcticoss.model.MediaItem
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetSortedFoldersStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
 import com.arcticoss.nextplayer.core.domain.models.Folder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,8 +23,8 @@ import javax.inject.Inject
 class MediaScreenViewModel @Inject constructor(
     preferencesDataSource: InterfacePreferencesDataSource,
     private val mediaRepository: IMediaRepository,
-    private val getSortedFoldersStream: GetSortedFoldersStreamUseCase,
-    private val getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase
+    getSortedFoldersStream: GetSortedFoldersStreamUseCase,
+    getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase
 ) : ViewModel() {
 
     private var syncMediaJob: Job? = null
@@ -42,13 +45,8 @@ class MediaScreenViewModel @Inject constructor(
                 initialValue = FolderUiState.Loading
             )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val mediaUiState: StateFlow<MediaUiState> = preferencesDataSource
-        .preferencesFlow.flatMapLatest { preferences ->
-            getSortedMediaItemsStream
-                .getAllMedia(preferences.showHidden, preferences.sortBy, preferences.sortOrder)
-                .map { MediaUiState.Success(it) }
-        }
+    val mediaUiState: StateFlow<MediaUiState> =
+        getSortedMediaItemsStream().map { MediaUiState.Success(it) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
