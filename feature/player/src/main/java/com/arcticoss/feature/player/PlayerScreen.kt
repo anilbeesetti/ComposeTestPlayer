@@ -24,7 +24,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.feature.player.presentation.composables.EventHandler
 import com.arcticoss.feature.player.presentation.composables.NextExoPlayer
 import com.arcticoss.feature.player.presentation.composables.NextPlayerUI
-import com.arcticoss.feature.player.utils.findActivity
 import com.arcticoss.model.PlayerPreferences
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -83,10 +82,6 @@ internal fun PlayerScreen(
     val focusRequester = remember { FocusRequester() }
     val context = LocalContext.current
     val density = LocalDensity.current
-    val activity = remember { context.findActivity() }
-
-    val width = activity?.resources?.displayMetrics?.widthPixels ?: 0
-    val height = activity?.resources?.displayMetrics?.heightPixels ?: 0
 
     val SCROLL_STEP = LocalDensity.current.run { 16.dp.toPx() }
     val SCROLL_STEP_SEEK = LocalDensity.current.run { 8.dp.toPx() }
@@ -135,6 +130,8 @@ internal fun PlayerScreen(
                 var startAtIgnoreBorder = false
                 detectHorizontalDragGestures(
                     onDragStart = { offset ->
+                        val width = context.resources.displayMetrics.widthPixels
+                        val height = context.resources.displayMetrics.heightPixels
                         if (offset.x < IGNORE_BORDER || offset.y < IGNORE_BORDER || offset.x > width - IGNORE_BORDER || offset.y > height - IGNORE_BORDER) {
                             startAtIgnoreBorder = true
                         } else {
@@ -191,6 +188,8 @@ internal fun PlayerScreen(
                 var startAtIgnoreBorder = false
                 detectVerticalDragGestures(
                     onDragStart = { offset ->
+                        val width = context.resources.displayMetrics.widthPixels
+                        val height = context.resources.displayMetrics.heightPixels
                         gestureScrollY = offset.y
                         if (offset.y < IGNORE_BORDER || offset.y > height - IGNORE_BORDER) {
                             startAtIgnoreBorder = true
