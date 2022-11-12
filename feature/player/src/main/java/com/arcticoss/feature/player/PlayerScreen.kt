@@ -28,6 +28,7 @@ import com.arcticoss.model.PlayerPreferences
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SeekParameters
+import kotlinx.coroutines.delay
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -82,6 +83,17 @@ internal fun PlayerScreen(
     val focusRequester = remember { FocusRequester() }
     val context = LocalContext.current
     val density = LocalDensity.current
+    var keyEvent by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = keyEvent) {
+        if (keyEvent) {
+            onUiEvent(UiEvent.ShowVolumeBar(true))
+            delay(1000)
+            keyEvent = false
+        } else {
+            onUiEvent(UiEvent.ShowVolumeBar(false))
+        }
+    }
 
     val SCROLL_STEP = LocalDensity.current.run { 16.dp.toPx() }
     val SCROLL_STEP_SEEK = LocalDensity.current.run { 8.dp.toPx() }
@@ -95,12 +107,14 @@ internal fun PlayerScreen(
                 if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_UP
                     && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN
                 ) {
+                    keyEvent = true
                     onEvent(PlayerEvent.IncreaseVolume)
                     return@onKeyEvent true
                 }
                 if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
                     && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN
                 ) {
+                    keyEvent = true
                     onEvent(PlayerEvent.DecreaseVolume)
                     return@onKeyEvent true
                 }
@@ -162,7 +176,7 @@ internal fun PlayerScreen(
                                     }
                                 } else {
                                     if (seekMax == C.TIME_UNSET || seekStart + seekChange + SEEK_STEP * distanceDiff < seekMax) {
-                                        player.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
+                                        player.setSeekParameters(SeekParameters.NEXT_SYNC)
                                         seekChange += SEEK_STEP * distanceDiff.toLong()
                                         position = seekStart + seekChange
                                         player.seekTo(position)
