@@ -63,7 +63,7 @@ static bool frameExtractorLoadFrameInto(JNIEnv *env, AVFormatContext *avFormatCo
     AVFrame *frame = av_frame_alloc();
 
 
-    int64_t seekPosition = at_duration != 0 ? at_duration : (videoDuration < 10000000 ? 0 : offset);
+    int64_t seekPosition = at_duration != 0 ? at_duration : (videoDuration < 10000 ? 0 : offset);
     av_seek_frame(avFormatContext,
                   videoStreamIndex,
                   seekPosition,
@@ -150,6 +150,7 @@ bool frameExtractorLoadFrame(JNIEnv *env, const char *filePath, jobject jBitmap,
 
         if (avCodecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
             videoStreamIndex = i;
+            break;
         }
     }
 
