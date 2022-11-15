@@ -146,7 +146,7 @@ fun MediaScreen(
                                 items((mediaUiState as MediaUiState.Success).mediaItems, key = { it.id }) { mediaItem ->
                                     MediaListItem(
                                         mediaItem = mediaItem,
-                                        onClick = { onNavigate(NavigateTo.Player(mediaItem.path)) }
+                                        onClick = { onNavigate(NavigateTo.Player(mediaItem.id)) }
                                     )
                                 }
                             }
@@ -159,6 +159,6 @@ fun MediaScreen(
 
 sealed interface NavigateTo {
     object Settings : NavigateTo
-    data class Player(val path: String) : NavigateTo
+    data class Player(val mediaId: Long) : NavigateTo
     data class Videos(val folderId: Long) : NavigateTo
 }

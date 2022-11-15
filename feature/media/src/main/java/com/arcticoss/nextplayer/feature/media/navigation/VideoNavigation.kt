@@ -13,7 +13,7 @@ fun NavController.navigateToVideosScreen(folderId: Long, navOptions: NavOptions?
 
 fun NavGraphBuilder.videoScreen(
     onBackClick: () -> Unit,
-    onMediaItemClick: (path: String) -> Unit
+    onMediaItemClick: (mediaId: Long, folderId: Long) -> Unit
 ) {
     composable(
         route = "$videosScreenNavigationRoute/{$folderIdArg}",

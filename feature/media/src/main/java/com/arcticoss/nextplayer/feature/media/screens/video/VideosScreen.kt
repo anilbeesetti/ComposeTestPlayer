@@ -25,7 +25,7 @@ import com.arcticoss.nextplayer.feature.media.composables.MediaListItem
 @Composable
 fun VideosScreen(
     onNavItemClick: () -> Unit = {},
-    onMediaItemClick: (path: String) -> Unit,
+    onMediaItemClick: (mediaId: Long, folderId: Long) -> Unit,
     viewModel: VideosViewModel = hiltViewModel(),
 ) {
     val mediaFolderState by viewModel.videoUiState.collectAsStateWithLifecycle()
@@ -36,9 +36,11 @@ fun VideosScreen(
         topBar = {
             LargeTopAppBar(
                 title = {
-                    Text(text = if (mediaFolderState is VideoUiState.Success)
-                        (mediaFolderState as VideoUiState.Success).mediaFolder.name
-                    else "")
+                    Text(
+                        text = if (mediaFolderState is VideoUiState.Success)
+                            (mediaFolderState as VideoUiState.Success).mediaFolder.name
+                        else ""
+                    )
                 },
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
@@ -83,11 +85,12 @@ fun VideosScreen(
                     item {
                         Spacer(modifier = Modifier.height(5.dp))
                     }
-                    items((mediaFolderState as VideoUiState.Success).mediaFolder.mediaItems, key = { it.id }) { mediaItem ->
+                    val mediaFolder = (mediaFolderState as VideoUiState.Success).mediaFolder
+                    items(mediaFolder.mediaItems, key = { it.id }) { mediaItem ->
                         Log.d("TAG", "ShowVideoFiles: ${mediaItem.id}")
                         MediaListItem(
                             mediaItem = mediaItem,
-                            onClick = { onMediaItemClick(mediaItem.path) }
+                            onClick = { onMediaItemClick(mediaItem.id, mediaFolder.id) }
                         )
                     }
                 }

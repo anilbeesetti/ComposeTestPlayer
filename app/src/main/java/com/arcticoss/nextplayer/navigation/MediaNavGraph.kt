@@ -28,22 +28,25 @@ fun NavGraphBuilder.mediaNavGraph(
             onNavigate = { navigateTo ->
                 when (navigateTo) {
                     NavigateTo.Settings -> navController.navigateToSettings()
-                    is NavigateTo.Player -> navigateToPlayerScreen(context, navigateTo.path)
+                    is NavigateTo.Player -> navigateToPlayerScreen(context, navigateTo.mediaId)
                     is NavigateTo.Videos -> navController.navigateToVideosScreen(navigateTo.folderId)
                 }
             }
         )
         videoScreen(
             onBackClick = { navController.popBackStack() },
-            onMediaItemClick = { navigateToPlayerScreen(context, it) }
+            onMediaItemClick = { mediaId, folderId ->
+                navigateToPlayerScreen(context, mediaId, folderId)
+            }
         )
     }
 }
 
 
-fun navigateToPlayerScreen(context: Context, path: String) {
+fun navigateToPlayerScreen(context: Context, mediaId: Long, folderId: Long = 0) {
     val intent = Intent(context, PlayerActivity::class.java).also {
-        it.putExtra("videoFilePath", path)
+        it.putExtra("mediaID", mediaId)
+        it.putExtra("folderID", folderId)
     }
     context.startActivity(intent)
 }

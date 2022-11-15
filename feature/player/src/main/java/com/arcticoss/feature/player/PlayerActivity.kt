@@ -1,6 +1,5 @@
 package com.arcticoss.feature.player
 
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -18,12 +17,10 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.arcticoss.feature.player.presentation.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 
 @AndroidEntryPoint
 class PlayerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val videoFilePath = intent.getStringExtra("videoFilePath")
         val intentData = intent.data
 
         super.onCreate(savedInstanceState)
@@ -44,7 +41,6 @@ class PlayerActivity : ComponentActivity() {
                     val viewModel: PlayerViewModel = hiltViewModel()
 
                     LaunchedEffect(key1 = Unit) {
-                        videoFilePath?.let { viewModel.addVideoUri(Uri.fromFile(File(it))) }
                         intentData?.let { viewModel.addVideoUri(it) }
                     }
                     CompositionLocalProvider(LocalContentColor provides Color.White) {

@@ -1,12 +1,15 @@
 package com.arcticoss.feature.player
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.feature.player.utils.Orientation
 import com.arcticoss.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
+import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
+import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -14,16 +17,22 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val preferencesDataSource: PlayerPreferencesDataSource,
+    getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
+    getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
     normalPlayer: Player
 ) : ViewModel() {
+
+    private val mediaID = savedStateHandle.get<Long>("mediaID")
+    private val folderID = savedStateHandle.get<Long>("folderID")
 
     val player = normalPlayer as ExoPlayer
 
@@ -64,6 +73,36 @@ class PlayerViewModel @Inject constructor(
         val mediaItem = MediaItem.fromUri(uri)
         player.addMediaItem(mediaItem)
         player.prepare()
+    }
+
+    init {
+        folderID?.let { id ->
+            if (id == 0L) {
+                getSortedMediaItemsStream().onEach { mediaItemList ->
+                    val index = mediaItemList.indexOfFirst { it.id == mediaID }
+                    val mediaItems = mediaItemList.map {
+                        MediaItem.fromUri(File(it.path).toUri())
+                    }
+                    player.setMediaItems(mediaItems)
+                    for (i in 0 until index) {
+                        player.seekToNextMediaItem()
+                    }
+                    player.prepare()
+                }.launchIn(viewModelScope)
+            } else {
+                getSortedMediaFolderStream(id).onEach { folder ->
+                    val index = folder.mediaItems.indexOfFirst { it.id == mediaID }
+                    val mediaItems = folder.mediaItems.map {
+                        MediaItem.fromUri(File(it.path).toUri())
+                    }
+                    player.setMediaItems(mediaItems)
+                    for (i in 0 until index) {
+                        player.seekToNextMediaItem()
+                    }
+                    player.prepare()
+                }.launchIn(viewModelScope)
+            }
+        }
     }
 
     fun onUiEvent(event: UiEvent) {
