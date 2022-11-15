@@ -17,8 +17,6 @@ import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs
 
 
-private const val TAG = "NextPlayerUI"
-
 @Composable
 fun NextPlayerUI(
     player: ExoPlayer,
