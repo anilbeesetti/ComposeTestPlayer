@@ -191,7 +191,3 @@ sealed interface PlayerEvent {
     data class SetPlayWhenReady(val value: Boolean): PlayerEvent
     data class SetOrientation(val value: Orientation) : PlayerEvent
 }
-
-enum class Bar {
-    Brightness, Volume
-}
