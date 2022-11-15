@@ -1,6 +1,8 @@
 package com.arcticoss.feature.player.presentation.composables
 
 import android.util.Log
+import android.view.KeyEvent
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -8,7 +10,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemGesturesPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -36,14 +43,34 @@ fun PlayerGestures(
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
+    val focusRequester = remember { FocusRequester() }
+
     val SCROLL_STEP = LocalDensity.current.run { 16.dp.toPx() }
     val SCROLL_STEP_SEEK = LocalDensity.current.run { 8.dp.toPx() }
-    val IGNORE_BORDER = LocalDensity.current.run { 24.dp.toPx() }
     val SEEK_STEP = 1000
 
     Box(
         modifier = Modifier
             .systemGesturesPadding()
+            .onKeyEvent {
+                if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_UP
+                    && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN
+                ) {
+                    onUiEvent(UiEvent.ShowVolumeBar(true))
+                    onEvent(PlayerEvent.IncreaseVolume)
+                    return@onKeyEvent true
+                }
+                if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+                    && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN
+                ) {
+                    onUiEvent(UiEvent.ShowVolumeBar(true))
+                    onEvent(PlayerEvent.DecreaseVolume)
+                    return@onKeyEvent true
+                }
+                false
+            }
+            .focusRequester(focusRequester)
+            .focusable()
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures(
@@ -113,55 +140,45 @@ fun PlayerGestures(
             .pointerInput(Unit) {
                 var gestureScrollY = 0.0f
                 var whichBar = Bar.Brightness
-                var startAtIgnoreBorder = false
                 detectVerticalDragGestures(
                     onDragStart = { offset ->
                         val width = context.resources.displayMetrics.widthPixels
-                        val height = context.resources.displayMetrics.heightPixels
                         gestureScrollY = offset.y
-                        if (offset.y < IGNORE_BORDER || offset.y > height - IGNORE_BORDER) {
-                            startAtIgnoreBorder = true
+
+                        if (offset.x < (width / 2)) {
+                            whichBar = Bar.Brightness
+                            onUiEvent(UiEvent.ShowBrightnessBar(true))
                         } else {
-                            startAtIgnoreBorder = false
-                            if (offset.x < (width / 2)) {
-                                whichBar = Bar.Brightness
-                                onUiEvent(UiEvent.ShowBrightnessBar(true))
-                            } else {
-                                whichBar = Bar.Volume
-                                onUiEvent(UiEvent.ShowVolumeBar(true))
-                            }
+                            whichBar = Bar.Volume
+                            onUiEvent(UiEvent.ShowVolumeBar(true))
                         }
+
                     },
                     onVerticalDrag = { change: PointerInputChange, dragAmount: Float ->
 
-                        if (!startAtIgnoreBorder) {
-                            change.consume()
-                            val offset = gestureScrollY - change.position.y
+                        change.consume()
+                        val offset = gestureScrollY - change.position.y
 
-                            if (abs(offset * dragAmount) > SCROLL_STEP) {
-                                when (whichBar) {
-                                    Bar.Volume -> {
-                                        if (offset > 0) {
-                                            onEvent(PlayerEvent.IncreaseVolume)
-                                        } else {
-                                            onEvent(PlayerEvent.DecreaseVolume)
-                                        }
-                                    }
-                                    Bar.Brightness -> {
-                                        if (offset > 0) {
-                                            onEvent(PlayerEvent.IncreaseBrightness)
-                                        } else {
-                                            onEvent(PlayerEvent.DecreaseBrightness)
-                                        }
+                        if (abs(offset * dragAmount) > SCROLL_STEP) {
+                            when (whichBar) {
+                                Bar.Volume -> {
+                                    if (offset > 0) {
+                                        onEvent(PlayerEvent.IncreaseVolume)
+                                    } else {
+                                        onEvent(PlayerEvent.DecreaseVolume)
                                     }
                                 }
-                                gestureScrollY = change.position.y
+                                Bar.Brightness -> {
+                                    if (offset > 0) {
+                                        onEvent(PlayerEvent.IncreaseBrightness)
+                                    } else {
+                                        onEvent(PlayerEvent.DecreaseBrightness)
+                                    }
+                                }
                             }
+                            gestureScrollY = change.position.y
                         }
-                    },
-                    onDragEnd = {
-                        onUiEvent(UiEvent.ShowBrightnessBar(false))
-                        onUiEvent(UiEvent.ShowVolumeBar(false))
+
                     },
                     onDragCancel = {
                         onUiEvent(UiEvent.ShowBrightnessBar(false))
@@ -170,6 +187,9 @@ fun PlayerGestures(
                 )
             }
     )
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 }
 
 fun Density.toDp(px: Float): Float {

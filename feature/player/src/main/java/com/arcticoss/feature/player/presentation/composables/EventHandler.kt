@@ -26,6 +26,7 @@ fun EventHandler(
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     val lifecycleOwner = LocalLifecycleOwner.current
     val activity = context.findActivity()
+    val delay = 1000L
 
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
         if (event == Lifecycle.Event.ON_START) {
@@ -40,6 +41,20 @@ fun EventHandler(
 
     LaunchedEffect(playerState.volume) {
         audioManager.setVolume(playerState.volume)
+    }
+
+    LaunchedEffect(playerUiState.isBrightnessBarVisible) {
+        if (playerUiState.isBrightnessBarVisible) {
+            delay(delay)
+            onUiEvent(UiEvent.ShowBrightnessBar(false))
+        }
+    }
+
+    LaunchedEffect(playerUiState.isVolumeBarVisible) {
+        if (playerUiState.isVolumeBarVisible) {
+            delay(delay)
+            onUiEvent(UiEvent.ShowVolumeBar(false))
+        }
     }
 
     LaunchedEffect(playerUiState.isControllerVisible, playerState.isPlaying) {

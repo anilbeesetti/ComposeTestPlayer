@@ -65,42 +65,8 @@ internal fun PlayerScreen(
     onUiEvent: (UiEvent) -> Unit,
     onBackPressed: () -> Unit
 ) {
-
-    val focusRequester = remember { FocusRequester() }
-    var keyEvent by remember { mutableStateOf(false) }
-
-    LaunchedEffect(key1 = keyEvent) {
-        if (keyEvent) {
-            onUiEvent(UiEvent.ShowVolumeBar(true))
-            delay(1000)
-            keyEvent = false
-        } else {
-            onUiEvent(UiEvent.ShowVolumeBar(false))
-        }
-    }
-
-
     Box(
         modifier = Modifier
-            .onKeyEvent {
-                if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_UP
-                    && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN
-                ) {
-                    keyEvent = true
-                    onEvent(PlayerEvent.IncreaseVolume)
-                    return@onKeyEvent true
-                }
-                if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
-                    && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN
-                ) {
-                    keyEvent = true
-                    onEvent(PlayerEvent.DecreaseVolume)
-                    return@onKeyEvent true
-                }
-                false
-            }
-            .focusRequester(focusRequester)
-            .focusable()
             .fillMaxSize()
     ) {
         NextExoPlayer(
@@ -124,8 +90,5 @@ internal fun PlayerScreen(
             onBackPressed = onBackPressed,
             onUiEvent = onUiEvent
         )
-    }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
     }
 }
