@@ -6,10 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.feature.player.presentation.composables.EventHandler
-import com.arcticoss.feature.player.presentation.composables.NextExoPlayer
-import com.arcticoss.feature.player.presentation.composables.NextPlayerUI
-import com.arcticoss.feature.player.presentation.composables.PlayerGestures
+import com.arcticoss.feature.player.presentation.composables.*
+import com.arcticoss.feature.player.utils.*
 import com.arcticoss.model.PlayerPreferences
 import com.google.android.exoplayer2.ExoPlayer
 

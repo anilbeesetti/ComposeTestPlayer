@@ -26,6 +26,7 @@ fun Activity.setBrightness(brightness: Float) {
     val windowAttributes = this.window.attributes
     windowAttributes.screenBrightness = brightness
     this.window.attributes = windowAttributes
+    WindowCompat.getInsetsController(window, window.decorView).systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 }
 
 @SuppressLint("SourceLockedOrientationActivity")
