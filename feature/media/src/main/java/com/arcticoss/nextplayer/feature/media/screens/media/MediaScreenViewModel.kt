@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.data.repository.IMediaRepository
 import com.arcticoss.model.InterfacePreferences
-import com.arcticoss.model.MediaItem
+import com.arcticoss.model.Media
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetSortedFoldersStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
@@ -73,6 +73,6 @@ sealed interface FolderUiState {
 }
 
 sealed interface MediaUiState {
-    data class Success(val mediaItems: List<MediaItem>) : MediaUiState
+    data class Success(val mediaItems: List<Media>) : MediaUiState
     object Loading : MediaUiState
 }

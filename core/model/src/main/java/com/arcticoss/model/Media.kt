@@ -3,7 +3,7 @@ package com.arcticoss.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MediaItem(
+data class Media(
     val id: Long = 0,
     val size: Long = 0,
     val width: Int = 0,

@@ -11,14 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.arcticoss.model.MediaItem
+import com.arcticoss.model.Media
 
 private const val TAG = "ShowVideoFiles"
 
 @Composable
 fun ShowVideoFiles(
     isLoading: Boolean,
-    mediaItems: List<MediaItem>,
+    mediaItems: List<Media>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     onMediaItemClick: (path: String) -> Unit = {},

@@ -4,5 +4,5 @@ data class MediaFolder(
     val id: Long = 0,
     val name: String = "",
     val path: String = "",
-    val mediaItems: List<MediaItem> = emptyList()
+    val mediaItems: List<Media> = emptyList()
 )

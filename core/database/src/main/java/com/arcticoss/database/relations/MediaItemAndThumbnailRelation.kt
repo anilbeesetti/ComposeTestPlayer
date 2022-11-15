@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.arcticoss.database.entities.MediaItemEntity
 import com.arcticoss.database.entities.ThumbnailEntity
-import com.arcticoss.model.MediaItem
+import com.arcticoss.model.Media
 
 data class MediaItemAndThumbnailRelation(
     @Embedded val mediaEntity: MediaItemEntity,
@@ -15,7 +15,7 @@ data class MediaItemAndThumbnailRelation(
     val thumbnail: ThumbnailEntity?
 )
 
-fun MediaItemAndThumbnailRelation.asExternalModel() = MediaItem(
+fun MediaItemAndThumbnailRelation.asExternalModel() = Media(
     id = mediaEntity.id,
     size = mediaEntity.size,
     width = mediaEntity.width,

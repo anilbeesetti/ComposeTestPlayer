@@ -3,8 +3,6 @@ package com.arcticoss.database.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.arcticoss.model.MediaItem
-import java.time.Duration
 
 
 @Entity(tableName = "media")
