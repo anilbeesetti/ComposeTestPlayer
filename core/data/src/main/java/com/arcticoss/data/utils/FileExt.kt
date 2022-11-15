@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.File
 import java.net.URLConnection
-import java.nio.file.Files
 import java.util.*
 
 private const val TAG = "FileExt"
@@ -57,6 +56,7 @@ fun File.getFolders(): List<File> {
 fun File.getFoldersAndVideos() = flow {
     val folderStack: Stack<File> = Stack()
     folderStack.add(this@getFoldersAndVideos)
+    emit(this@getFoldersAndVideos)
     while (folderStack.isNotEmpty()) {
         for (file in folderStack.pop().listFiles() ?: emptyArray()) {
             if (file.isDirectory) {
