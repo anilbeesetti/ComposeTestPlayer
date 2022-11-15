@@ -1,13 +1,8 @@
 package com.arcticoss.feature.player
 
-import android.view.KeyEvent
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,7 +12,6 @@ import com.arcticoss.feature.player.presentation.composables.NextPlayerUI
 import com.arcticoss.feature.player.presentation.composables.PlayerGestures
 import com.arcticoss.model.PlayerPreferences
 import com.google.android.exoplayer2.ExoPlayer
-import kotlinx.coroutines.delay
 
 
 private const val TAG = "NextPlayerScreen"
