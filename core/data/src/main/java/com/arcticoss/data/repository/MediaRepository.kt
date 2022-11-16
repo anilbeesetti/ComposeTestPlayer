@@ -11,6 +11,7 @@ import com.arcticoss.database.relations.FolderAndMediaItemRelation
 import com.arcticoss.database.relations.asExternalModel
 import com.arcticoss.mediainfo.FrameLoader
 import com.arcticoss.mediainfo.MediaInfoBuilder
+import com.arcticoss.model.Media
 import com.arcticoss.model.MediaFolder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -55,6 +56,10 @@ class MediaRepository @Inject constructor(
         mediaItemDao.update(
             mediaEntity.copy(lastPlayedPosition = lastPlayedPosition)
         )
+    }
+
+    override suspend fun getMedia(path: String): Media {
+        return mediaItemDao.get(path).asExternalModel()
     }
 
     private suspend fun syncFoldersAndVideos() {

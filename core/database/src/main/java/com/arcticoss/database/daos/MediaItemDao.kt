@@ -20,6 +20,10 @@ interface MediaItemDao {
     @Query("SELECT * FROM media WHERE id = :id")
     suspend fun get(id: Long): MediaItemEntity
 
+    @Transaction
+    @Query("SELECT * FROM media WHERE path = :path")
+    suspend fun get(path: String): MediaItemAndThumbnailRelation
+
     @Query("SELECT EXISTS(SELECT * FROM media WHERE path = :path )")
     suspend fun isExist(path: String): Boolean
 

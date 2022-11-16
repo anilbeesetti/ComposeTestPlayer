@@ -41,7 +41,7 @@ class PlayerActivity : ComponentActivity() {
                     val viewModel: PlayerViewModel = hiltViewModel()
 
                     LaunchedEffect(key1 = Unit) {
-                        intentData?.let { viewModel.addVideoUri(it) }
+                        intentData?.let { viewModel.invokeMedia(it) }
                     }
                     CompositionLocalProvider(LocalContentColor provides Color.White) {
                         PlayerScreen(onBackPressed = this::finish)

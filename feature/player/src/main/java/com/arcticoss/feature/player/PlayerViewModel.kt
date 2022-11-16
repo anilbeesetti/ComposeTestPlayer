@@ -11,6 +11,7 @@ import com.arcticoss.model.Media
 import com.arcticoss.model.PlayerPreferences
 import com.arcticoss.model.Resume
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
+import com.arcticoss.nextplayer.core.domain.GetMediaFromUriUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
 import com.google.android.exoplayer2.ExoPlayer
@@ -24,16 +25,16 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-
 private const val TAG = "PlayerViewModel"
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val mediaRepository: IMediaRepository,
     private val preferencesDataSource: PlayerPreferencesDataSource,
     getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
     getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
-    private val mediaRepository: IMediaRepository,
+    private val getMediaFromUri: GetMediaFromUriUseCase,
+    savedStateHandle: SavedStateHandle,
     normalPlayer: Player
 ) : ViewModel() {
 
@@ -69,10 +70,15 @@ class PlayerViewModel @Inject constructor(
             initialValue = PlayerPreferences()
         )
 
-    fun addVideoUri(uri: Uri) {
-        val mediaItem = MediaItem.fromUri(uri)
-        player.addMediaItem(mediaItem)
-        player.prepare()
+    fun invokeMedia(uri: Uri) {
+        viewModelScope.launch {
+            val mediaItem = getMediaFromUri(uri)
+            mediaItem?.let { media ->
+                _playerState.update { it.copy(mediaList = listOf(media)) }
+            }
+            setMediaItems()
+            restoreMediaState(playerState.value.currentMediaItemIndex)
+        }
     }
 
     init {
@@ -84,19 +90,20 @@ class PlayerViewModel @Inject constructor(
                     getSortedMediaFolderStream(id).first().mediaItems
 
                 _playerState.update { it.copy(mediaList = mediaList) }
+                val index = mediaList.indexOfFirst { it.id == mediaID }
                 setMediaItems()
+                moveToMediaItem(index)
+                restoreMediaState(index)
             }
         }
     }
 
     private fun setMediaItems() {
         with(playerState.value) {
-            val index = mediaList.indexOfFirst { it.id == mediaID }
             val mediaItems = mediaList.map {
                 MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
             }
             player.setMediaItems(mediaItems)
-            moveToMediaItem(index)
             player.prepare()
         }
     }
@@ -113,7 +120,6 @@ class PlayerViewModel @Inject constructor(
         }
 
         _playerState.update { it.copy(currentMediaItemIndex = index) }
-        restoreMediaState(index)
     }
 
     private fun restoreMediaState(index: Int) {
