@@ -48,7 +48,7 @@ fun MediaScreen(
         topBar = {
             LargeTopAppBar(
                 title = {
-                    Text(text = stringResource(id = if (interfacePreferences.groupVideos) R.string.folders else R.string.videos))
+                    Text(text = stringResource(id = R.string.next_player))
                 },
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {

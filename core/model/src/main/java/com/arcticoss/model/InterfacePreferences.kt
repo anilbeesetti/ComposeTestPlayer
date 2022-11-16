@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class InterfacePreferences(
     val theme: Theme = Theme.FollowSystem,
     val showFloatingButton: Boolean = false,
-    val groupVideos: Boolean = false,
+    val groupVideos: Boolean = true,
     val showHidden: Boolean = false,
     val sortBy: SortBy = SortBy.Title,
     val sortOrder: SortOrder = SortOrder.Ascending
