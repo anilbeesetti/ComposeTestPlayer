@@ -50,6 +50,13 @@ class MediaRepository @Inject constructor(
         syncThumbnails()
     }
 
+    override suspend fun updateMedia(id: Long, lastPlayedPosition: Long) {
+        val mediaEntity = mediaItemDao.get(id)
+        mediaItemDao.update(
+            mediaEntity.copy(lastPlayedPosition = lastPlayedPosition)
+        )
+    }
+
     private suspend fun syncFoldersAndVideos() {
         val job = CoroutineScope(Dispatchers.IO).launch {
             storageDir.getFoldersAndVideos().collect { file ->
@@ -74,20 +81,6 @@ class MediaRepository @Inject constructor(
         }
     }
 
-    private suspend fun syncFolders() {
-        storageDir.getFolders().forEach {
-            if (!folderDao.isExist(it.path)) {
-                folderDao.insert(
-                    FolderEntity(
-                        name = it.name,
-                        path = it.path
-                    )
-                )
-            }
-        }
-    }
-
-
     private suspend fun syncVideoFile(videoFile: File) {
         if (!mediaItemDao.isExist(videoFile.path)) {
             val mediaInfoBuilder = MediaInfoBuilder()
@@ -105,12 +98,6 @@ class MediaRepository @Inject constructor(
             mediaInfo.subtitleStreams.forEach {
                 subtitleTrackDao.insert(it.asSubtitleTrackEntity(mediaItemId))
             }
-        }
-    }
-
-    private suspend fun syncVideos() {
-        storageDir.getVideos().collect { file ->
-            syncVideoFile(file)
         }
     }
 

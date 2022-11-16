@@ -5,9 +5,11 @@ import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arcticoss.data.repository.IMediaRepository
 import com.arcticoss.feature.player.utils.Orientation
 import com.arcticoss.model.Media
 import com.arcticoss.model.PlayerPreferences
+import com.arcticoss.model.Resume
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
@@ -31,6 +33,7 @@ class PlayerViewModel @Inject constructor(
     private val preferencesDataSource: PlayerPreferencesDataSource,
     getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
     getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
+    private val mediaRepository: IMediaRepository,
     normalPlayer: Player
 ) : ViewModel() {
 
@@ -45,7 +48,8 @@ class PlayerViewModel @Inject constructor(
     private val _playerUiState = MutableStateFlow(PlayerUiState())
     val playerUiState = _playerUiState.asStateFlow()
 
-    val playerCurrentPosition = getPlayerCurrentPosition()
+    val playerCurrentPosition = player
+        .currentPositionAsFlow()
         .distinctUntilChanged()
         .stateIn(
             scope = viewModelScope,
@@ -64,13 +68,6 @@ class PlayerViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = PlayerPreferences()
         )
-
-    private fun getPlayerCurrentPosition() = flow {
-        while (true) {
-            emit(player.currentPosition)
-            delay(1.seconds / 30)
-        }
-    }
 
     fun addVideoUri(uri: Uri) {
         val mediaItem = MediaItem.fromUri(uri)
@@ -93,16 +90,36 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun setMediaItems() {
-        val index = playerState.value.mediaList.indexOfFirst { it.id == mediaID }
-        val mediaItems = playerState.value.mediaList.map {
-            MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
+        with(playerState.value) {
+            val index = mediaList.indexOfFirst { it.id == mediaID }
+            val mediaItems = mediaList.map {
+                MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
+            }
+            player.setMediaItems(mediaItems)
+            moveToMediaItem(index)
+            player.prepare()
+        }
+    }
+
+    private fun moveToMediaItem(index: Int) {
+        if (index > player.currentMediaItemIndex) {
+            for (i in player.currentMediaItemIndex until index) {
+                player.seekToNextMediaItem()
+            }
+        } else {
+            for (i in index until player.currentMediaItemIndex) {
+                player.seekToPreviousMediaItem()
+            }
         }
 
-        player.setMediaItems(mediaItems)
-        for (i in 0 until index) {
-            player.seekToNextMediaItem()
+        _playerState.update { it.copy(currentMediaItemIndex = index) }
+        restoreMediaState(index)
+    }
+
+    private fun restoreMediaState(index: Int) {
+        if (preferencesFlow.value.resume == Resume.Always) {
+            player.seekTo(playerState.value.mediaList[index].lastPlayedPosition)
         }
-        player.prepare()
     }
 
     fun onUiEvent(event: UiEvent) {
@@ -124,6 +141,29 @@ class PlayerViewModel @Inject constructor(
             }
             UiEvent.ToggleAspectRatio -> viewModelScope.launch {
                 preferencesDataSource.switchAspectRatio()
+            }
+            UiEvent.SeekToNext -> {
+                this.onUiEvent(UiEvent.SavePlaybackState)
+                player.seekToNext()
+                _playerState.update { it.copy(currentMediaItemIndex = player.currentMediaItemIndex) }
+                restoreMediaState(playerState.value.currentMediaItemIndex)
+            }
+            UiEvent.SeekToPrevious -> {
+                this.onUiEvent(UiEvent.SavePlaybackState)
+                player.seekToPrevious()
+                _playerState.update { it.copy(currentMediaItemIndex = player.currentMediaItemIndex) }
+                restoreMediaState(playerState.value.currentMediaItemIndex)
+            }
+            UiEvent.SavePlaybackState -> {
+                if (playerState.value.mediaList.isNotEmpty()) {
+                    viewModelScope.launch {
+                        mediaRepository.updateMedia(playerState.value.mediaList[playerState.value.currentMediaItemIndex].id, lastPlayedPosition = playerCurrentPosition.value)
+                    }
+                }
+            }
+            is UiEvent.SeekToMediaItem -> {
+                this.onUiEvent(UiEvent.SavePlaybackState)
+                moveToMediaItem(event.value)
             }
         }
     }
@@ -181,9 +221,6 @@ class PlayerViewModel @Inject constructor(
                     }
                 }
             }
-            is PlayerEvent.SetCurrentMediaItemId -> {
-                _playerState.update { it.copy(currentMediaItemId = event.value) }
-            }
         }
     }
 }
@@ -196,7 +233,7 @@ data class PlayerState(
     val playWhenReady: Boolean = true,
     val currentMediaItemDuration: Long = 0,
     val mediaList: List<Media> = emptyList(),
-    val currentMediaItemId: Long = 0,
+    val currentMediaItemIndex: Int = 0,
     val screenOrientation: Orientation = Orientation.PORTRAIT
 )
 
@@ -210,11 +247,15 @@ data class PlayerUiState(
 
 sealed interface UiEvent {
     object ToggleShowUi : UiEvent
+    object SeekToNext : UiEvent
+    object SeekToPrevious: UiEvent
+    object SavePlaybackState: UiEvent
     object ToggleAspectRatio : UiEvent
     data class ShowUi(val value: Boolean) : UiEvent
     data class ShowSeekBar(val value: Boolean) : UiEvent
     data class ShowVolumeBar(val value: Boolean) : UiEvent
     data class ShowBrightnessBar(val value: Boolean) : UiEvent
+    data class SeekToMediaItem(val value: Int): UiEvent
 }
 
 sealed interface PlayerEvent {
@@ -227,5 +268,11 @@ sealed interface PlayerEvent {
     data class SetPlaybackState(val value: Boolean) : PlayerEvent
     data class SetPlayWhenReady(val value: Boolean) : PlayerEvent
     data class SetOrientation(val value: Orientation) : PlayerEvent
-    data class SetCurrentMediaItemId(val value: Long): PlayerEvent
+}
+
+fun ExoPlayer.currentPositionAsFlow() = flow {
+    while (true) {
+        emit(this@currentPositionAsFlow.currentPosition)
+        delay(1.seconds / 30)
+    }
 }

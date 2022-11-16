@@ -11,4 +11,6 @@ interface IMediaRepository {
 
     suspend fun syncMedia()
 
+    suspend fun updateMedia(id: Long, lastPlayedPosition: Long)
+
 }

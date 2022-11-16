@@ -30,6 +30,8 @@ fun EventHandler(
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
         if (event == Lifecycle.Event.ON_START) {
             onEvent(PlayerEvent.SetVolume(audioManager.getVolume()))
+        } else if (event == Lifecycle.Event.ON_PAUSE) {
+            onUiEvent(UiEvent.SavePlaybackState)
         }
     }
 

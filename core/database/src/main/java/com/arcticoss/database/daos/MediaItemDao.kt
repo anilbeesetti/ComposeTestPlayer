@@ -14,14 +14,20 @@ interface MediaItemDao {
     @Delete
     suspend fun delete(mediaItemEntity: MediaItemEntity)
 
+    @Update
+    suspend fun update(mediaItemEntity: MediaItemEntity)
+
+    @Query("SELECT * FROM media WHERE id = :id")
+    suspend fun get(id: Long): MediaItemEntity
+
     @Query("SELECT EXISTS(SELECT * FROM media WHERE path = :path )")
     suspend fun isExist(path: String): Boolean
 
-    @Query("SELECT * From media")
+    @Query("SELECT * FROM media")
     fun getMediaItemEntities(): List<MediaItemEntity>
 
     @Transaction
-    @Query("SELECT * From media")
+    @Query("SELECT * FROM media")
     fun getMediaItemEntitiesStream(): Flow<List<MediaItemAndThumbnailRelation>>
 
 }
