@@ -19,10 +19,7 @@ import com.arcticoss.feature.player.utils.Orientation
 import com.arcticoss.feature.player.utils.findActivity
 import com.arcticoss.feature.player.utils.setOrientation
 import com.arcticoss.model.AspectRatio
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView
 
@@ -132,6 +129,12 @@ fun NextExoPlayer(
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     onEvent(PlayerEvent.SetPlaybackState(isPlaying))
                     playerView?.keepScreenOn = isPlaying
+                }
+
+                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                    mediaItem?.let {
+                        onEvent(PlayerEvent.SetCurrentMediaItemId(it.mediaId.toLong()))
+                    }
                 }
             }
             exoPlayer.addListener(playbackStateListener)

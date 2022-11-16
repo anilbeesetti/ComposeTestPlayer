@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.feature.player.utils.Orientation
+import com.arcticoss.model.Media
 import com.arcticoss.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
@@ -21,6 +22,8 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
+
+private const val TAG = "PlayerViewModel"
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
@@ -77,32 +80,29 @@ class PlayerViewModel @Inject constructor(
 
     init {
         folderID?.let { id ->
-            if (id == 0L) {
-                getSortedMediaItemsStream().onEach { mediaItemList ->
-                    val index = mediaItemList.indexOfFirst { it.id == mediaID }
-                    val mediaItems = mediaItemList.map {
-                        MediaItem.fromUri(File(it.path).toUri())
-                    }
-                    player.setMediaItems(mediaItems)
-                    for (i in 0 until index) {
-                        player.seekToNextMediaItem()
-                    }
-                    player.prepare()
-                }.launchIn(viewModelScope)
-            } else {
-                getSortedMediaFolderStream(id).onEach { folder ->
-                    val index = folder.mediaItems.indexOfFirst { it.id == mediaID }
-                    val mediaItems = folder.mediaItems.map {
-                        MediaItem.fromUri(File(it.path).toUri())
-                    }
-                    player.setMediaItems(mediaItems)
-                    for (i in 0 until index) {
-                        player.seekToNextMediaItem()
-                    }
-                    player.prepare()
-                }.launchIn(viewModelScope)
+            viewModelScope.launch {
+                val mediaList = if (id == 0L)
+                    getSortedMediaItemsStream().first()
+                else
+                    getSortedMediaFolderStream(id).first().mediaItems
+
+                _playerState.update { it.copy(mediaList = mediaList) }
+                setMediaItems()
             }
         }
+    }
+
+    private fun setMediaItems() {
+        val index = playerState.value.mediaList.indexOfFirst { it.id == mediaID }
+        val mediaItems = playerState.value.mediaList.map {
+            MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
+        }
+
+        player.setMediaItems(mediaItems)
+        for (i in 0 until index) {
+            player.seekToNextMediaItem()
+        }
+        player.prepare()
     }
 
     fun onUiEvent(event: UiEvent) {
@@ -145,9 +145,6 @@ class PlayerViewModel @Inject constructor(
             is PlayerEvent.SetPlayWhenReady -> _playerState.update {
                 it.copy(playWhenReady = event.value)
             }
-            is PlayerEvent.SetCurrentPosition -> _playerState.update {
-                it.copy(currentPosition = event.value)
-            }
             PlayerEvent.IncreaseVolume -> {
                 val volume = playerState.value.volume
                 if (volume < 25) {
@@ -184,20 +181,22 @@ class PlayerViewModel @Inject constructor(
                     }
                 }
             }
+            is PlayerEvent.SetCurrentMediaItemId -> {
+                _playerState.update { it.copy(currentMediaItemId = event.value) }
+            }
         }
     }
 }
 
 data class PlayerState(
-    val width: Int = 0,
     val volume: Int = 0,
-    val height: Int = 0,
     val maxLevel: Int = 25,
     val brightness: Int = 5,
     val isPlaying: Boolean = true,
-    val currentPosition: Long = 0,
     val playWhenReady: Boolean = true,
     val currentMediaItemDuration: Long = 0,
+    val mediaList: List<Media> = emptyList(),
+    val currentMediaItemId: Long = 0,
     val screenOrientation: Orientation = Orientation.PORTRAIT
 )
 
@@ -210,8 +209,8 @@ data class PlayerUiState(
 )
 
 sealed interface UiEvent {
-    object ToggleShowUi: UiEvent
-    object ToggleAspectRatio: UiEvent
+    object ToggleShowUi : UiEvent
+    object ToggleAspectRatio : UiEvent
     data class ShowUi(val value: Boolean) : UiEvent
     data class ShowSeekBar(val value: Boolean) : UiEvent
     data class ShowVolumeBar(val value: Boolean) : UiEvent
@@ -219,14 +218,14 @@ sealed interface UiEvent {
 }
 
 sealed interface PlayerEvent {
-    object IncreaseVolume: PlayerEvent
-    object DecreaseVolume: PlayerEvent
-    object IncreaseBrightness: PlayerEvent
-    object DecreaseBrightness: PlayerEvent
+    object IncreaseVolume : PlayerEvent
+    object DecreaseVolume : PlayerEvent
+    object IncreaseBrightness : PlayerEvent
+    object DecreaseBrightness : PlayerEvent
     data class SetVolume(val value: Int) : PlayerEvent
-    data class SetDuration(val value: Long): PlayerEvent
-    data class SetCurrentPosition(val value: Long): PlayerEvent
-    data class SetPlaybackState(val value: Boolean): PlayerEvent
-    data class SetPlayWhenReady(val value: Boolean): PlayerEvent
+    data class SetDuration(val value: Long) : PlayerEvent
+    data class SetPlaybackState(val value: Boolean) : PlayerEvent
+    data class SetPlayWhenReady(val value: Boolean) : PlayerEvent
     data class SetOrientation(val value: Orientation) : PlayerEvent
+    data class SetCurrentMediaItemId(val value: Long): PlayerEvent
 }

@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,13 +29,15 @@ fun NextPlayerUI(
     onBackPressed: () -> Unit,
     onUiEvent: (UiEvent) -> Unit
 ) {
+    val currentMedia = remember(playerState.currentMediaItemId) { playerState.mediaList.firstOrNull { it.id == playerState.currentMediaItemId } }
+
     Box(
         modifier = modifier
             .fillMaxSize()
     ) {
         if (playerUiState.isControllerVisible) {
             PlayerUIHeader(
-                title = "TODO",
+                title = currentMedia?.title ?: "",
                 onBackPressed = onBackPressed,
                 modifier = Modifier
                     .systemBarsPadding()
