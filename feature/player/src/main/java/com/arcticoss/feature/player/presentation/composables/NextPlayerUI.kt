@@ -58,7 +58,7 @@ fun NextPlayerUI(
         PlayerUIFooter(
             playerUiState = playerUiState,
             preferences = preferences,
-            duration = playerState.currentMediaItemDuration,
+            duration = if (playerState.mediaList.isNotEmpty()) playerState.mediaList[playerState.currentMediaItemIndex].duration / 1000 else 0L,
             currentPosition = currentPosition,
             modifier = Modifier
                 .navigationBarsPadding()
