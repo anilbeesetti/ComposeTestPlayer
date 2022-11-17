@@ -25,14 +25,12 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-private const val TAG = "PlayerViewModel"
-
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val mediaRepository: IMediaRepository,
     private val preferencesDataSource: PlayerPreferencesDataSource,
-    getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
-    getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
+    private val getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
+    private val getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
     private val getMediaFromUri: GetMediaFromUriUseCase,
     savedStateHandle: SavedStateHandle,
     normalPlayer: Player
@@ -74,38 +72,40 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             val mediaItem = getMediaFromUri(uri)
             mediaItem?.let { media ->
-                _playerState.update { it.copy(mediaList = listOf(media)) }
+                setMedia(listOf(media))
             }
-            setMediaItems()
-            restoreMediaState(playerState.value.currentMediaItemIndex)
         }
     }
 
     init {
         folderID?.let { id ->
-            viewModelScope.launch {
-                val mediaList = if (id == 0L)
-                    getSortedMediaItemsStream().first()
-                else
-                    getSortedMediaFolderStream(id).first().mediaItems
+            if (id == 0L)
+                getSortedMediaItemsStream().onEach { mediaList ->
+                    setMedia(mediaList)
+                }.launchIn(viewModelScope)
+            else
+                getSortedMediaFolderStream(id).onEach { mediaFolder ->
+                    setMedia(mediaFolder.mediaItems)
+                }.launchIn(viewModelScope)
+        }
 
-                _playerState.update { it.copy(mediaList = mediaList) }
-                val index = mediaList.indexOfFirst { it.id == mediaID }
-                setMediaItems()
-                moveToMediaItem(index)
-                restoreMediaState(index)
-            }
+    }
+
+    private fun setMedia(mediaList: List<Media>) {
+        _playerState.update { it.copy(mediaList = mediaList) }
+        if (playerState.value.currentPlayingMedia.id == 0L) {
+            val index = mediaList.indexOfFirst { it.id == mediaID }
+            setPlayerMediaItems()
+            moveToMediaItem(index)
         }
     }
 
-    private fun setMediaItems() {
-        with(playerState.value) {
-            val mediaItems = mediaList.map {
-                MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
-            }
-            player.setMediaItems(mediaItems)
-            player.prepare()
+    private fun setPlayerMediaItems() {
+        val mediaItems = playerState.value.mediaList.map {
+            MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
         }
+        player.setMediaItems(mediaItems)
+        player.prepare()
     }
 
     private fun moveToMediaItem(index: Int) {
@@ -118,13 +118,22 @@ class PlayerViewModel @Inject constructor(
                 player.seekToPreviousMediaItem()
             }
         }
-
-        _playerState.update { it.copy(currentMediaItemIndex = index) }
     }
 
-    private fun restoreMediaState(index: Int) {
+    private fun savePlaybackState() {
+        if (playerState.value.currentPlayingMedia.id != 0L) {
+            viewModelScope.launch {
+                mediaRepository.updateMedia(
+                    playerState.value.currentPlayingMedia.id,
+                    lastPlayedPosition = playerCurrentPosition.value
+                )
+            }
+        }
+    }
+
+    private fun restoreMediaState() {
         if (preferencesFlow.value.resume == Resume.Always) {
-            player.seekTo(playerState.value.mediaList[index].lastPlayedPosition)
+            player.seekTo(playerState.value.currentPlayingMedia.lastPlayedPosition)
         }
     }
 
@@ -148,24 +157,8 @@ class PlayerViewModel @Inject constructor(
             UiEvent.ToggleAspectRatio -> viewModelScope.launch {
                 preferencesDataSource.switchAspectRatio()
             }
-            UiEvent.SeekToNext -> {
-                this.onUiEvent(UiEvent.SavePlaybackState)
-                player.seekToNext()
-                _playerState.update { it.copy(currentMediaItemIndex = player.currentMediaItemIndex) }
-                restoreMediaState(playerState.value.currentMediaItemIndex)
-            }
-            UiEvent.SeekToPrevious -> {
-                this.onUiEvent(UiEvent.SavePlaybackState)
-                player.seekToPrevious()
-                _playerState.update { it.copy(currentMediaItemIndex = player.currentMediaItemIndex) }
-                restoreMediaState(playerState.value.currentMediaItemIndex)
-            }
             UiEvent.SavePlaybackState -> {
-                if (playerState.value.mediaList.isNotEmpty()) {
-                    viewModelScope.launch {
-                        mediaRepository.updateMedia(playerState.value.mediaList[playerState.value.currentMediaItemIndex].id, lastPlayedPosition = playerCurrentPosition.value)
-                    }
-                }
+                savePlaybackState()
             }
             is UiEvent.SeekToMediaItem -> {
                 this.onUiEvent(UiEvent.SavePlaybackState)
@@ -227,6 +220,15 @@ class PlayerViewModel @Inject constructor(
                     }
                 }
             }
+            is PlayerEvent.MediaItemTransition -> {
+                savePlaybackState()
+                _playerState.update { state ->
+                    state.copy(
+                        currentPlayingMedia = playerState.value.mediaList.first { it.id == event.value }
+                    )
+                }
+                restoreMediaState()
+            }
         }
     }
 }
@@ -239,7 +241,7 @@ data class PlayerState(
     val playWhenReady: Boolean = true,
     val currentMediaItemDuration: Long = 0,
     val mediaList: List<Media> = emptyList(),
-    val currentMediaItemIndex: Int = 0,
+    val currentPlayingMedia: Media = Media(),
     val screenOrientation: Orientation = Orientation.PORTRAIT
 )
 
@@ -253,15 +255,13 @@ data class PlayerUiState(
 
 sealed interface UiEvent {
     object ToggleShowUi : UiEvent
-    object SeekToNext : UiEvent
-    object SeekToPrevious: UiEvent
-    object SavePlaybackState: UiEvent
+    object SavePlaybackState : UiEvent
     object ToggleAspectRatio : UiEvent
     data class ShowUi(val value: Boolean) : UiEvent
     data class ShowSeekBar(val value: Boolean) : UiEvent
     data class ShowVolumeBar(val value: Boolean) : UiEvent
     data class ShowBrightnessBar(val value: Boolean) : UiEvent
-    data class SeekToMediaItem(val value: Int): UiEvent
+    data class SeekToMediaItem(val value: Int) : UiEvent
 }
 
 sealed interface PlayerEvent {
@@ -274,6 +274,7 @@ sealed interface PlayerEvent {
     data class SetPlaybackState(val value: Boolean) : PlayerEvent
     data class SetPlayWhenReady(val value: Boolean) : PlayerEvent
     data class SetOrientation(val value: Orientation) : PlayerEvent
+    data class MediaItemTransition(val value: Long) : PlayerEvent
 }
 
 fun ExoPlayer.currentPositionAsFlow() = flow {
