@@ -34,7 +34,7 @@ fun NextPlayerUI(
     ) {
         if (playerUiState.isControllerVisible) {
             PlayerUIHeader(
-                title = if (playerState.mediaList.isNotEmpty()) playerState.mediaList[playerState.currentMediaItemIndex].title else "",
+                title = playerState.currentPlayingMedia.title,
                 onBackPressed = onBackPressed,
                 modifier = Modifier
                     .systemBarsPadding()
@@ -49,8 +49,8 @@ fun NextPlayerUI(
                         player.play()
                     }
                 },
-                onSkipNextClick = { onUiEvent(UiEvent.SeekToNext) },
-                onSkipPreviousClick = { onUiEvent(UiEvent.SeekToPrevious) },
+                onSkipNextClick = player::seekToNext,
+                onSkipPreviousClick = player::seekToPrevious,
                 modifier = Modifier
                     .align(Alignment.Center)
             )
@@ -58,7 +58,7 @@ fun NextPlayerUI(
         PlayerUIFooter(
             playerUiState = playerUiState,
             preferences = preferences,
-            duration = if (playerState.mediaList.isNotEmpty()) playerState.mediaList[playerState.currentMediaItemIndex].duration / 1000 else 0L,
+            duration = playerState.currentPlayingMedia.duration / 1000,
             currentPosition = currentPosition,
             modifier = Modifier
                 .navigationBarsPadding()

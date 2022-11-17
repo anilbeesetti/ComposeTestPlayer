@@ -131,6 +131,12 @@ fun NextExoPlayer(
                     playerView?.keepScreenOn = isPlaying
                 }
 
+                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                    mediaItem?.let {
+                        onEvent(PlayerEvent.MediaItemTransition(it.mediaId.toLong()))
+                    }
+                }
+
             }
             exoPlayer.addListener(playbackStateListener)
             onDispose {
