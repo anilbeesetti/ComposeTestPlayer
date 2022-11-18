@@ -1,8 +1,8 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
@@ -13,13 +13,13 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "NextPlayer"
-include ':app'
-include ':mediainfo'
-include ':core:database'
-include ':core:data'
-include ':core:model'
-include ':feature:player'
-include ':feature:media'
-include ':core:datastore'
-include ':core:domain'
-include ':feature:settings'
+include(":app")
+include(":mediainfo")
+include(":core:datastore")
+include(":core:database")
+include(":core:model")
+include(":core:data")
+include(":core:domain")
+include(":feature:media")
+include(":feature:player")
+include(":feature:settings")
