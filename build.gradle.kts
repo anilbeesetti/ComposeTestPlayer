@@ -1,11 +1,15 @@
 buildscript {
 
-}// Top-level build file where you can add configuration options common to all sub-projects/modules.
+}
+
+/**
+ * TODO: IDE showing error but it works this issue is already reported in issue tracker
+ * Issue Tracker Link: https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
+ */
 plugins {
-    id("com.android.application") version "7.3.1" apply false
-    id("com.android.library") version "7.3.1" apply false
-    id("org.jetbrains.kotlin.android") version "1.6.10" apply false
-    id("com.google.dagger.hilt.android") version "2.44" apply false
-    id("org.jetbrains.kotlin.jvm") version "1.7.20" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20" apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
 }

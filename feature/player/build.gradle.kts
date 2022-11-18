@@ -48,39 +48,42 @@ android {
 
 dependencies {
 
-    val composeVersion = "1.3.0-rc01"
-    val hiltVersion = "2.44"
-
     implementation (project(":core:model"))
     implementation (project(":core:datastore"))
     implementation (project(":core:domain"))
     implementation (project(":core:data"))
 
-    implementation ("androidx.core:core-ktx:1.9.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-    implementation ("androidx.activity:activity-compose:1.6.0")
-    implementation ("androidx.compose.ui:ui:$composeVersion")
-    implementation ("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-    implementation ("androidx.compose.material3:material3:1.0.0-rc01")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-    implementation ("androidx.compose.material:material-icons-extended:1.2.1")
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
 
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha02")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.iconsExtended)
+    implementation(libs.androidx.lifecycle.viewModelCompose)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.kotlinx.coroutines.android)
+
 
     implementation ("com.google.android.exoplayer:exoplayer-core:2.18.1")
     implementation ("com.google.android.exoplayer:exoplayer-ui:2.18.1")
 
     // Hilt
-    implementation ("com.google.dagger:hilt-android:$hiltVersion")
-    kapt ("com.google.dagger:hilt-android-compiler:$hiltVersion")
-    kapt ("androidx.hilt:hilt-compiler:1.0.0")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    kapt(libs.hilt.compiler)
+    kapt(libs.androidx.hilt.compiler)
 
-    testImplementation ("junit:junit:4.13.2")
-    androidTestImplementation ("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation ("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeVersion")
-    debugImplementation ("androidx.compose.ui:ui-tooling:$composeVersion")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeVersion")
+    testImplementation(libs.junit4)
+
+    androidTestImplementation(libs.androidx.test.ext)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.compose.ui.test)
+
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.testManifest)
 }
