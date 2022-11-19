@@ -1,6 +1,6 @@
 package com.arcticoss.nextplayer.core.domain
 
-import com.arcticoss.data.repository.IMediaRepository
+import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
 import com.arcticoss.model.Media
 import com.arcticoss.model.SortBy
 import com.arcticoss.model.SortOrder
