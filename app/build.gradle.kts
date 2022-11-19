@@ -1,18 +1,15 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
+    id("nextplayer.android.application")
+    id("nextplayer.android.application.compose")
+    id("nextplayer.android.hilt")
 }
 
 android {
+
     namespace = "com.arcticoss.nextplayer"
-    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.arcticoss.nextplayer"
-        minSdk = 21
-        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -39,19 +36,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
-    }
     packagingOptions {
         resources {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
@@ -64,10 +48,6 @@ dependencies {
     implementation(project(":feature:media"))
     implementation(project(":feature:player"))
     implementation(project(":feature:settings"))
-
-    val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
