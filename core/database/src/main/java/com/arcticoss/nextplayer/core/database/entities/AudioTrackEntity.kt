@@ -1,9 +1,6 @@
 package com.arcticoss.nextplayer.core.database.entities
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 /**
  * Defines a audio_track for [MediaItemEntity]
@@ -18,7 +15,8 @@ import androidx.room.PrimaryKey
             childColumns = arrayOf("media_item_id"),
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index(value = ["media_item_id"])]
 )
 data class AudioTrackEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

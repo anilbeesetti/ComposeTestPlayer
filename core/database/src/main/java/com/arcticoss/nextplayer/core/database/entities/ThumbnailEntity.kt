@@ -1,9 +1,6 @@
 package com.arcticoss.nextplayer.core.database.entities
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 /**
 * Defines thumbnail for [MediaItemEntity]
@@ -18,7 +15,8 @@ import androidx.room.PrimaryKey
             childColumns = arrayOf("media_item_id"),
             onDelete = ForeignKey.SET_NULL
         )
-    ]
+    ],
+    indices = [Index(value = ["media_item_id"])]
 )
 data class ThumbnailEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
