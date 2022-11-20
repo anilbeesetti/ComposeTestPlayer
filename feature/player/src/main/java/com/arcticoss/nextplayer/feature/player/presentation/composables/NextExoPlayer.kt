@@ -143,7 +143,7 @@ fun NextExoPlayer(
                                     audioTracks.add(
                                         AudioTrack(
                                             displayName = displayName,
-                                            lang = trackFormat.language.toString(),
+                                            formatId = trackFormat.id.toString(),
                                             isSelected = trackGroup.isSelected
                                         )
                                     )

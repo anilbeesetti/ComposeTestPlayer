@@ -110,7 +110,7 @@ internal fun PlayerScreen(
                                 AudioTrackChooser(
                                     text = it.displayName,
                                     selected = it.isSelected,
-                                    onClick = {  }
+                                    onClick = { onEvent(PlayerEvent.SwitchAudioTrack(it.formatId)) }
                                 )
                             }
                         }

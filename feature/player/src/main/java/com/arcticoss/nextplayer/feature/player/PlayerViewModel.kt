@@ -6,24 +6,25 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
-import com.arcticoss.nextplayer.core.model.Media
-import com.arcticoss.nextplayer.core.model.PlayerPreferences
-import com.arcticoss.nextplayer.core.model.Resume
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetMediaFromUriUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
+import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.Resume
 import com.arcticoss.nextplayer.feature.player.utils.Orientation
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.*
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
@@ -239,6 +240,17 @@ class PlayerViewModel @Inject constructor(
                     )
                 }
             }
+            is PlayerEvent.SwitchAudioTrack -> {
+                val audioGroup = player.getTrackGroupFromFormatId(C.TRACK_TYPE_AUDIO, event.value)
+                audioGroup?.let {
+                    if (!it.isSelected && it.isSupported) {
+                        player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                            .setOverrideForType(
+                                TrackSelectionOverride(it.mediaTrackGroup, 0)
+                            ).build()
+                    }
+                }
+            }
         }
     }
 }
@@ -269,7 +281,7 @@ sealed interface UiEvent {
     object ToggleShowUi : UiEvent
     object SavePlaybackState : UiEvent
     object ToggleAspectRatio : UiEvent
-    data class ShowAudioTrackDialog(val value: Boolean): UiEvent
+    data class ShowAudioTrackDialog(val value: Boolean) : UiEvent
     data class ShowUi(val value: Boolean) : UiEvent
     data class ShowSeekBar(val value: Boolean) : UiEvent
     data class ShowVolumeBar(val value: Boolean) : UiEvent
@@ -288,7 +300,8 @@ sealed interface PlayerEvent {
     data class SetPlayWhenReady(val value: Boolean) : PlayerEvent
     data class SetOrientation(val value: Orientation) : PlayerEvent
     data class MediaItemTransition(val value: Long) : PlayerEvent
-    data class AddAudioTracks(val value: List<AudioTrack>): PlayerEvent
+    data class AddAudioTracks(val value: List<AudioTrack>) : PlayerEvent
+    data class SwitchAudioTrack(val value: String) : PlayerEvent
 }
 
 fun ExoPlayer.currentPositionAsFlow() = flow {
@@ -298,8 +311,21 @@ fun ExoPlayer.currentPositionAsFlow() = flow {
     }
 }
 
+fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String):  Tracks.Group? {
+    for (group in this.currentTracks.groups) {
+        if (group.type == trackType) {
+            val trackGroup = group.mediaTrackGroup
+            val format: Format = trackGroup.getFormat(0)
+            if (Objects.equals(id, format.id)) {
+                return group
+            }
+        }
+    }
+    return null
+}
+
 data class AudioTrack(
     val displayName: String,
-    val lang: String,
+    val formatId: String,
     val isSelected: Boolean
 )
