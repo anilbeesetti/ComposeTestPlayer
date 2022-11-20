@@ -76,7 +76,7 @@ internal fun PlayerScreen(
     ) {
         NextExoPlayer(
             exoPlayer = player,
-            playWhenReady = playerState.playWhenReady,
+            playerState = playerState,
             aspectRatio = preferences.aspectRatio,
             onBackPressed = onBackPressed,
             onEvent = onEvent

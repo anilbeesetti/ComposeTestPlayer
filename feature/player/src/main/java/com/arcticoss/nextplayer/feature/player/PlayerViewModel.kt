@@ -14,7 +14,8 @@ import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.model.Resume
 import com.arcticoss.nextplayer.feature.player.utils.Orientation
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -63,6 +64,20 @@ class PlayerViewModel @Inject constructor(
             initialValue = PlayerPreferences()
         )
 
+    init {
+        folderID?.let { id ->
+            if (id == 0L) {
+                getSortedMediaItemsStream().onEach { mediaList ->
+                    setMedia(mediaList)
+                }.launchIn(viewModelScope)
+            } else {
+                getSortedMediaFolderStream(id).onEach { mediaFolder ->
+                    setMedia(mediaFolder.mediaList)
+                }.launchIn(viewModelScope)
+            }
+        }
+    }
+
     fun invokeMedia(uri: Uri) {
         viewModelScope.launch {
             val mediaItem = getMediaFromUri(uri)
@@ -72,38 +87,21 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    init {
-        folderID?.let { id ->
-            if (id == 0L)
-                getSortedMediaItemsStream().onEach { mediaList ->
-                    setMedia(mediaList)
-                }.launchIn(viewModelScope)
-            else
-                getSortedMediaFolderStream(id).onEach { mediaFolder ->
-                    setMedia(mediaFolder.mediaList)
-                }.launchIn(viewModelScope)
-        }
-
-    }
-
     private fun setMedia(mediaList: List<Media>) {
         _playerState.update { it.copy(mediaList = mediaList) }
         if (playerState.value.currentPlayingMedia.id == 0L) {
             val index = mediaList.indexOfFirst { it.id == mediaID }
-            setPlayerMediaItems()
+            val mediaItems = playerState.value.mediaList.map {
+                MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString())
+                    .build()
+            }
+            playerHelper.exoPlayer.setMediaItems(mediaItems)
+            playerHelper.exoPlayer.prepare()
             playerHelper.moveToMediaItem(index)
         }
     }
 
-    private fun setPlayerMediaItems() {
-        val mediaItems = playerState.value.mediaList.map {
-            MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
-        }
-        playerHelper.exoPlayer.setMediaItems(mediaItems)
-        playerHelper.exoPlayer.prepare()
-    }
-
-    private fun savePlaybackState() {
+    private fun saveMediaState() {
         if (playerState.value.currentPlayingMedia.id != 0L) {
             viewModelScope.launch {
                 mediaRepository.updateMedia(
@@ -134,6 +132,13 @@ class PlayerViewModel @Inject constructor(
             is UiEvent.ShowSeekBar -> _playerUiState.update {
                 it.copy(isSeekBarVisible = event.value)
             }
+            is UiEvent.ShowAudioTrackDialog -> _playerUiState.update {
+                it.copy(isAudioTrackDialogVisible = event.value)
+            }
+            is UiEvent.SeekToMediaItem -> {
+                this.onUiEvent(UiEvent.SavePlaybackState)
+                playerHelper.moveToMediaItem(event.value)
+            }
             UiEvent.ToggleShowUi -> _playerUiState.update {
                 it.copy(isControllerVisible = !it.isControllerVisible)
             }
@@ -141,14 +146,7 @@ class PlayerViewModel @Inject constructor(
                 preferencesDataSource.switchAspectRatio()
             }
             UiEvent.SavePlaybackState -> {
-                savePlaybackState()
-            }
-            is UiEvent.SeekToMediaItem -> {
-                this.onUiEvent(UiEvent.SavePlaybackState)
-                playerHelper.moveToMediaItem(event.value)
-            }
-            is UiEvent.ShowAudioTrackDialog -> _playerUiState.update {
-                it.copy(isAudioTrackDialogVisible = event.value)
+                saveMediaState()
             }
         }
     }
@@ -164,11 +162,40 @@ class PlayerViewModel @Inject constructor(
             is PlayerEvent.SetDuration -> _playerState.update {
                 it.copy(currentMediaItemDuration = event.value)
             }
-            is PlayerEvent.SetPlaybackState -> _playerState.update {
+            is PlayerEvent.SetIsPlayingState -> _playerState.update {
                 it.copy(isPlaying = event.value)
             }
             is PlayerEvent.SetPlayWhenReady -> _playerState.update {
                 it.copy(playWhenReady = event.value)
+            }
+            is PlayerEvent.PlayerError -> _playerState.update {
+                it.copy(error = event.value)
+            }
+            is PlayerEvent.AddAudioTracks -> _playerState.update {
+                it.copy(audioTracks = event.value)
+            }
+            is PlayerEvent.MediaItemTransition -> {
+                saveMediaState()
+                _playerState.update { state ->
+                    state.copy(
+                        currentPlayingMedia = playerState.value.mediaList.first { it.id == event.value }
+                    )
+                }
+                restoreMediaState()
+            }
+            is PlayerEvent.SwitchAudioTrack -> {
+                val audioGroup = playerHelper
+                    .getTrackGroupFromFormatId(C.TRACK_TYPE_AUDIO, event.value)
+                audioGroup?.let {
+                    if (!it.isSelected && it.isSupported) {
+                        playerHelper.exoPlayer.trackSelectionParameters = playerHelper.exoPlayer
+                            .trackSelectionParameters
+                            .buildUpon()
+                            .setOverrideForType(
+                                TrackSelectionOverride(it.mediaTrackGroup, 0)
+                            ).build()
+                    }
+                }
             }
             PlayerEvent.IncreaseVolume -> {
                 val volume = playerState.value.volume
@@ -206,34 +233,11 @@ class PlayerViewModel @Inject constructor(
                     }
                 }
             }
-            is PlayerEvent.MediaItemTransition -> {
-                savePlaybackState()
-                _playerState.update { state ->
-                    state.copy(
-                        currentPlayingMedia = playerState.value.mediaList.first { it.id == event.value }
-                    )
-                }
-                restoreMediaState()
+            is PlayerEvent.PlaybackState -> _playerState.update {
+                it.copy(playbackState = event.value)
             }
-            is PlayerEvent.AddAudioTracks -> {
-                _playerState.update { state ->
-                    state.copy(
-                        audioTracks = event.value
-                    )
-                }
-            }
-            is PlayerEvent.SwitchAudioTrack -> {
-                val audioGroup = playerHelper.getTrackGroupFromFormatId(C.TRACK_TYPE_AUDIO, event.value)
-                audioGroup?.let {
-                    if (!it.isSelected && it.isSupported) {
-                        playerHelper.exoPlayer.trackSelectionParameters = playerHelper.exoPlayer
-                            .trackSelectionParameters
-                            .buildUpon()
-                            .setOverrideForType(
-                                TrackSelectionOverride(it.mediaTrackGroup, 0)
-                            ).build()
-                    }
-                }
+            is PlayerEvent.PlaybackStarted -> _playerState.update {
+                it.copy(playbackStarted = event.value)
             }
         }
     }
@@ -243,8 +247,11 @@ data class PlayerState(
     val volume: Int = 0,
     val maxLevel: Int = 25,
     val brightness: Int = 5,
+    val playbackState: Int = 0,
+    val error: Boolean = false,
     val isPlaying: Boolean = true,
     val playWhenReady: Boolean = true,
+    val playbackStarted: Boolean = false,
     val currentMediaItemDuration: Long = 0,
     val mediaList: List<Media> = emptyList(),
     val currentPlayingMedia: Media = Media(),
@@ -280,12 +287,15 @@ sealed interface PlayerEvent {
     object DecreaseBrightness : PlayerEvent
     data class SetVolume(val value: Int) : PlayerEvent
     data class SetDuration(val value: Long) : PlayerEvent
-    data class SetPlaybackState(val value: Boolean) : PlayerEvent
+    data class SetIsPlayingState(val value: Boolean) : PlayerEvent
     data class SetPlayWhenReady(val value: Boolean) : PlayerEvent
     data class SetOrientation(val value: Orientation) : PlayerEvent
     data class MediaItemTransition(val value: Long) : PlayerEvent
     data class AddAudioTracks(val value: List<AudioTrack>) : PlayerEvent
     data class SwitchAudioTrack(val value: String) : PlayerEvent
+    data class PlayerError(val value: Boolean) : PlayerEvent
+    data class PlaybackState(val value: Int): PlayerEvent
+    data class PlaybackStarted(val value: Boolean): PlayerEvent
 }
 
 data class AudioTrack(
