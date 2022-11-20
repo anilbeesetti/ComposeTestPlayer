@@ -1,8 +1,19 @@
 package com.arcticoss.nextplayer.feature.player
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -84,5 +95,95 @@ internal fun PlayerScreen(
             onBackPressed = onBackPressed,
             onUiEvent = onUiEvent
         )
+
+        if (playerUiState.isAudioTrackDialogVisible) {
+            CenterDialog(
+                onDismiss = { onUiEvent(UiEvent.ShowAudioTrackDialog(false)) },
+                title = { Text(text = "Select audio track") },
+                content = {
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Column(Modifier.selectableGroup()) {
+                            playerState.audioTracks.forEach {
+                                AudioTrackChooser(
+                                    text = it.displayName,
+                                    selected = it.isSelected,
+                                    onClick = {  }
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun CenterDialog(
+    onDismiss: () -> Unit,
+    title: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        content = {
+            Surface(
+                shape = MaterialTheme.shapes.extraLarge,
+                modifier = modifier
+                    .fillMaxWidth(0.70f)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 24.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
+                    ) {
+                        val textStyle = MaterialTheme.typography.headlineSmall
+                        ProvideTextStyle(value = textStyle) {
+                            title()
+                        }
+                    }
+                    content()
+                }
+            }
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    )
+}
+
+
+@Composable
+fun AudioTrackChooser(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .selectable(
+                selected = selected,
+                role = Role.RadioButton,
+                onClick = onClick,
+            )
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = null
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(text)
     }
 }

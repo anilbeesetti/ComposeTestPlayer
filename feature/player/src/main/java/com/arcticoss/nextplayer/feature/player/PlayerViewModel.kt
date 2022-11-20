@@ -164,6 +164,9 @@ class PlayerViewModel @Inject constructor(
                 this.onUiEvent(UiEvent.SavePlaybackState)
                 moveToMediaItem(event.value)
             }
+            is UiEvent.ShowAudioTrackDialog -> _playerUiState.update {
+                it.copy(isAudioTrackDialogVisible = event.value)
+            }
         }
     }
 
@@ -259,12 +262,14 @@ data class PlayerUiState(
     val isVolumeBarVisible: Boolean = false,
     val isControllerVisible: Boolean = false,
     val isBrightnessBarVisible: Boolean = false,
+    val isAudioTrackDialogVisible: Boolean = false,
 )
 
 sealed interface UiEvent {
     object ToggleShowUi : UiEvent
     object SavePlaybackState : UiEvent
     object ToggleAspectRatio : UiEvent
+    data class ShowAudioTrackDialog(val value: Boolean): UiEvent
     data class ShowUi(val value: Boolean) : UiEvent
     data class ShowSeekBar(val value: Boolean) : UiEvent
     data class ShowVolumeBar(val value: Boolean) : UiEvent
