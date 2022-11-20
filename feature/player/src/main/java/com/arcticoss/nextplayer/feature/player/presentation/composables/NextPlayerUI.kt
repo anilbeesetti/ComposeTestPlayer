@@ -35,7 +35,8 @@ fun NextPlayerUI(
         if (playerUiState.isControllerVisible) {
             PlayerUIHeader(
                 title = playerState.currentPlayingMedia.title,
-                onBackPressed = onBackPressed,
+                onBackClick = onBackPressed,
+                onAudioTrackButtonClick = {onUiEvent(UiEvent.ShowAudioTrackDialog(true))},
                 modifier = Modifier
                     .systemBarsPadding()
                     .align(Alignment.TopCenter)

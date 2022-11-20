@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Audiotrack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -15,14 +16,15 @@ import androidx.compose.ui.text.style.TextOverflow
 @Composable
 fun PlayerUIHeader(
     title: String,
-    onBackPressed: () -> Unit,
+    onBackClick: () -> Unit,
+    onAudioTrackButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { onBackPressed() }) {
+        IconButton(onClick = onBackClick) {
             Icon(
                 imageVector = Icons.Rounded.ArrowBack,
                 contentDescription = "",
@@ -31,7 +33,14 @@ fun PlayerUIHeader(
         Text(
             text = title,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
         )
+        IconButton(onClick = onAudioTrackButtonClick) {
+            Icon(
+                imageVector = Icons.Rounded.Audiotrack,
+                contentDescription = Icons.Rounded.Audiotrack.name
+            )
+        }
     }
 }
