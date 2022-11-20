@@ -17,6 +17,7 @@ import androidx.lifecycle.Lifecycle
 import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.arcticoss.nextplayer.feature.player.AudioTrack
 import com.arcticoss.nextplayer.feature.player.PlayerEvent
+import com.arcticoss.nextplayer.feature.player.PlayerState
 import com.arcticoss.nextplayer.feature.player.utils.Orientation
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.setOrientation
@@ -30,7 +31,7 @@ private const val TAG = "NextExoPlayer"
 @Composable
 fun NextExoPlayer(
     exoPlayer: ExoPlayer,
-    playWhenReady: Boolean,
+    playerState: PlayerState,
     aspectRatio: AspectRatio,
     onEvent: (PlayerEvent) -> Unit,
     onBackPressed: () -> Unit
@@ -45,11 +46,14 @@ fun NextExoPlayer(
         onLifecycleEvent = { event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
-                    onEvent(PlayerEvent.SetPlayWhenReady(exoPlayer.playWhenReady))
+                    Log.d(TAG, "NextExoPlayer: ${exoPlayer.isPlaying}")
+                    onEvent(PlayerEvent.SetPlayWhenReady(false))
                     exoPlayer.playWhenReady = false
+                    Log.d(TAG, "NextExoPlayer: ${playerState.playWhenReady}")
                 }
                 Lifecycle.Event.ON_RESUME -> {
-                    exoPlayer.playWhenReady = playWhenReady
+                    exoPlayer.playWhenReady = playerState.playWhenReady
+                    Log.d(TAG, "NextExoPlayer: ${playerState.playWhenReady}")
                 }
                 else -> {}
             }
@@ -65,7 +69,6 @@ fun NextExoPlayer(
         DisposableEffect(
             AndroidView(
                 factory = { androidContext ->
-                    Log.d(TAG, "NextExoPlayer: hie")
                     StyledPlayerView(androidContext).apply {
                         hideController()
                         useController = false
@@ -83,6 +86,7 @@ fun NextExoPlayer(
         ) {
             playbackStateListener = object : Player.Listener {
                 override fun onPlaybackStateChanged(playbackState: Int) {
+                    onEvent(PlayerEvent.PlaybackState(playbackState))
                     when (playbackState) {
                         Player.STATE_BUFFERING -> {
                             Log.d(TAG, "onPlaybackStateChanged: buffering")
@@ -98,6 +102,7 @@ fun NextExoPlayer(
                         }
                         Player.STATE_READY -> {
                             onEvent(PlayerEvent.SetDuration(exoPlayer.duration))
+                            onEvent(PlayerEvent.PlaybackStarted(true))
                         }
                     }
                 }
@@ -152,11 +157,10 @@ fun NextExoPlayer(
                         }
                     }
                     onEvent(PlayerEvent.AddAudioTracks(audioTracks))
-                    super.onTracksChanged(tracks)
                 }
                 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    onEvent(PlayerEvent.SetPlaybackState(isPlaying))
+                    onEvent(PlayerEvent.SetIsPlayingState(isPlaying))
                     playerView?.keepScreenOn = isPlaying
                 }
 
@@ -164,6 +168,11 @@ fun NextExoPlayer(
                     mediaItem?.let {
                         onEvent(PlayerEvent.MediaItemTransition(it.mediaId.toLong()))
                     }
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    Log.d(TAG, "onPlayerError: ${error.cause}")
+                    onEvent(PlayerEvent.PlayerError(true))
                 }
 
             }

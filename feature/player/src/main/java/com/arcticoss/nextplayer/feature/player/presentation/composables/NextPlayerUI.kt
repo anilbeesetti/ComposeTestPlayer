@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,6 +14,7 @@ import com.arcticoss.nextplayer.feature.player.PlayerUiState
 import com.arcticoss.nextplayer.feature.player.UiEvent
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs
 
@@ -32,6 +34,11 @@ fun NextPlayerUI(
         modifier = modifier
             .fillMaxSize()
     ) {
+        if (playerState.playbackState == Player.STATE_BUFFERING && !playerState.playbackStarted) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
         if (playerUiState.isControllerVisible) {
             PlayerUIHeader(
                 title = playerState.currentPlayingMedia.title,
@@ -39,6 +46,7 @@ fun NextPlayerUI(
                 onAudioTrackButtonClick = {onUiEvent(UiEvent.ShowAudioTrackDialog(true))},
                 modifier = Modifier
                     .systemBarsPadding()
+                    .padding(top = 5.dp)
                     .align(Alignment.TopCenter)
             )
             PlayerUIMainControls(
