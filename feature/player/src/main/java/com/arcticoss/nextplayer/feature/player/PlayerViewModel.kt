@@ -229,6 +229,13 @@ class PlayerViewModel @Inject constructor(
                 }
                 restoreMediaState()
             }
+            is PlayerEvent.AddAudioTracks -> {
+                _playerState.update { state ->
+                    state.copy(
+                        audioTracks = event.value
+                    )
+                }
+            }
         }
     }
 }
@@ -242,6 +249,7 @@ data class PlayerState(
     val currentMediaItemDuration: Long = 0,
     val mediaList: List<Media> = emptyList(),
     val currentPlayingMedia: Media = Media(),
+    val audioTracks: List<AudioTrack> = emptyList(),
     val screenOrientation: Orientation = Orientation.PORTRAIT
 )
 
@@ -275,6 +283,7 @@ sealed interface PlayerEvent {
     data class SetPlayWhenReady(val value: Boolean) : PlayerEvent
     data class SetOrientation(val value: Orientation) : PlayerEvent
     data class MediaItemTransition(val value: Long) : PlayerEvent
+    data class AddAudioTracks(val value: List<AudioTrack>): PlayerEvent
 }
 
 fun ExoPlayer.currentPositionAsFlow() = flow {
@@ -283,3 +292,9 @@ fun ExoPlayer.currentPositionAsFlow() = flow {
         delay(1.seconds / 30)
     }
 }
+
+data class AudioTrack(
+    val displayName: String,
+    val lang: String,
+    val isSelected: Boolean
+)

@@ -14,14 +14,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
+import com.arcticoss.nextplayer.core.model.AspectRatio
+import com.arcticoss.nextplayer.feature.player.AudioTrack
 import com.arcticoss.nextplayer.feature.player.PlayerEvent
 import com.arcticoss.nextplayer.feature.player.utils.Orientation
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.setOrientation
-import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import java.util.*
 
 private const val TAG = "NextExoPlayer"
 
@@ -101,28 +103,55 @@ fun NextExoPlayer(
                 }
 
                 override fun onTracksChanged(tracks: Tracks) {
+                    val audioTracks = mutableListOf<AudioTrack>()
                     tracks.groups.forEach { trackGroup ->
-                        if (trackGroup.type == C.TRACK_TYPE_VIDEO) {
-                            for (i in 0 until trackGroup.length) {
-                                val trackFormat = trackGroup.getTrackFormat(i)
-                                if (trackFormat.height >= trackFormat.width) {
-                                    activity?.setOrientation(Orientation.PORTRAIT) {
-                                        onEvent(PlayerEvent.SetOrientation(it))
-                                    }
-                                } else {
-                                    if (trackFormat.rotationDegrees < 90) {
-                                        activity?.setOrientation(Orientation.LANDSCAPE_SENSOR) {
+                        when(trackGroup.type) {
+                            C.TRACK_TYPE_VIDEO -> {
+                                for (i in 0 until trackGroup.length) {
+                                    val trackFormat = trackGroup.getTrackFormat(i)
+                                    if (trackFormat.height >= trackFormat.width) {
+                                        activity?.setOrientation(Orientation.PORTRAIT) {
                                             onEvent(PlayerEvent.SetOrientation(it))
                                         }
                                     } else {
-                                        activity?.setOrientation(Orientation.PORTRAIT) {
-                                            onEvent(PlayerEvent.SetOrientation(it))
+                                        if (trackFormat.rotationDegrees < 90) {
+                                            activity?.setOrientation(Orientation.LANDSCAPE_SENSOR) {
+                                                onEvent(PlayerEvent.SetOrientation(it))
+                                            }
+                                        } else {
+                                            activity?.setOrientation(Orientation.PORTRAIT) {
+                                                onEvent(PlayerEvent.SetOrientation(it))
+                                            }
                                         }
                                     }
                                 }
                             }
+                            C.TRACK_TYPE_AUDIO -> {
+                                for (i in 0 until trackGroup.length) {
+                                    val trackFormat = trackGroup.getTrackFormat(i)
+                                    var displayName = ""
+                                    trackFormat.language?.let {
+                                        displayName += if (trackFormat.language != "und") {
+                                            Locale(trackFormat.language.toString()).displayLanguage
+                                        } else {
+                                            trackFormat.sampleMimeType
+                                        }
+                                    }
+                                    trackFormat.label?.let {
+                                        displayName += "," + trackFormat.label
+                                    }
+                                    audioTracks.add(
+                                        AudioTrack(
+                                            displayName = displayName,
+                                            lang = trackFormat.language.toString(),
+                                            isSelected = trackGroup.isSelected
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
+                    onEvent(PlayerEvent.AddAudioTracks(audioTracks))
                     super.onTracksChanged(tracks)
                 }
                 
