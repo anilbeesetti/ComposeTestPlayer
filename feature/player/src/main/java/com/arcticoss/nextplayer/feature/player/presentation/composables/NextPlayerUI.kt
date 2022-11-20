@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.feature.player.PlayerState
 import com.arcticoss.nextplayer.feature.player.PlayerUiState
 import com.arcticoss.nextplayer.feature.player.UiEvent
-import com.arcticoss.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs

@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.arcticoss.nextplayer.core.database.entities.FolderEntity
 import com.arcticoss.nextplayer.core.database.entities.MediaItemEntity
-import com.arcticoss.model.MediaFolder
+import com.arcticoss.nextplayer.core.model.Folder
 
 data class FolderAndMediaItemRelation(
     @Embedded val folderEntity: FolderEntity,
@@ -17,9 +17,9 @@ data class FolderAndMediaItemRelation(
 )
 
 
-fun FolderAndMediaItemRelation.asExternalModel() = MediaFolder(
+fun FolderAndMediaItemRelation.asExternalModel() = Folder(
     id = folderEntity.id,
     name = folderEntity.name,
     path = folderEntity.path,
-    mediaItems = mediaItems.map { it.asExternalModel() }
+    mediaList = mediaItems.map { it.asExternalModel() }
 )

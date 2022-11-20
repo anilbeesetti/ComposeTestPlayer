@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.arcticoss.nextplayer.core.database.entities.MediaItemEntity
 import com.arcticoss.nextplayer.core.database.entities.ThumbnailEntity
-import com.arcticoss.model.Media
+import com.arcticoss.nextplayer.core.model.Media
 
 data class MediaItemAndThumbnailRelation(
     @Embedded val mediaEntity: MediaItemEntity,

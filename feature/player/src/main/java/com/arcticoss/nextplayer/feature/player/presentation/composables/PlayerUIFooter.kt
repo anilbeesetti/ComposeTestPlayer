@@ -14,8 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.feature.player.PlayerUiState
 import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
-import com.arcticoss.model.AspectRatio
-import com.arcticoss.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.AspectRatio
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
 
 @Composable
 fun PlayerUIFooter(

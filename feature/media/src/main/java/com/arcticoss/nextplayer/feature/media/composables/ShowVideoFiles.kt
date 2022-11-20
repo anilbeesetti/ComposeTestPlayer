@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.arcticoss.model.Media
+import com.arcticoss.nextplayer.core.model.Media
 
 private const val TAG = "ShowVideoFiles"
 

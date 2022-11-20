@@ -1,14 +1,14 @@
 package com.arcticoss.nextplayer.core.data.repository
 
-import com.arcticoss.model.Media
-import com.arcticoss.model.MediaFolder
+import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.model.Folder
 import kotlinx.coroutines.flow.Flow
 
 interface IMediaRepository {
 
-    fun getMediaFolderStream(id: Long): Flow<MediaFolder>
+    fun getMediaFolderStream(id: Long): Flow<Folder>
 
-    fun getFolderMediaStream(): Flow<List<MediaFolder>>
+    fun getFolderMediaStream(): Flow<List<Folder>>
 
     suspend fun syncMedia()
 

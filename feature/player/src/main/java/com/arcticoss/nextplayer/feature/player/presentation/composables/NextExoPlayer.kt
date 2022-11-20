@@ -18,7 +18,7 @@ import com.arcticoss.nextplayer.feature.player.PlayerEvent
 import com.arcticoss.nextplayer.feature.player.utils.Orientation
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.setOrientation
-import com.arcticoss.model.AspectRatio
+import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView

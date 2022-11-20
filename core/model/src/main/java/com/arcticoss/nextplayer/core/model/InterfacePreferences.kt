@@ -1,4 +1,4 @@
-package com.arcticoss.model
+package com.arcticoss.nextplayer.core.model
 
 import kotlinx.serialization.Serializable
 
@@ -16,10 +16,6 @@ enum class Theme(val title: String) {
     Dark(title = "Dark"),
     Light(title = "Light"),
     FollowSystem(title = "Follow system");
-}
-
-enum class ViewOption {
-    Videos, Folders
 }
 
 enum class SortBy {

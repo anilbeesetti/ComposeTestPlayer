@@ -3,8 +3,8 @@ package com.arcticoss.nextplayer.feature.media.screens.video
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.model.InterfacePreferences
-import com.arcticoss.model.MediaFolder
+import com.arcticoss.nextplayer.core.model.InterfacePreferences
+import com.arcticoss.nextplayer.core.model.Folder
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.feature.media.navigation.folderIdArg
@@ -44,6 +44,6 @@ class VideosViewModel @Inject constructor(
 
 sealed class VideoUiState {
     object Loading: VideoUiState()
-    data class Success(val mediaFolder: MediaFolder): VideoUiState()
+    data class Success(val folder: Folder): VideoUiState()
     data class Error(val error: String): VideoUiState()
 }

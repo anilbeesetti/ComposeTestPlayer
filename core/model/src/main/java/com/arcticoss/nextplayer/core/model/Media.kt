@@ -1,8 +1,5 @@
-package com.arcticoss.model
+package com.arcticoss.nextplayer.core.model
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class Media(
     val id: Long = 0,
     val size: Long = 0,

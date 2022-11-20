@@ -5,7 +5,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.loader.content.CursorLoader
 import com.arcticoss.nextplayer.core.data.repository.MediaRepository
-import com.arcticoss.model.Media
+import com.arcticoss.nextplayer.core.model.Media
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

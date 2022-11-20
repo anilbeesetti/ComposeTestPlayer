@@ -25,7 +25,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.arcticoss.model.Media
+import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.media.utils.TimeUtils
 
 @OptIn(ExperimentalFoundationApi::class)

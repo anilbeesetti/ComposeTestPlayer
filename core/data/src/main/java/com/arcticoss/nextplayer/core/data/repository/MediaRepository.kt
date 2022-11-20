@@ -5,8 +5,8 @@ import android.graphics.Bitmap
 import android.os.Environment
 import com.arcticoss.nextplayer.mediainfo.FrameLoader
 import com.arcticoss.nextplayer.mediainfo.MediaInfoBuilder
-import com.arcticoss.model.Media
-import com.arcticoss.model.MediaFolder
+import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.model.Folder
 import com.arcticoss.nextplayer.core.data.utils.*
 import com.arcticoss.nextplayer.core.database.daos.*
 import com.arcticoss.nextplayer.core.database.entities.FolderEntity
@@ -36,12 +36,12 @@ class MediaRepository @Inject constructor(
     private val storageDir = Environment.getExternalStorageDirectory()
     private val dataDir = context.getExternalFilesDir(null)
 
-    override fun getMediaFolderStream(id: Long): Flow<MediaFolder> =
+    override fun getMediaFolderStream(id: Long): Flow<Folder> =
         folderDao.getFolderAndMediaItemStream(id)
             .map { it.asExternalModel() }
 
 
-    override fun getFolderMediaStream(): Flow<List<MediaFolder>> =
+    override fun getFolderMediaStream(): Flow<List<Folder>> =
         folderDao.getFolderAndMediaItemStream()
             .map { it.map(FolderAndMediaItemRelation::asExternalModel) }
 

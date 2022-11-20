@@ -1,4 +1,4 @@
-package com.arcticoss.model
+package com.arcticoss.nextplayer.core.model
 
 import kotlinx.serialization.Serializable
 

@@ -3,8 +3,8 @@ package com.arcticoss.nextplayer.feature.media.screens.media
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
-import com.arcticoss.model.InterfacePreferences
-import com.arcticoss.model.Media
+import com.arcticoss.nextplayer.core.model.InterfacePreferences
+import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetSortedFoldersStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase

@@ -1,9 +1,9 @@
 package com.arcticoss.nextplayer.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
-import com.arcticoss.model.AspectRatio
-import com.arcticoss.model.PlayerPreferences
-import com.arcticoss.model.next
+import com.arcticoss.nextplayer.core.model.AspectRatio
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.next
 import javax.inject.Inject
 
 class PlayerPreferencesDataSource @Inject constructor(

@@ -6,9 +6,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
-import com.arcticoss.model.Media
-import com.arcticoss.model.PlayerPreferences
-import com.arcticoss.model.Resume
+import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.Resume
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetMediaFromUriUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
@@ -85,7 +85,7 @@ class PlayerViewModel @Inject constructor(
                 }.launchIn(viewModelScope)
             else
                 getSortedMediaFolderStream(id).onEach { mediaFolder ->
-                    setMedia(mediaFolder.mediaItems)
+                    setMedia(mediaFolder.mediaList)
                 }.launchIn(viewModelScope)
         }
 

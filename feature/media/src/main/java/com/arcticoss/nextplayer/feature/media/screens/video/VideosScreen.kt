@@ -38,7 +38,7 @@ fun VideosScreen(
                 title = {
                     Text(
                         text = if (mediaFolderState is VideoUiState.Success)
-                            (mediaFolderState as VideoUiState.Success).mediaFolder.name
+                            (mediaFolderState as VideoUiState.Success).folder.name
                         else ""
                     )
                 },
@@ -85,8 +85,8 @@ fun VideosScreen(
                     item {
                         Spacer(modifier = Modifier.height(5.dp))
                     }
-                    val mediaFolder = (mediaFolderState as VideoUiState.Success).mediaFolder
-                    items(mediaFolder.mediaItems, key = { it.id }) { mediaItem ->
+                    val mediaFolder = (mediaFolderState as VideoUiState.Success).folder
+                    items(mediaFolder.mediaList, key = { it.id }) { mediaItem ->
                         Log.d("TAG", "ShowVideoFiles: ${mediaItem.id}")
                         MediaListItem(
                             mediaItem = mediaItem,

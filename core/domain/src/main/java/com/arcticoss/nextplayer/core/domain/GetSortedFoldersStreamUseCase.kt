@@ -1,8 +1,8 @@
 package com.arcticoss.nextplayer.core.domain
 
 import com.arcticoss.nextplayer.core.data.repository.MediaRepository
-import com.arcticoss.model.SortBy
-import com.arcticoss.model.SortOrder
+import com.arcticoss.nextplayer.core.model.SortBy
+import com.arcticoss.nextplayer.core.model.SortOrder
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.models.Folder
 import kotlinx.coroutines.flow.Flow
@@ -21,13 +21,13 @@ class GetSortedFoldersStreamUseCase @Inject constructor(
         ) { mediaFolders, preferences ->
             val folders = mediaFolders.map { mediaFolder ->
                 mediaFolder.copy(
-                    mediaItems = mediaFolder.mediaItems
+                    mediaList = mediaFolder.mediaList
                         .filter {
                             if (preferences.showHidden) true else !it.title.startsWith(".")
                         }
                 )
             }.filter {
-                it.mediaItems.isNotEmpty()
+                it.mediaList.isNotEmpty()
             }.filter {
                 if (preferences.showHidden) true else !it.name.startsWith(".")
             }.map {
@@ -35,7 +35,7 @@ class GetSortedFoldersStreamUseCase @Inject constructor(
                     id = it.id,
                     name = it.name,
                     path = it.path,
-                    mediaItemCount = it.mediaItems.size
+                    mediaItemCount = it.mediaList.size
                 )
             }
 
