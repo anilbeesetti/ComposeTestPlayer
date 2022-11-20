@@ -34,7 +34,7 @@ fun PlayerScreen(
     onBackPressed: () -> Unit,
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
-    val player = viewModel.player
+    val player = viewModel.playerHelper.exoPlayer
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()

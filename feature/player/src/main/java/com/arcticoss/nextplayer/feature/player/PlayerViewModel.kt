@@ -17,13 +17,10 @@ import com.arcticoss.nextplayer.feature.player.utils.Orientation
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.*
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
 
 @HiltViewModel
@@ -33,14 +30,12 @@ class PlayerViewModel @Inject constructor(
     private val getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
     private val getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
     private val getMediaFromUri: GetMediaFromUriUseCase,
-    savedStateHandle: SavedStateHandle,
-    normalPlayer: Player
+    val playerHelper: IPlayerHelper,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val mediaID = savedStateHandle.get<Long>("mediaID")
     private val folderID = savedStateHandle.get<Long>("folderID")
-
-    val player = normalPlayer as ExoPlayer
 
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState = _playerState.asStateFlow()
@@ -48,8 +43,7 @@ class PlayerViewModel @Inject constructor(
     private val _playerUiState = MutableStateFlow(PlayerUiState())
     val playerUiState = _playerUiState.asStateFlow()
 
-    val playerCurrentPosition = player
-        .currentPositionAsFlow()
+    val playerCurrentPosition = playerHelper.currentPositionFlow
         .distinctUntilChanged()
         .stateIn(
             scope = viewModelScope,
@@ -97,7 +91,7 @@ class PlayerViewModel @Inject constructor(
         if (playerState.value.currentPlayingMedia.id == 0L) {
             val index = mediaList.indexOfFirst { it.id == mediaID }
             setPlayerMediaItems()
-            moveToMediaItem(index)
+            playerHelper.moveToMediaItem(index)
         }
     }
 
@@ -105,20 +99,8 @@ class PlayerViewModel @Inject constructor(
         val mediaItems = playerState.value.mediaList.map {
             MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
         }
-        player.setMediaItems(mediaItems)
-        player.prepare()
-    }
-
-    private fun moveToMediaItem(index: Int) {
-        if (index > player.currentMediaItemIndex) {
-            for (i in player.currentMediaItemIndex until index) {
-                player.seekToNextMediaItem()
-            }
-        } else {
-            for (i in index until player.currentMediaItemIndex) {
-                player.seekToPreviousMediaItem()
-            }
-        }
+        playerHelper.exoPlayer.setMediaItems(mediaItems)
+        playerHelper.exoPlayer.prepare()
     }
 
     private fun savePlaybackState() {
@@ -134,7 +116,7 @@ class PlayerViewModel @Inject constructor(
 
     private fun restoreMediaState() {
         if (preferencesFlow.value.resume == Resume.Always) {
-            player.seekTo(playerState.value.currentPlayingMedia.lastPlayedPosition)
+            playerHelper.exoPlayer.seekTo(playerState.value.currentPlayingMedia.lastPlayedPosition)
         }
     }
 
@@ -163,7 +145,7 @@ class PlayerViewModel @Inject constructor(
             }
             is UiEvent.SeekToMediaItem -> {
                 this.onUiEvent(UiEvent.SavePlaybackState)
-                moveToMediaItem(event.value)
+                playerHelper.moveToMediaItem(event.value)
             }
             is UiEvent.ShowAudioTrackDialog -> _playerUiState.update {
                 it.copy(isAudioTrackDialogVisible = event.value)
@@ -241,10 +223,12 @@ class PlayerViewModel @Inject constructor(
                 }
             }
             is PlayerEvent.SwitchAudioTrack -> {
-                val audioGroup = player.getTrackGroupFromFormatId(C.TRACK_TYPE_AUDIO, event.value)
+                val audioGroup = playerHelper.getTrackGroupFromFormatId(C.TRACK_TYPE_AUDIO, event.value)
                 audioGroup?.let {
                     if (!it.isSelected && it.isSupported) {
-                        player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                        playerHelper.exoPlayer.trackSelectionParameters = playerHelper.exoPlayer
+                            .trackSelectionParameters
+                            .buildUpon()
                             .setOverrideForType(
                                 TrackSelectionOverride(it.mediaTrackGroup, 0)
                             ).build()
@@ -302,26 +286,6 @@ sealed interface PlayerEvent {
     data class MediaItemTransition(val value: Long) : PlayerEvent
     data class AddAudioTracks(val value: List<AudioTrack>) : PlayerEvent
     data class SwitchAudioTrack(val value: String) : PlayerEvent
-}
-
-fun ExoPlayer.currentPositionAsFlow() = flow {
-    while (true) {
-        emit(this@currentPositionAsFlow.currentPosition)
-        delay(1.seconds / 30)
-    }
-}
-
-fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String):  Tracks.Group? {
-    for (group in this.currentTracks.groups) {
-        if (group.type == trackType) {
-            val trackGroup = group.mediaTrackGroup
-            val format: Format = trackGroup.getFormat(0)
-            if (Objects.equals(id, format.id)) {
-                return group
-            }
-        }
-    }
-    return null
 }
 
 data class AudioTrack(

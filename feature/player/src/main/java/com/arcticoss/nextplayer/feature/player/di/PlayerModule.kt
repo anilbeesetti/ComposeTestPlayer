@@ -1,6 +1,8 @@
 package com.arcticoss.nextplayer.feature.player.di
 
 import android.content.Context
+import com.arcticoss.nextplayer.feature.player.IPlayerHelper
+import com.arcticoss.nextplayer.feature.player.NextPlayerHelper
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import dagger.Module
@@ -18,6 +20,12 @@ object PlayerModule {
     @ViewModelScoped
     fun provideExoPlayer(@ApplicationContext context: Context): Player {
         return ExoPlayer.Builder(context).build()
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun provideExoPlayerHelper(player: Player): IPlayerHelper {
+        return NextPlayerHelper(player)
     }
 
 }
