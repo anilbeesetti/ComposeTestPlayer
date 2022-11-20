@@ -4,11 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.arcticoss.data"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
+    namespace = "com.arcticoss.nextplayer.core.data"
 }
 
 dependencies {

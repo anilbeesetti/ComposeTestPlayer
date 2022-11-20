@@ -5,7 +5,7 @@
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_arcticoss_mediainfo_FrameLoader_nativeLoadFrame(JNIEnv *env,
+Java_com_arcticoss_nextplayer_mediainfo_FrameLoader_nativeLoadFrame(JNIEnv *env,
                                                          jobject thiz,
                                                          jstring jFilePath,
                                                          jobject bitmap,
@@ -15,9 +15,10 @@ Java_com_arcticoss_mediainfo_FrameLoader_nativeLoadFrame(JNIEnv *env,
     env->ReleaseStringUTFChars(jFilePath, cFilePath);
     return result;
 }
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_arcticoss_mediainfo_MediaInfoBuilder_nativeCreateMediaInfo(JNIEnv *env,
+Java_com_arcticoss_nextplayer_mediainfo_MediaInfoBuilder_nativeCreateMediaInfo(JNIEnv *env,
                                                                     jobject thiz,
                                                                     jstring jPath) {
     const char *cPath = env->GetStringUTFChars(jPath, nullptr);

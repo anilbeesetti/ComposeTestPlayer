@@ -2,7 +2,7 @@ package com.arcticoss.nextplayer.core.datastore.serializer
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.arcticoss.model.InterfacePreferences
+import com.arcticoss.nextplayer.core.model.InterfacePreferences
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream

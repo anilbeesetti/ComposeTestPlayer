@@ -3,7 +3,7 @@ buildscript {
 }
 
 /**
- * TODO: IDE showing error but it works this issue is already reported in issue tracker
+ * TODO: IDE showing error but it works, this issue is already reported in issue tracker
  * Issue Tracker Link: https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
  */
 plugins {

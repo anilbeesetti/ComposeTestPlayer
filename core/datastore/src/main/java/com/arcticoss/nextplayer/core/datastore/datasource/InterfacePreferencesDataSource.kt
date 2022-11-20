@@ -1,10 +1,10 @@
 package com.arcticoss.nextplayer.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
-import com.arcticoss.model.InterfacePreferences
-import com.arcticoss.model.SortBy
-import com.arcticoss.model.SortOrder
-import com.arcticoss.model.Theme
+import com.arcticoss.nextplayer.core.model.InterfacePreferences
+import com.arcticoss.nextplayer.core.model.SortBy
+import com.arcticoss.nextplayer.core.model.SortOrder
+import com.arcticoss.nextplayer.core.model.Theme
 import javax.inject.Inject
 
 class InterfacePreferencesDataSource @Inject constructor(

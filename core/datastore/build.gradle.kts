@@ -6,10 +6,6 @@ plugins {
 
 android {
     namespace = "com.arcticoss.nextplayer.core.datastore"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

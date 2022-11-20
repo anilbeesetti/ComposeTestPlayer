@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.arcticoss.feature.player"
+    namespace = "com.arcticoss.nextplayer.feature.player"
 }
 
 dependencies {

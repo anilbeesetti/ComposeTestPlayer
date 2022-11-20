@@ -47,7 +47,7 @@ int utils_fields_init(JavaVM *vm) {
         } \
     } while (0)
 
-    GET_CLASS(fields.MediaMetadataBuilder.clazz, "com/arcticoss/mediainfo/MediaInfoBuilder", true);
+    GET_CLASS(fields.MediaMetadataBuilder.clazz, "com/arcticoss/nextplayer/mediainfo/MediaInfoBuilder", true);
 
     GET_ID(GetMethodID,
            fields.MediaMetadataBuilder.onMediaFileFoundID,

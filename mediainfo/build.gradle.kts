@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.arcticoss.mediainfo"
+    namespace = "com.arcticoss.nextplayer.mediainfo"
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
