@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.feature.player.compose
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.view.WindowManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
@@ -44,6 +45,14 @@ fun VideoScreen(
             } else {
                 activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             }
+        }
+    }
+
+    LaunchedEffect(key1 = mediaState.playerState?.isPlaying) {
+        if (mediaState.playerState?.isPlaying == true) {
+            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
     }
 
