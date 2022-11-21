@@ -14,12 +14,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.Dialog
+import com.arcticoss.nextplayer.feature.player.presentation.ControllerState
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIHeader
 import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIMainControls
-import com.arcticoss.nextplayer.feature.player.presentation.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
+import com.arcticoss.nextplayer.feature.player.utils.hideSystemBars
+import com.arcticoss.nextplayer.feature.player.utils.showSystemBars
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SeekParameters
@@ -28,12 +30,19 @@ import com.google.android.exoplayer2.SeekParameters
 fun MediaControls(
     currentMedia: Media,
     mediaState: MediaState,
+    controller: ControllerState,
     showDialog: (Dialog) -> Unit
 ) {
 
     val context = LocalContext.current
-    val controller = rememberControllerState(mediaState = mediaState)
     val activity = context.findActivity()
+
+    LaunchedEffect(key1 = mediaState.isControllerShowing) {
+        when (mediaState.isControllerShowing) {
+            true -> activity?.showSystemBars()
+            false -> activity?.hideSystemBars()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -53,7 +62,7 @@ fun MediaControls(
         }
         if (mediaState.isControllerShowing) {
             PlayerUIHeader(
-                title = currentMedia.title ?: "",
+                title = currentMedia.title,
                 onBackClick = { activity?.finish() },
                 onAudioTrackButtonClick = { showDialog(Dialog.AudioTrack) },
                 modifier = Modifier
@@ -72,39 +81,41 @@ fun MediaControls(
                     .align(Alignment.Center)
             )
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(bottom = 30.dp)
-                .align(Alignment.BottomCenter),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = TimeUtils.formatTime(context, controller.positionMs),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(horizontal = 5.dp)
-            )
-
-            TimeBar(
-                durationMs = controller.durationMs,
-                positionMs = controller.positionMs,
-                bufferedPositionMs = controller.bufferedPositionMs,
-                onScrubMove = {
-                    (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                    mediaState.player?.seekTo(it)
-                },
+        if (mediaState.isControllerShowing) {
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .height(52.dp),
-                contentPadding = PaddingValues(24.dp),
-            )
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(bottom = 30.dp)
+                    .align(Alignment.BottomCenter),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = TimeUtils.formatTime(context, controller.positionMs),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(horizontal = 5.dp)
+                )
 
-            Text(
-                text = TimeUtils.formatTime(context, controller.durationMs),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(horizontal = 5.dp)
-            )
+                TimeBar(
+                    durationMs = controller.durationMs,
+                    positionMs = controller.positionMs,
+                    bufferedPositionMs = controller.bufferedPositionMs,
+                    onScrubMove = {
+                        (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                        mediaState.player?.seekTo(it)
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(52.dp),
+                    contentPadding = PaddingValues(24.dp),
+                )
+
+                Text(
+                    text = TimeUtils.formatTime(context, controller.durationMs),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(horizontal = 5.dp)
+                )
+            }
         }
     }
 }

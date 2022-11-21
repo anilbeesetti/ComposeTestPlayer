@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.*
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
+import com.arcticoss.nextplayer.feature.player.presentation.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.google.android.exoplayer2.*
@@ -34,6 +35,7 @@ fun VideoScreen(
 ) {
 
     val mediaState = rememberMediaState(player = viewModel.playerHelper.exoPlayer)
+    val controller = rememberControllerState(mediaState = mediaState)
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = context.findActivity()
@@ -79,12 +81,16 @@ fun VideoScreen(
         ) {
             onDispose { }
         }
+        MediaGestures(
+            mediaState = mediaState,
+            controller = controller
+        )
         MediaControls(
             mediaState = mediaState,
             currentMedia = currentMedia,
+            controller = controller,
             showDialog = viewModel::showDialog
         )
-
         if (playerViewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->
                 AudioTrackSelectorDialog(

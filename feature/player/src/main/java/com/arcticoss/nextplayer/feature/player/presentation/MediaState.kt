@@ -39,7 +39,7 @@ class MediaState(
         get() = _player
 
     /**
-     * The state of the [Media]'s [player].
+     * The state of the [player].
      */
     val playerState: PlayerState? get() = stateOfPlayerState.value
 
