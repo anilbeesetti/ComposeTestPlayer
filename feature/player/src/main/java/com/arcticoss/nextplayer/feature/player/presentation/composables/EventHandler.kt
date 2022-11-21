@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import com.arcticoss.nextplayer.feature.player.PlayerEvent
-import com.arcticoss.nextplayer.feature.player.PlayerState
+import com.arcticoss.nextplayer.feature.player.ExoplayerState
 import com.arcticoss.nextplayer.feature.player.PlayerUiState
 import com.arcticoss.nextplayer.feature.player.UiEvent
 import com.arcticoss.nextplayer.feature.player.utils.*
@@ -17,7 +17,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun EventHandler(
-    playerState: PlayerState,
+    exoPlayerState: ExoplayerState,
     playerUiState: PlayerUiState,
     onUiEvent: (UiEvent) -> Unit,
     onEvent: (PlayerEvent) -> Unit,
@@ -35,19 +35,19 @@ fun EventHandler(
         }
     }
 
-    LaunchedEffect(playerState.brightness) {
-        val level = 1.0f / playerState.maxLevel * playerState.brightness
+    LaunchedEffect(exoPlayerState.brightness) {
+        val level = 1.0f / exoPlayerState.maxLevel * exoPlayerState.brightness
         activity?.setBrightness(level)
     }
 
-    LaunchedEffect(playerState.volume) {
-        audioManager.setVolume(playerState.volume)
+    LaunchedEffect(exoPlayerState.volume) {
+        audioManager.setVolume(exoPlayerState.volume)
     }
 
-    LaunchedEffect(playerUiState.isControllerVisible, playerState.isPlaying) {
+    LaunchedEffect(playerUiState.isControllerVisible, exoPlayerState.isPlaying) {
         if (playerUiState.isControllerVisible) {
             activity?.showSystemBars()
-            if(playerState.isPlaying) {
+            if(exoPlayerState.isPlaying) {
                 delay(5000)
                 onUiEvent(UiEvent.ToggleShowUi)
             }

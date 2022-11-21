@@ -19,7 +19,7 @@ import androidx.lifecycle.Lifecycle
 import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.arcticoss.nextplayer.feature.player.AudioTrack
 import com.arcticoss.nextplayer.feature.player.PlayerEvent
-import com.arcticoss.nextplayer.feature.player.PlayerState
+import com.arcticoss.nextplayer.feature.player.ExoplayerState
 import com.arcticoss.nextplayer.feature.player.utils.Orientation
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.setOrientation
@@ -31,7 +31,7 @@ private const val TAG = "NextExoPlayer"
 @Composable
 fun NextExoPlayer(
     exoPlayer: ExoPlayer,
-    playerState: PlayerState,
+    exoPlayerState: ExoplayerState,
     aspectRatio: AspectRatio,
     onEvent: (PlayerEvent) -> Unit,
     onBackPressed: () -> Unit
@@ -49,11 +49,11 @@ fun NextExoPlayer(
                     Log.d(TAG, "NextExoPlayer: ${exoPlayer.isPlaying}")
                     onEvent(PlayerEvent.SetPlayWhenReady(false))
                     exoPlayer.playWhenReady = false
-                    Log.d(TAG, "NextExoPlayer: ${playerState.playWhenReady}")
+                    Log.d(TAG, "NextExoPlayer: ${exoPlayerState.playWhenReady}")
                 }
                 Lifecycle.Event.ON_RESUME -> {
-                    exoPlayer.playWhenReady = playerState.playWhenReady
-                    Log.d(TAG, "NextExoPlayer: ${playerState.playWhenReady}")
+                    exoPlayer.playWhenReady = exoPlayerState.playWhenReady
+                    Log.d(TAG, "NextExoPlayer: ${exoPlayerState.playWhenReady}")
                 }
                 else -> {}
             }
@@ -250,4 +250,6 @@ enum class SurfaceType {
     SurfaceView,
     TextureView;
 }
+
+
 

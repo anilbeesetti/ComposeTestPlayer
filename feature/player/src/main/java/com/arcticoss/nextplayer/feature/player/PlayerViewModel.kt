@@ -38,8 +38,8 @@ class PlayerViewModel @Inject constructor(
     private val mediaID = savedStateHandle.get<Long>("mediaID")
     private val folderID = savedStateHandle.get<Long>("folderID")
 
-    private val _playerState = MutableStateFlow(PlayerState())
-    val playerState = _playerState.asStateFlow()
+    private val _exoplayerState = MutableStateFlow(ExoplayerState())
+    val exoplayerStateStateFlow = _exoplayerState.asStateFlow()
 
     private val _playerUiState = MutableStateFlow(PlayerUiState())
     val playerUiState = _playerUiState.asStateFlow()
@@ -55,7 +55,7 @@ class PlayerViewModel @Inject constructor(
     val preferencesFlow = preferencesDataSource.preferencesFlow
         .onEach { preferences ->
             if (preferences.saveBrightnessLevel) {
-                _playerState.update { it.copy(brightness = preferences.brightnessLevel) }
+                _exoplayerState.update { it.copy(brightness = preferences.brightnessLevel) }
             }
         }
         .stateIn(
@@ -88,10 +88,10 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun setMedia(mediaList: List<Media>) {
-        _playerState.update { it.copy(mediaList = mediaList) }
-        if (playerState.value.currentPlayingMedia.id == 0L) {
+        _exoplayerState.update { it.copy(mediaList = mediaList) }
+        if (exoplayerStateStateFlow.value.currentPlayingMedia.id == 0L) {
             val index = mediaList.indexOfFirst { it.id == mediaID }
-            val mediaItems = playerState.value.mediaList.map {
+            val mediaItems = exoplayerStateStateFlow.value.mediaList.map {
                 MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString())
                     .build()
             }
@@ -102,10 +102,10 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun saveMediaState() {
-        if (playerState.value.currentPlayingMedia.id != 0L) {
+        if (exoplayerStateStateFlow.value.currentPlayingMedia.id != 0L) {
             viewModelScope.launch {
                 mediaRepository.updateMedia(
-                    playerState.value.currentPlayingMedia.id,
+                    exoplayerStateStateFlow.value.currentPlayingMedia.id,
                     lastPlayedPosition = playerCurrentPosition.value
                 )
             }
@@ -114,7 +114,7 @@ class PlayerViewModel @Inject constructor(
 
     private fun restoreMediaState() {
         if (preferencesFlow.value.resume == Resume.Always) {
-            playerHelper.exoPlayer.seekTo(playerState.value.currentPlayingMedia.lastPlayedPosition)
+            playerHelper.exoPlayer.seekTo(exoplayerStateStateFlow.value.currentPlayingMedia.lastPlayedPosition)
         }
     }
 
@@ -153,32 +153,32 @@ class PlayerViewModel @Inject constructor(
 
     fun onEvent(event: PlayerEvent) {
         when (event) {
-            is PlayerEvent.SetOrientation -> _playerState.update {
+            is PlayerEvent.SetOrientation -> _exoplayerState.update {
                 it.copy(screenOrientation = event.value)
             }
-            is PlayerEvent.SetVolume -> _playerState.update {
+            is PlayerEvent.SetVolume -> _exoplayerState.update {
                 it.copy(volume = event.value)
             }
-            is PlayerEvent.SetDuration -> _playerState.update {
+            is PlayerEvent.SetDuration -> _exoplayerState.update {
                 it.copy(currentMediaItemDuration = event.value)
             }
-            is PlayerEvent.SetIsPlayingState -> _playerState.update {
+            is PlayerEvent.SetIsPlayingState -> _exoplayerState.update {
                 it.copy(isPlaying = event.value)
             }
-            is PlayerEvent.SetPlayWhenReady -> _playerState.update {
+            is PlayerEvent.SetPlayWhenReady -> _exoplayerState.update {
                 it.copy(playWhenReady = event.value)
             }
-            is PlayerEvent.PlayerError -> _playerState.update {
+            is PlayerEvent.PlayerError -> _exoplayerState.update {
                 it.copy(error = event.value)
             }
-            is PlayerEvent.AddAudioTracks -> _playerState.update {
+            is PlayerEvent.AddAudioTracks -> _exoplayerState.update {
                 it.copy(audioTracks = event.value)
             }
             is PlayerEvent.MediaItemTransition -> {
                 saveMediaState()
-                _playerState.update { state ->
+                _exoplayerState.update { state ->
                     state.copy(
-                        currentPlayingMedia = playerState.value.mediaList.first { it.id == event.value }
+                        currentPlayingMedia = exoplayerStateStateFlow.value.mediaList.first { it.id == event.value }
                     )
                 }
                 restoreMediaState()
@@ -198,52 +198,56 @@ class PlayerViewModel @Inject constructor(
                 }
             }
             PlayerEvent.IncreaseVolume -> {
-                val volume = playerState.value.volume
+                val volume = exoplayerStateStateFlow.value.volume
                 if (volume < 25) {
-                    _playerState.update { it.copy(volume = volume + 1) }
+                    _exoplayerState.update { it.copy(volume = volume + 1) }
                 }
             }
             PlayerEvent.DecreaseVolume -> {
-                val volume = playerState.value.volume
+                val volume = exoplayerStateStateFlow.value.volume
                 if (volume > 0) {
-                    _playerState.update { it.copy(volume = volume - 1) }
+                    _exoplayerState.update { it.copy(volume = volume - 1) }
                 }
             }
             PlayerEvent.IncreaseBrightness -> {
-                val brightness = playerState.value.brightness
+                val brightness = exoplayerStateStateFlow.value.brightness
                 if (brightness < 25) {
                     if (preferencesFlow.value.saveBrightnessLevel) {
                         viewModelScope.launch {
                             preferencesDataSource.updateBrightnessLevel(brightness + 1)
                         }
                     } else {
-                        _playerState.update { it.copy(brightness = brightness + 1) }
+                        _exoplayerState.update { it.copy(brightness = brightness + 1) }
                     }
                 }
             }
             PlayerEvent.DecreaseBrightness -> {
-                val brightness = playerState.value.brightness
+                val brightness = exoplayerStateStateFlow.value.brightness
                 if (brightness > 0) {
                     if (preferencesFlow.value.saveBrightnessLevel) {
                         viewModelScope.launch {
                             preferencesDataSource.updateBrightnessLevel(brightness - 1)
                         }
                     } else {
-                        _playerState.update { it.copy(brightness = brightness - 1) }
+                        _exoplayerState.update { it.copy(brightness = brightness - 1) }
                     }
                 }
             }
-            is PlayerEvent.PlaybackState -> _playerState.update {
+            is PlayerEvent.PlaybackState -> _exoplayerState.update {
                 it.copy(playbackState = event.value)
             }
-            is PlayerEvent.PlaybackStarted -> _playerState.update {
+            is PlayerEvent.PlaybackStarted -> _exoplayerState.update {
                 it.copy(playbackStarted = event.value)
             }
         }
     }
+
+    override fun onCleared() {
+        playerHelper.exoPlayer.release()
+    }
 }
 
-data class PlayerState(
+data class ExoplayerState(
     val volume: Int = 0,
     val maxLevel: Int = 25,
     val brightness: Int = 5,

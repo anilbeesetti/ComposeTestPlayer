@@ -18,10 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
-import com.arcticoss.nextplayer.feature.player.presentation.composables.EventHandler
-import com.arcticoss.nextplayer.feature.player.presentation.composables.NextExoPlayer
-import com.arcticoss.nextplayer.feature.player.presentation.composables.NextPlayerUI
-import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerGestures
+import com.arcticoss.nextplayer.feature.player.presentation.composables.*
 import com.google.android.exoplayer2.ExoPlayer
 
 
@@ -35,20 +32,20 @@ fun PlayerScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
     val player = viewModel.playerHelper.exoPlayer
-    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val playerState by viewModel.exoplayerStateStateFlow.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
     val playerUiState by viewModel.playerUiState.collectAsStateWithLifecycle()
     val playerCurrentPosition by viewModel.playerCurrentPosition.collectAsStateWithLifecycle()
 
     EventHandler(
-        playerState = playerState,
+        exoPlayerState = playerState,
         playerUiState = playerUiState,
         onEvent = viewModel::onEvent,
         onUiEvent = viewModel::onUiEvent
     )
     PlayerScreen(
         player = player,
-        playerState = playerState,
+        exoPlayerState = playerState,
         playerUiState = playerUiState,
         currentPosition = playerCurrentPosition,
         preferences = preferences,
@@ -63,7 +60,7 @@ fun PlayerScreen(
 internal fun PlayerScreen(
     player: ExoPlayer,
     currentPosition: Long,
-    playerState: PlayerState,
+    exoPlayerState: ExoplayerState,
     playerUiState: PlayerUiState,
     preferences: PlayerPreferences,
     onEvent: (PlayerEvent) -> Unit,
@@ -76,7 +73,7 @@ internal fun PlayerScreen(
     ) {
         NextExoPlayer(
             exoPlayer = player,
-            playerState = playerState,
+            exoPlayerState = exoPlayerState,
             aspectRatio = preferences.aspectRatio,
             onBackPressed = onBackPressed,
             onEvent = onEvent
@@ -88,7 +85,7 @@ internal fun PlayerScreen(
         )
         NextPlayerUI(
             player = player,
-            playerState = playerState,
+            exoPlayerState = exoPlayerState,
             playerUiState = playerUiState,
             currentPosition = currentPosition,
             preferences = preferences,
@@ -106,7 +103,7 @@ internal fun PlayerScreen(
                             .verticalScroll(rememberScrollState())
                     ) {
                         Column(Modifier.selectableGroup()) {
-                            playerState.audioTracks.forEach {
+                            exoPlayerState.audioTracks.forEach {
                                 AudioTrackChooser(
                                     text = it.displayName,
                                     selected = it.isSelected,

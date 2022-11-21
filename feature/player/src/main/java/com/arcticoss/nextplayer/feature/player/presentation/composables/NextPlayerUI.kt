@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.arcticoss.nextplayer.feature.player.PlayerState
+import com.arcticoss.nextplayer.feature.player.ExoplayerState
 import com.arcticoss.nextplayer.feature.player.PlayerUiState
 import com.arcticoss.nextplayer.feature.player.UiEvent
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
@@ -22,7 +22,7 @@ import kotlin.math.abs
 @Composable
 fun NextPlayerUI(
     player: ExoPlayer,
-    playerState: PlayerState,
+    exoPlayerState: ExoplayerState,
     playerUiState: PlayerUiState,
     preferences: PlayerPreferences,
     currentPosition: Long,
@@ -34,14 +34,14 @@ fun NextPlayerUI(
         modifier = modifier
             .fillMaxSize()
     ) {
-        if (playerState.playbackState == Player.STATE_BUFFERING && !playerState.playbackStarted) {
+        if (exoPlayerState.playbackState == Player.STATE_BUFFERING && !exoPlayerState.playbackStarted) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
             )
         }
         if (playerUiState.isControllerVisible) {
             PlayerUIHeader(
-                title = playerState.currentPlayingMedia.title,
+                title = exoPlayerState.currentPlayingMedia.title,
                 onBackClick = onBackPressed,
                 onAudioTrackButtonClick = {onUiEvent(UiEvent.ShowAudioTrackDialog(true))},
                 modifier = Modifier
@@ -50,7 +50,7 @@ fun NextPlayerUI(
                     .align(Alignment.TopCenter)
             )
             PlayerUIMainControls(
-                playPauseIcon = if (playerState.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                playPauseIcon = if (exoPlayerState.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 onPlayPauseClick = {
                     if (player.playWhenReady) {
                         player.pause()
@@ -67,7 +67,7 @@ fun NextPlayerUI(
         PlayerUIFooter(
             playerUiState = playerUiState,
             preferences = preferences,
-            duration = playerState.currentPlayingMedia.duration / 1000,
+            duration = exoPlayerState.currentPlayingMedia.duration / 1000,
             currentPosition = currentPosition,
             modifier = Modifier
                 .navigationBarsPadding()
@@ -84,8 +84,8 @@ fun NextPlayerUI(
         )
         if (playerUiState.isVolumeBarVisible) {
             AudioAdjustmentBar(
-                volumeLevel = playerState.volume,
-                maxVolumeLevel = playerState.maxLevel,
+                volumeLevel = exoPlayerState.volume,
+                maxVolumeLevel = exoPlayerState.maxLevel,
                 modifier = Modifier
                     .heightIn(max = 500.dp)
                     .fillMaxHeight(0.6f)
@@ -95,8 +95,8 @@ fun NextPlayerUI(
         }
         if (playerUiState.isBrightnessBarVisible) {
             BrightnessAdjustmentBar(
-                brightness = playerState.brightness,
-                maxBrightness = playerState.maxLevel,
+                brightness = exoPlayerState.brightness,
+                maxBrightness = exoPlayerState.maxLevel,
                 modifier = Modifier
                     .heightIn(max = 500.dp)
                     .fillMaxHeight(0.6f)

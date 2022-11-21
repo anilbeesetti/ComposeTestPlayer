@@ -144,7 +144,6 @@ fun PlayerGestures(
                                     player.seekTo(position)
                                 }
                             }
-                            Log.d(TAG, "PlayerScreen: $seekChange")
                             gestureScrollX = change.position.x
                         }
 
