@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.PlayerViewModel
 import com.arcticoss.nextplayer.feature.player.presentation.composables.SurfaceType
 import com.arcticoss.nextplayer.feature.player.presentation.composables.VideoSurface
@@ -27,7 +28,7 @@ fun VideoScreen(
 ) {
 
     val mediaState = rememberMediaState(player = viewModel.playerHelper.exoPlayer)
-    val exoplayerState by viewModel.exoplayerStateStateFlow.collectAsStateWithLifecycle()
+    val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = context.findActivity()
 
@@ -38,6 +39,16 @@ fun VideoScreen(
             } else {
                 activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             }
+        }
+    }
+
+    val currentMedia by remember {
+        derivedStateOf {
+            if (playerViewState.mediaList.isNotEmpty()) {
+                mediaState.playerState?.let {
+                    playerViewState.mediaList[it.mediaItemIndex]
+                } ?: Media()
+            } else Media()
         }
     }
 
@@ -54,7 +65,7 @@ fun VideoScreen(
         ) {
             onDispose { }
         }
-        MediaControls(mediaState = mediaState)
+        MediaControls(mediaState = mediaState, currentMedia = currentMedia)
     }
 }
 

@@ -41,6 +41,9 @@ class PlayerViewModel @Inject constructor(
     private val _exoplayerState = MutableStateFlow(ExoplayerState())
     val exoplayerStateStateFlow = _exoplayerState.asStateFlow()
 
+    private val _playerViewState = MutableStateFlow(PlayerViewState())
+    val playerViewState = _playerViewState.asStateFlow()
+
     private val _playerUiState = MutableStateFlow(PlayerUiState())
     val playerUiState = _playerUiState.asStateFlow()
 
@@ -89,6 +92,7 @@ class PlayerViewModel @Inject constructor(
 
     private fun setMedia(mediaList: List<Media>) {
         _exoplayerState.update { it.copy(mediaList = mediaList) }
+        _playerViewState.update { it.copy(mediaList = mediaList) }
         if (exoplayerStateStateFlow.value.currentPlayingMedia.id == 0L) {
             val index = mediaList.indexOfFirst { it.id == mediaID }
             val mediaItems = exoplayerStateStateFlow.value.mediaList.map {
@@ -301,6 +305,11 @@ sealed interface PlayerEvent {
     data class PlaybackState(val value: Int): PlayerEvent
     data class PlaybackStarted(val value: Boolean): PlayerEvent
 }
+
+
+data class PlayerViewState(
+    val mediaList: List<Media> = emptyList()
+)
 
 data class AudioTrack(
     val displayName: String,

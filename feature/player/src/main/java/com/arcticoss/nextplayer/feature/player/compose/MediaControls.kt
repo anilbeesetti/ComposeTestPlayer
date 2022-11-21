@@ -25,19 +25,13 @@ import com.google.android.exoplayer2.SeekParameters
 
 @Composable
 fun MediaControls(
+    currentMedia: Media,
     mediaState: MediaState
 ) {
 
     val context = LocalContext.current
     val controller = rememberControllerState(mediaState = mediaState)
     val activity = context.findActivity()
-
-    val currentMedia by remember {
-        derivedStateOf { mediaState.playerState?.let {
-            Media()
-        }
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -57,7 +51,7 @@ fun MediaControls(
         }
         if (mediaState.isControllerShowing) {
             PlayerUIHeader(
-                title = currentMedia?.title ?: "",
+                title = currentMedia.title ?: "",
                 onBackClick = { activity?.finish() },
                 onAudioTrackButtonClick = {},
                 modifier = Modifier
@@ -100,7 +94,8 @@ fun MediaControls(
                 },
                 modifier = Modifier
                     .weight(1f)
-                    .height(5.dp)
+                    .height(52.dp),
+                contentPadding = PaddingValues(24.dp),
             )
 
             Text(
