@@ -87,16 +87,6 @@ class MediaState(
         override fun onRenderedFirstFrame() {
 
         }
-
-        override fun onEvents(player: Player, events: Player.Events) {
-            if (events.containsAny(
-                    Player.EVENT_PLAYBACK_STATE_CHANGED,
-                    Player.EVENT_PLAY_WHEN_READY_CHANGED
-                )
-            ) {
-                maybeShowController()
-            }
-        }
     }
     private var _player: Player? by mutableStateOf(initPlayer)
     private fun onPlayerChanged(previous: Player?, current: Player?) {

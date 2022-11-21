@@ -2,20 +2,23 @@ package com.arcticoss.nextplayer.feature.player.compose
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
-import android.view.WindowManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.*
+import com.arcticoss.nextplayer.feature.player.presentation.composables.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
 import com.arcticoss.nextplayer.feature.player.presentation.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
+import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import java.util.*
@@ -33,12 +36,9 @@ fun VideoScreen(
     val mediaState = rememberMediaState(player = viewModel.playerHelper.exoPlayer)
     val controller = rememberControllerState(mediaState = mediaState)
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val activity = context.findActivity()
-
-    LaunchedEffect(key1 = Unit) {
-        mediaState.player?.play()
-    }
 
     LaunchedEffect(key1 = mediaState.playerState?.videoFormat) {
         mediaState.playerState?.videoFormat?.let {
@@ -51,10 +51,15 @@ fun VideoScreen(
     }
 
     LaunchedEffect(key1 = mediaState.playerState?.isPlaying) {
-        if (mediaState.playerState?.isPlaying == true) {
-            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        activity?.keepScreenOn(mediaState.playerState?.isPlaying == true)
+    }
+
+    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
+        if (it == Lifecycle.Event.ON_PAUSE) {
+            mediaState.player?.pause()
+        }
+        if (it == Lifecycle.Event.ON_RESUME) {
+            mediaState.player?.play()
         }
     }
 

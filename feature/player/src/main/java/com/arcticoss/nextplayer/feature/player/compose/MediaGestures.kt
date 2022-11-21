@@ -1,5 +1,6 @@
 package com.arcticoss.nextplayer.feature.player.compose
 
+import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerState
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
+
+
+private const val TAG = "MediaGestures"
 
 @Composable
 fun MediaGestures(
