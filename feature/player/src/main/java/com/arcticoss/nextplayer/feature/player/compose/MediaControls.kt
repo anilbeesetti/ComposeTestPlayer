@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.Dialog
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerState
+import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIHeader
 import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIMainControls
@@ -71,7 +72,7 @@ fun MediaControls(
                     .align(Alignment.TopCenter)
             )
             PlayerUIMainControls(
-                playPauseIcon = if (mediaState.playerState?.isPlaying == true) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                playPauseIcon = if (controller.showPause) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 onPlayPauseClick = {
                     controller.playOrPause()
                 },
@@ -81,7 +82,7 @@ fun MediaControls(
                     .align(Alignment.Center)
             )
         }
-        if (mediaState.isControllerShowing) {
+        if (mediaState.isControllerShowing || mediaState.controllerVisibility == ControllerVisibility.PartiallyVisible) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -2,15 +2,12 @@ package com.arcticoss.nextplayer.feature.player
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -18,6 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
+import com.arcticoss.nextplayer.feature.player.compose.TrackChooser
 import com.arcticoss.nextplayer.feature.player.presentation.composables.*
 import com.google.android.exoplayer2.ExoPlayer
 
@@ -104,7 +102,7 @@ internal fun PlayerScreen(
                     ) {
                         Column(Modifier.selectableGroup()) {
                             exoPlayerState.audioTracks.forEach {
-                                AudioTrackChooser(
+                                TrackChooser(
                                     text = it.displayName,
                                     selected = it.isSelected,
                                     onClick = { onEvent(PlayerEvent.SwitchAudioTrack(it.formatId)) }
@@ -156,31 +154,4 @@ fun CenterDialog(
             usePlatformDefaultWidth = false
         )
     )
-}
-
-
-@Composable
-fun AudioTrackChooser(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .selectable(
-                selected = selected,
-                role = Role.RadioButton,
-                onClick = onClick,
-            )
-            .padding(horizontal = 24.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = null
-        )
-        Spacer(Modifier.width(8.dp))
-        Text(text)
-    }
 }

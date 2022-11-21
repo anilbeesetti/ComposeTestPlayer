@@ -4,10 +4,6 @@ import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.view.WindowManager
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -39,6 +35,10 @@ fun VideoScreen(
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = context.findActivity()
+
+    LaunchedEffect(key1 = Unit) {
+        mediaState.player?.play()
+    }
 
     LaunchedEffect(key1 = mediaState.playerState?.videoFormat) {
         mediaState.playerState?.videoFormat?.let {
@@ -98,14 +98,7 @@ fun VideoScreen(
                     tracks = state.audioTracks,
                     onTrackClick = {
                         if (!it.isSelected && it.isSupported) {
-                            mediaState.player?.let { player ->
-                                player.trackSelectionParameters = player
-                                    .trackSelectionParameters
-                                    .buildUpon()
-                                    .setOverrideForType(
-                                        TrackSelectionOverride(it.mediaTrackGroup, 0)
-                                    ).build()
-                            }
+                            mediaState.player?.switchAudioTrack(it)
                         }
                     }
                 )
@@ -115,19 +108,15 @@ fun VideoScreen(
 }
 
 
-private fun Format.displayName(): String {
-    var displayName = ""
-    this.language?.let {
-        displayName += if (this.language != "und") {
-            Locale(this.language.toString()).displayLanguage
-        } else {
-            this.sampleMimeType
-        }
+private fun Player.switchAudioTrack(trackGroup: Tracks.Group) {
+    if (!trackGroup.isSelected && trackGroup.isSupported) {
+        this.trackSelectionParameters = this
+            .trackSelectionParameters
+            .buildUpon()
+            .setOverrideForType(
+                TrackSelectionOverride(trackGroup.mediaTrackGroup, 0)
+            ).build()
     }
-    this.label?.let {
-        displayName += "," + this.label
-    }
-    return displayName
 }
 
 
@@ -142,32 +131,4 @@ private fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String): Tra
         }
     }
     return null
-}
-
-@Composable
-fun AudioTrackSelectorDialog(
-    onDismiss: () -> Unit,
-    tracks: List<Tracks.Group>,
-    onTrackClick: (Tracks.Group) -> Unit
-) {
-    CenterDialog(
-        onDismiss = onDismiss,
-        title = { Text(text = "Select audio track") },
-        content = {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Column(Modifier.selectableGroup()) {
-                    tracks.forEach { track ->
-                        AudioTrackChooser(
-                            text = track.getTrackFormat(0).displayName(),
-                            selected = track.isSelected,
-                            onClick = { onTrackClick(track) }
-                        )
-                    }
-                }
-            }
-        }
-    )
 }
