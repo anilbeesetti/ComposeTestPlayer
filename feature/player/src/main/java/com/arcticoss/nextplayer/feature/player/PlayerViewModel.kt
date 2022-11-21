@@ -246,6 +246,10 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
+    fun showDialog(dialog: Dialog) {
+        _playerViewState.update { it.copy(showDialog = dialog) }
+    }
+
     override fun onCleared() {
         playerHelper.exoPlayer.release()
     }
@@ -308,7 +312,8 @@ sealed interface PlayerEvent {
 
 
 data class PlayerViewState(
-    val mediaList: List<Media> = emptyList()
+    val mediaList: List<Media> = emptyList(),
+    val showDialog: Dialog = Dialog.None
 )
 
 data class AudioTrack(
@@ -316,3 +321,8 @@ data class AudioTrack(
     val formatId: String,
     val isSelected: Boolean
 )
+
+enum class Dialog {
+    AudioTrack,
+    None
+}
