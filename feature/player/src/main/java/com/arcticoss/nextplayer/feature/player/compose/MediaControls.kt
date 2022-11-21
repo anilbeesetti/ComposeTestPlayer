@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.feature.player.Dialog
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIHeader
 import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIMainControls
@@ -26,7 +27,8 @@ import com.google.android.exoplayer2.SeekParameters
 @Composable
 fun MediaControls(
     currentMedia: Media,
-    mediaState: MediaState
+    mediaState: MediaState,
+    showDialog: (Dialog) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -40,7 +42,7 @@ fun MediaControls(
         val isBufferingShowing by remember {
             derivedStateOf {
                 mediaState.playerState?.run {
-                    playbackState == Player.STATE_BUFFERING
+                    playbackState == Player.STATE_BUFFERING && videoFormat == null
                 } ?: false
             }
         }
@@ -53,7 +55,7 @@ fun MediaControls(
             PlayerUIHeader(
                 title = currentMedia.title ?: "",
                 onBackClick = { activity?.finish() },
-                onAudioTrackButtonClick = {},
+                onAudioTrackButtonClick = { showDialog(Dialog.AudioTrack) },
                 modifier = Modifier
                     .systemBarsPadding()
                     .padding(top = 5.dp)

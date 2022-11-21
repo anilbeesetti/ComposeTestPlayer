@@ -3,6 +3,10 @@ package com.arcticoss.nextplayer.feature.player.compose
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -10,12 +14,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
-import com.arcticoss.nextplayer.feature.player.PlayerViewModel
+import com.arcticoss.nextplayer.feature.player.*
 import com.arcticoss.nextplayer.feature.player.presentation.composables.SurfaceType
 import com.arcticoss.nextplayer.feature.player.presentation.composables.VideoSurface
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
+import com.google.android.exoplayer2.*
+import java.util.*
 
 
 private const val TAG = "VideoScreen"
@@ -65,7 +71,79 @@ fun VideoScreen(
         ) {
             onDispose { }
         }
-        MediaControls(mediaState = mediaState, currentMedia = currentMedia)
+        MediaControls(
+            mediaState = mediaState,
+            currentMedia = currentMedia,
+            showDialog = viewModel::showDialog
+        )
+
+        if (playerViewState.showDialog == Dialog.AudioTrack) {
+            CenterDialog(
+                onDismiss = { viewModel.showDialog(Dialog.None) },
+                title = { Text(text = "Select audio track") },
+                content = {
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Column(Modifier.selectableGroup()) {
+                            mediaState.player?.let {
+                                it.getAudioTracks().forEach { track ->
+                                    AudioTrackChooser(
+                                        text = track.first.displayName(),
+                                        selected = track.second,
+                                        onClick = {  }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
     }
 }
 
+
+fun Format.displayName(): String {
+    var displayName = ""
+    this.language?.let {
+        displayName += if (this.language != "und") {
+            Locale(this.language.toString()).displayLanguage
+        } else {
+            this.sampleMimeType
+        }
+    }
+    this.label?.let {
+        displayName += "," + this.label
+    }
+    return displayName
+}
+
+fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String): Tracks.Group? {
+    for (group in this.currentTracks.groups) {
+        if (group.type == trackType) {
+            val trackGroup = group.mediaTrackGroup
+            val format: Format = trackGroup.getFormat(0)
+            if (Objects.equals(id, format.id)) {
+                return group
+            }
+        }
+    }
+    return null
+}
+
+
+
+
+fun Player.getAudioTracks(): List<Pair<Format, Boolean>> {
+    val audioTracks = mutableListOf<Pair<Format, Boolean>>()
+    this.currentTracks.groups.forEach {
+        if (it.type == C.TRACK_TYPE_AUDIO) {
+            for (i in 0 until it.length) {
+                audioTracks.add(Pair(it.getTrackFormat(i), it.isSelected))
+            }
+        }
+    }
+    return audioTracks
+}
