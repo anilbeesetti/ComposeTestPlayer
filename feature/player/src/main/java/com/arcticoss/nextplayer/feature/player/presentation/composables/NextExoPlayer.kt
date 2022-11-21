@@ -1,13 +1,15 @@
 package com.arcticoss.nextplayer.feature.player.presentation.composables
 
 import android.util.Log
+import android.view.SurfaceView
+import android.view.TextureView
+import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -22,8 +24,6 @@ import com.arcticoss.nextplayer.feature.player.utils.Orientation
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.setOrientation
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import java.util.*
 
 private const val TAG = "NextExoPlayer"
@@ -59,7 +59,7 @@ fun NextExoPlayer(
             }
         }
     )
-    var playerView: StyledPlayerView? = null
+
     lateinit var playbackStateListener: Player.Listener
     Box(
         modifier = Modifier
@@ -67,22 +67,27 @@ fun NextExoPlayer(
             .fillMaxSize()
     ) {
         DisposableEffect(
-            AndroidView(
-                factory = { androidContext ->
-                    StyledPlayerView(androidContext).apply {
-                        hideController()
-                        useController = false
-                        player = exoPlayer
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .align(Alignment.Center)
-                    .background(Color.Black),
-                update = {
-                    playerView = it
-                }
+            VideoSurface(
+                player = exoPlayer,
+                surfaceType = SurfaceType.SurfaceView,
+                modifier = Modifier.fillMaxSize()
             )
+//            AndroidView(
+//                factory = { androidContext ->
+//                    StyledPlayerView(androidContext).apply {
+//                        hideController()
+//                        useController = false
+//                        player = exoPlayer
+//                    }
+//                },
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .align(Alignment.Center)
+//                    .background(Color.Black),
+//                update = {
+//                    playerView = it
+//                }
+//            )
         ) {
             playbackStateListener = object : Player.Listener {
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -110,7 +115,7 @@ fun NextExoPlayer(
                 override fun onTracksChanged(tracks: Tracks) {
                     val audioTracks = mutableListOf<AudioTrack>()
                     tracks.groups.forEach { trackGroup ->
-                        when(trackGroup.type) {
+                        when (trackGroup.type) {
                             C.TRACK_TYPE_VIDEO -> {
                                 for (i in 0 until trackGroup.length) {
                                     val trackFormat = trackGroup.getTrackFormat(i)
@@ -158,10 +163,9 @@ fun NextExoPlayer(
                     }
                     onEvent(PlayerEvent.AddAudioTracks(audioTracks))
                 }
-                
+
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     onEvent(PlayerEvent.SetIsPlayingState(isPlaying))
-                    playerView?.keepScreenOn = isPlaying
                 }
 
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -175,6 +179,14 @@ fun NextExoPlayer(
                     onEvent(PlayerEvent.PlayerError(true))
                 }
 
+                override fun onVolumeChanged(volume: Float) {
+                    Log.d(TAG, "onVolumeChanged: $volume")
+                }
+
+                override fun onDeviceVolumeChanged(volume: Int, muted: Boolean) {
+                    Log.d(TAG, "onDeviceVolumeChanged: $volume $muted")
+                }
+
             }
             exoPlayer.addListener(playbackStateListener)
             onDispose {
@@ -183,24 +195,59 @@ fun NextExoPlayer(
             }
         }
     }
-    LaunchedEffect(key1 = aspectRatio) {
-        when(aspectRatio) {
-            AspectRatio.FitScreen -> {
-                playerView?.let {
-                    it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-                }
-            }
-            AspectRatio.Stretch -> {
-                playerView?.let {
-                    it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
-                }
-            }
-            AspectRatio.Crop -> {
-                playerView?.let {
-                    it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                }
-            }
+}
+
+
+@Composable
+fun VideoSurface(
+    player: Player,
+    surfaceType: SurfaceType,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    fun Player.clearVideoView(view: View) {
+        when(surfaceType) {
+            SurfaceType.SurfaceView -> clearVideoSurfaceView(view as SurfaceView)
+            SurfaceType.TextureView -> clearVideoTextureView(view as TextureView)
         }
     }
+
+    fun Player.setVideoView(view: View) {
+        when (surfaceType) {
+            SurfaceType.SurfaceView -> setVideoSurfaceView(view as SurfaceView)
+            SurfaceType.TextureView -> setVideoTextureView(view as TextureView)
+        }
+    }
+
+    val videoView = remember {
+        when (surfaceType) {
+            SurfaceType.SurfaceView -> SurfaceView(context)
+            SurfaceType.TextureView -> TextureView(context)
+        }
+    }
+
+    AndroidView(
+        factory = { videoView },
+        modifier = modifier
+    ) {
+        val previousPlayer = it.tag as? Player
+        if (previousPlayer == player) return@AndroidView
+
+        previousPlayer?.clearVideoView(it)
+        it.tag = player.apply { setVideoView(it) }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            (videoView.tag as? Player)?.clearVideoView(videoView)
+        }
+    }
+}
+
+
+enum class SurfaceType {
+    SurfaceView,
+    TextureView;
 }
 
