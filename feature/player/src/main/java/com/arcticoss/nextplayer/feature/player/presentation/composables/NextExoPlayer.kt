@@ -1,25 +1,22 @@
 package com.arcticoss.nextplayer.feature.player.presentation.composables
 
 import android.util.Log
-import android.view.SurfaceView
-import android.view.TextureView
-import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.arcticoss.nextplayer.feature.player.AudioTrack
-import com.arcticoss.nextplayer.feature.player.PlayerEvent
 import com.arcticoss.nextplayer.feature.player.ExoplayerState
+import com.arcticoss.nextplayer.feature.player.PlayerEvent
+import com.arcticoss.nextplayer.feature.player.compose.SurfaceType
+import com.arcticoss.nextplayer.feature.player.compose.VideoSurface
 import com.arcticoss.nextplayer.feature.player.utils.Orientation
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.setOrientation
@@ -195,60 +192,6 @@ fun NextExoPlayer(
             }
         }
     }
-}
-
-
-@Composable
-fun VideoSurface(
-    player: Player,
-    surfaceType: SurfaceType,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-
-    fun Player.clearVideoView(view: View) {
-        when(surfaceType) {
-            SurfaceType.SurfaceView -> clearVideoSurfaceView(view as SurfaceView)
-            SurfaceType.TextureView -> clearVideoTextureView(view as TextureView)
-        }
-    }
-
-    fun Player.setVideoView(view: View) {
-        when (surfaceType) {
-            SurfaceType.SurfaceView -> setVideoSurfaceView(view as SurfaceView)
-            SurfaceType.TextureView -> setVideoTextureView(view as TextureView)
-        }
-    }
-
-    val videoView = remember {
-        when (surfaceType) {
-            SurfaceType.SurfaceView -> SurfaceView(context)
-            SurfaceType.TextureView -> TextureView(context)
-        }
-    }
-
-    AndroidView(
-        factory = { videoView },
-        modifier = modifier
-    ) {
-        val previousPlayer = it.tag as? Player
-        if (previousPlayer == player) return@AndroidView
-
-        previousPlayer?.clearVideoView(it)
-        it.tag = player.apply { setVideoView(it) }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            (videoView.tag as? Player)?.clearVideoView(videoView)
-        }
-    }
-}
-
-
-enum class SurfaceType {
-    SurfaceView,
-    TextureView;
 }
 
 

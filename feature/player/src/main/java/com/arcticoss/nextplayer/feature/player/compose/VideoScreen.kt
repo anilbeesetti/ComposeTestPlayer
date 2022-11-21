@@ -15,12 +15,11 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.*
-import com.arcticoss.nextplayer.feature.player.presentation.composables.SurfaceType
-import com.arcticoss.nextplayer.feature.player.presentation.composables.VideoSurface
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import java.util.*
 
 
@@ -78,34 +77,30 @@ fun VideoScreen(
         )
 
         if (playerViewState.showDialog == Dialog.AudioTrack) {
-            CenterDialog(
-                onDismiss = { viewModel.showDialog(Dialog.None) },
-                title = { Text(text = "Select audio track") },
-                content = {
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Column(Modifier.selectableGroup()) {
-                            mediaState.player?.let {
-                                it.getAudioTracks().forEach { track ->
-                                    AudioTrackChooser(
-                                        text = track.first.displayName(),
-                                        selected = track.second,
-                                        onClick = {  }
-                                    )
-                                }
+            mediaState.playerState?.let { state ->
+                AudioTrackSelectorDialog(
+                    onDismiss = { viewModel.showDialog(Dialog.None) },
+                    tracks = state.audioTracks,
+                    onTrackClick = {
+                        if (!it.isSelected && it.isSupported) {
+                            mediaState.player?.let { player ->
+                                player.trackSelectionParameters = player
+                                    .trackSelectionParameters
+                                    .buildUpon()
+                                    .setOverrideForType(
+                                        TrackSelectionOverride(it.mediaTrackGroup, 0)
+                                    ).build()
                             }
                         }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
 
 
-fun Format.displayName(): String {
+private fun Format.displayName(): String {
     var displayName = ""
     this.language?.let {
         displayName += if (this.language != "und") {
@@ -120,7 +115,8 @@ fun Format.displayName(): String {
     return displayName
 }
 
-fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String): Tracks.Group? {
+
+private fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String): Tracks.Group? {
     for (group in this.currentTracks.groups) {
         if (group.type == trackType) {
             val trackGroup = group.mediaTrackGroup
@@ -133,17 +129,30 @@ fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String): Tracks.Grou
     return null
 }
 
-
-
-
-fun Player.getAudioTracks(): List<Pair<Format, Boolean>> {
-    val audioTracks = mutableListOf<Pair<Format, Boolean>>()
-    this.currentTracks.groups.forEach {
-        if (it.type == C.TRACK_TYPE_AUDIO) {
-            for (i in 0 until it.length) {
-                audioTracks.add(Pair(it.getTrackFormat(i), it.isSelected))
+@Composable
+fun AudioTrackSelectorDialog(
+    onDismiss: () -> Unit,
+    tracks: List<Tracks.Group>,
+    onTrackClick: (Tracks.Group) -> Unit
+) {
+    CenterDialog(
+        onDismiss = onDismiss,
+        title = { Text(text = "Select audio track") },
+        content = {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Column(Modifier.selectableGroup()) {
+                    tracks.forEach { track ->
+                        AudioTrackChooser(
+                            text = track.getTrackFormat(0).displayName(),
+                            selected = track.isSelected,
+                            onClick = { onTrackClick(track) }
+                        )
+                    }
+                }
             }
         }
-    }
-    return audioTracks
+    )
 }

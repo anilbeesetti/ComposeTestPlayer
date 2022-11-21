@@ -1,5 +1,6 @@
 package com.arcticoss.nextplayer.feature.player.presentation
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +9,9 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.text.CueGroup
 import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
 import com.google.android.exoplayer2.video.VideoSize
+
+
+private const val TAG = "PlayerState"
 
 /**
  * Create a instance of [PlayerState] and register a [listener][Player.Listener] to the [Player] to
@@ -37,6 +41,10 @@ interface PlayerState {
     val videoFormat: Format?
 
     val audioFormat: Format?
+
+    val audioTracks: List<Tracks.Group>
+
+    val subtitleTracks: List<Tracks.Group>
 
     val isLoading: Boolean
 
@@ -105,6 +113,12 @@ internal class PlayerStateImpl(
         private set
 
     override var audioFormat: Format? by mutableStateOf(player.audioFormat)
+        private set
+
+    override var audioTracks: List<Tracks.Group> by mutableStateOf(emptyList())
+        private set
+
+    override var subtitleTracks: List<Tracks.Group> by mutableStateOf(emptyList())
         private set
 
     override var isLoading: Boolean by mutableStateOf(player.isLoading)
@@ -279,6 +293,11 @@ internal class PlayerStateImpl(
 
         override fun onCues(cueGroup: CueGroup) {
             this@PlayerStateImpl.cues = cues
+        }
+
+        override fun onTracksChanged(tracks: Tracks) {
+            Log.d(TAG, "onTracksChanged: heelo")
+            this@PlayerStateImpl.audioTracks = tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }
         }
 
     }
