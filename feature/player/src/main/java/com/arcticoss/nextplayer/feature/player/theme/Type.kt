@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.presentation.theme
+package com.arcticoss.nextplayer.feature.player.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.presentation.theme
+package com.arcticoss.nextplayer.feature.player.theme
 
 import android.app.Activity
 import android.os.Build

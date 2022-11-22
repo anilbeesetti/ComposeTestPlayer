@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Audiotrack
+import androidx.compose.material.icons.rounded.Subtitles
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -17,7 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 fun PlayerUIHeader(
     title: String,
     onBackClick: () -> Unit,
-    onAudioTrackButtonClick: () -> Unit,
+    onAudioIconClick: () -> Unit,
+    onSubtitleIconClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -36,7 +38,13 @@ fun PlayerUIHeader(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
-        IconButton(onClick = onAudioTrackButtonClick) {
+        IconButton(onClick = onSubtitleIconClick) {
+            Icon(
+                imageVector = Icons.Rounded.Subtitles,
+                contentDescription = Icons.Rounded.Subtitles.name
+            )
+        }
+        IconButton(onClick = onAudioIconClick) {
             Icon(
                 imageVector = Icons.Rounded.Audiotrack,
                 contentDescription = Icons.Rounded.Audiotrack.name

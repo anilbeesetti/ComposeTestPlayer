@@ -24,8 +24,6 @@ dependencies {
 
 
     implementation ("com.google.android.exoplayer:exoplayer-core:2.18.1")
-    implementation ("com.google.android.exoplayer:exoplayer-ui:2.18.1")
-
 
     testImplementation(libs.junit4)
 
