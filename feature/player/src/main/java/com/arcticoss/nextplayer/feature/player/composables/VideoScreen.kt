@@ -10,21 +10,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.*
 import com.arcticoss.nextplayer.feature.player.presentation.aspectRatio
-import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import java.io.File
 import java.util.*
 
 
@@ -37,13 +40,18 @@ fun VideoScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
 
-    val mediaState = rememberMediaState(player = viewModel.player)
+    val player by rememberManagedExoPlayer()
+    val mediaState = rememberMediaState(player = player)
     val controller = rememberControllerState(mediaState = mediaState)
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val activity = context.findActivity()
 
+
+    /**
+     * Handling rotation on video format change
+     */
     LaunchedEffect(key1 = mediaState.playerState?.videoFormat) {
         mediaState.playerState?.videoFormat?.let {
             if (it.isPortrait) {
@@ -54,16 +62,55 @@ fun VideoScreen(
         }
     }
 
+    /**
+     * Handling screen on while media is playing
+     */
     LaunchedEffect(key1 = mediaState.playerState?.isPlaying) {
         activity?.keepScreenOn(mediaState.playerState?.isPlaying == true)
     }
 
+    /**
+     * Saving media state on pause
+     */
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
         if (it == Lifecycle.Event.ON_PAUSE) {
-            mediaState.player?.pause()
+            mediaState.playerState?.let { playerState ->
+                viewModel.saveState(playerState.mediaItemIndex, controller.positionMs, playerState.playWhenReady)
+            }
         }
-        if (it == Lifecycle.Event.ON_RESUME) {
-            mediaState.player?.play()
+    }
+
+    /**
+     * Restoring media state on mediaItemIndexChange
+     */
+    LaunchedEffect(mediaState.playerState?.mediaItemIndex) {
+        mediaState.playerState?.let {
+            if (playerViewState.mediaList.isNotEmpty()) {
+                val position = playerViewState.mediaList[it.mediaItemIndex].lastPlayedPosition
+                player?.seekTo(position)
+            }
+        }
+    }
+
+    /**
+     * Sets [MediaItem] list to player
+     */
+    LaunchedEffect(player, playerViewState.mediaList) {
+        player?.run {
+            val mediaItems = playerViewState.mediaList.map {
+                MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
+            }
+            setMediaItems(mediaItems)
+
+            playerViewState.currentMediaItemId?.let { id ->
+                val index = playerViewState.mediaList.indexOfFirst { it.id == id }
+                if (index >= 0) {
+                    val media = playerViewState.mediaList[index]
+                    seekTo(index, media.lastPlayedPosition)
+                }
+            }
+            playWhenReady = playerViewState.playWhenReady
+            prepare()
         }
     }
 
@@ -138,7 +185,7 @@ fun VideoScreen(
         if (playerViewState.showDialog == Dialog.SubtitleTrack) {
             mediaState.playerState?.let { state ->
                 TrackSelectorDialog(
-                    title = {Text(text = "Select audio track")},
+                    title = {Text(text = "Select subtitle track")},
                     onDismiss = { viewModel.showDialog(Dialog.None) },
                     tracks = state.subtitleTracks,
                     onTrackClick = {
