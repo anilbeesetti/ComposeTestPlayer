@@ -18,8 +18,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.media.R
-import com.arcticoss.nextplayer.feature.media.composables.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.media.composables.CheckPermissionAndSetContent
 import com.arcticoss.nextplayer.feature.media.composables.FolderItem
 import com.arcticoss.nextplayer.feature.media.composables.MediaListItem

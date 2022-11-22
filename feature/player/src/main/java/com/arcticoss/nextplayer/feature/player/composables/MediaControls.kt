@@ -16,8 +16,6 @@ import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.Dialog
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
-import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIHeader
-import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIMainControls
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
 import com.arcticoss.nextplayer.feature.player.utils.findActivity

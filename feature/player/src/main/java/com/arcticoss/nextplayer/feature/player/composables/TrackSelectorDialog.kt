@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.arcticoss.nextplayer.core.ui.CenterDialog
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Tracks
 import java.util.*
