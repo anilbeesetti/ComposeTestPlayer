@@ -16,7 +16,10 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.*
+import com.arcticoss.nextplayer.feature.player.presentation.aspectRatio
 import com.arcticoss.nextplayer.feature.player.presentation.composables.AddLifecycleEventObserver
+import com.arcticoss.nextplayer.feature.player.presentation.composables.ResizeMode
+import com.arcticoss.nextplayer.feature.player.presentation.composables.resize
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
 import com.arcticoss.nextplayer.feature.player.presentation.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
@@ -77,7 +80,15 @@ fun VideoScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        DisposableEffect(
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .run {
+                    val aspectRatio = mediaState.playerState?.videoSize?.aspectRatio ?: 0F
+                    if (aspectRatio <= 0) fillMaxSize()
+                    else resize(aspectRatio, ResizeMode.Fit)
+                }
+        ) {
             mediaState.player?.let {
                 VideoSurface(
                     player = it,
@@ -86,8 +97,6 @@ fun VideoScreen(
                         .fillMaxSize()
                 )
             }
-        ) {
-            onDispose { }
         }
         MediaGestures(
             mediaState = mediaState,
