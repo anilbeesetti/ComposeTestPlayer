@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.compose
+package com.arcticoss.nextplayer.feature.player.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -14,11 +14,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.Dialog
-import com.arcticoss.nextplayer.feature.player.presentation.ControllerState
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIHeader
 import com.arcticoss.nextplayer.feature.player.presentation.composables.PlayerUIMainControls
+import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.hideSystemBars

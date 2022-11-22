@@ -2,6 +2,8 @@ package com.arcticoss.nextplayer.feature.player.presentation
 
 import android.os.Looper
 import androidx.compose.runtime.*
+import com.arcticoss.nextplayer.feature.player.state.PlayerState
+import com.arcticoss.nextplayer.feature.player.state.state
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player

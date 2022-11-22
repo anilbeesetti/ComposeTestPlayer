@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.compose
+package com.arcticoss.nextplayer.feature.player.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.arcticoss.nextplayer.feature.player.CenterDialog
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Tracks
 import java.util.*

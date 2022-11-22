@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.presentation
+package com.arcticoss.nextplayer.feature.player.state
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

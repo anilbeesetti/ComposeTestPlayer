@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.compose
+package com.arcticoss.nextplayer.feature.player.composables
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background

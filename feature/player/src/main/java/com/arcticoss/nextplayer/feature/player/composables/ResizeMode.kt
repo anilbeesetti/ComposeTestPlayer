@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.presentation.composables
+package com.arcticoss.nextplayer.feature.player.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment

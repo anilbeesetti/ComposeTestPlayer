@@ -1,6 +1,7 @@
-package com.arcticoss.nextplayer.feature.player.presentation
+package com.arcticoss.nextplayer.feature.player.state
 
 import androidx.compose.runtime.*
+import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import kotlinx.coroutines.delay

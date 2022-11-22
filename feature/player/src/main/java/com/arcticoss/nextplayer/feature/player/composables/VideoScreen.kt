@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.compose
+package com.arcticoss.nextplayer.feature.player.composables
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
@@ -18,11 +18,9 @@ import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.*
 import com.arcticoss.nextplayer.feature.player.presentation.aspectRatio
 import com.arcticoss.nextplayer.feature.player.presentation.composables.AddLifecycleEventObserver
-import com.arcticoss.nextplayer.feature.player.presentation.composables.ResizeMode
-import com.arcticoss.nextplayer.feature.player.presentation.composables.resize
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
-import com.arcticoss.nextplayer.feature.player.presentation.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
+import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
 import com.google.android.exoplayer2.*
@@ -39,7 +37,7 @@ fun VideoScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
 
-    val mediaState = rememberMediaState(player = viewModel.playerHelper.exoPlayer)
+    val mediaState = rememberMediaState(player = viewModel.player)
     val controller = rememberControllerState(mediaState = mediaState)
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current

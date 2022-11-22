@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.arcticoss.nextplayer.feature.player.compose.VideoScreen
-import com.arcticoss.nextplayer.feature.player.presentation.theme.NextPlayerTheme
+import com.arcticoss.nextplayer.feature.player.composables.VideoScreen
+import com.arcticoss.nextplayer.feature.player.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
