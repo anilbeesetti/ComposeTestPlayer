@@ -53,6 +53,7 @@ internal class PlayerManager(
         player.value?.let { player ->
             player.release()
         }
+        player.value = null
     }
     override fun onAbandoned() {
         release()
@@ -62,9 +63,7 @@ internal class PlayerManager(
         release()
     }
 
-    override fun onRemembered() {
-
-    }
+    override fun onRemembered() {}
 }
 
 @Composable

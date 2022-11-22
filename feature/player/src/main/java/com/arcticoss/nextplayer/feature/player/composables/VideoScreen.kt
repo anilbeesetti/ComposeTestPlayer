@@ -68,6 +68,16 @@ fun VideoScreen(
             }
         }
     }
+
+    LaunchedEffect(mediaState.playerState?.mediaItemIndex) {
+        mediaState.playerState?.let {
+            if (playerViewState.mediaList.isNotEmpty()) {
+                val position = playerViewState.mediaList[it.mediaItemIndex].lastPlayedPosition
+                player?.seekTo(position)
+            }
+        }
+    }
+
     
     LaunchedEffect(player, playerViewState.mediaList) {
         player?.run {
