@@ -1,6 +1,5 @@
 package com.arcticoss.nextplayer.feature.player.presentation
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -89,7 +88,7 @@ interface PlayerState {
 
     val videoSize: VideoSize
 
-    val cues: CueGroup
+    val cueGroup: CueGroup
 
     fun dispose()
 }
@@ -184,7 +183,7 @@ internal class PlayerStateImpl(
     override var videoSize: VideoSize by mutableStateOf(player.videoSize)
         private set
 
-    override var cues: CueGroup by mutableStateOf(player.currentCues)
+    override var cueGroup: CueGroup by mutableStateOf(player.currentCues)
         private set
 
     private val listener = object : Player.Listener {
@@ -292,11 +291,10 @@ internal class PlayerStateImpl(
         }
 
         override fun onCues(cueGroup: CueGroup) {
-            this@PlayerStateImpl.cues = cues
+            this@PlayerStateImpl.cueGroup = cueGroup
         }
 
         override fun onTracksChanged(tracks: Tracks) {
-            Log.d(TAG, "onTracksChanged: heelo")
             this@PlayerStateImpl.audioTracks = tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }
         }
 

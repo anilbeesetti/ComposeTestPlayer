@@ -3,10 +3,13 @@ package com.arcticoss.nextplayer.feature.player.compose
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -90,6 +93,19 @@ fun VideoScreen(
             mediaState = mediaState,
             controller = controller
         )
+        Column(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            mediaState.playerState?.cueGroup?.let { cueGroup ->
+                cueGroup.cues.forEach {
+                    Text(
+                        text = it.text.toString(),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
         MediaControls(
             mediaState = mediaState,
             currentMedia = currentMedia,
