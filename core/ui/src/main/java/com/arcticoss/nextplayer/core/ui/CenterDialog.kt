@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player.composables
+package com.arcticoss.nextplayer.core.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme

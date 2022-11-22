@@ -17,7 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.*
 import com.arcticoss.nextplayer.feature.player.presentation.aspectRatio
-import com.arcticoss.nextplayer.feature.player.presentation.composables.AddLifecycleEventObserver
+import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState

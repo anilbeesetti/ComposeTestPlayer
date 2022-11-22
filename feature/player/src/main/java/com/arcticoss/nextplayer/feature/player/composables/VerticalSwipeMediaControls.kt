@@ -6,7 +6,6 @@ import androidx.compose.material.icons.rounded.VolumeMute
 import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.arcticoss.nextplayer.feature.player.presentation.composables.AdjustmentBar
 
 @Composable
 fun BrightnessAdjustmentBar(
