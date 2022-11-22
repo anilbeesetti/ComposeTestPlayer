@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -25,6 +26,7 @@ import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import java.io.File
 import java.util.*
 
 
@@ -37,7 +39,8 @@ fun VideoScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
 
-    val mediaState = rememberMediaState(player = viewModel.player)
+    val player by rememberManagedExoPlayer()
+    val mediaState = rememberMediaState(player = player)
     val controller = rememberControllerState(mediaState = mediaState)
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -60,12 +63,31 @@ fun VideoScreen(
 
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
         if (it == Lifecycle.Event.ON_PAUSE) {
-            mediaState.player?.pause()
-        }
-        if (it == Lifecycle.Event.ON_RESUME) {
-            mediaState.player?.play()
+            mediaState.playerState?.let { playerState ->
+                viewModel.saveState(playerState.mediaItemIndex, controller.positionMs, playerState.playWhenReady)
+            }
         }
     }
+    
+    LaunchedEffect(player, playerViewState.mediaList) {
+        player?.run {
+            val mediaItems = playerViewState.mediaList.map {
+                MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString())
+                    .build()
+            }
+            setMediaItems(mediaItems)
+            playerViewState.currentMediaItemId?.let { id ->
+                val index = playerViewState.mediaList.indexOfFirst { it.id == id }
+                if (index >= 0) {
+                    val media = playerViewState.mediaList[index]
+                    seekTo(index, media.lastPlayedPosition)
+                }
+            }
+            playWhenReady = playerViewState.playWhenReady
+            prepare()
+        }
+    }
+    
 
     val currentMedia by remember {
         derivedStateOf {

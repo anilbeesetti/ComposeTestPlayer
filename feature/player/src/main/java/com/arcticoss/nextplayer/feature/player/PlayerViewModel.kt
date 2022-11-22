@@ -1,7 +1,6 @@
 package com.arcticoss.nextplayer.feature.player
 
 import android.net.Uri
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,13 +11,9 @@ import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 
@@ -29,7 +24,6 @@ class PlayerViewModel @Inject constructor(
     private val getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
     private val getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
     private val getMediaFromUri: GetMediaFromUriUseCase,
-    val player: Player,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -51,47 +45,45 @@ class PlayerViewModel @Inject constructor(
         folderID?.let { id ->
             if (id == 0L) {
                 getSortedMediaItemsStream().onEach { mediaList ->
-                    setMedia(mediaList)
+                    _playerViewState.update { it.copy(mediaList = mediaList) }
                 }.launchIn(viewModelScope)
             } else {
                 getSortedMediaFolderStream(id).onEach { mediaFolder ->
-                    setMedia(mediaFolder.mediaList)
+                    _playerViewState.update { it.copy(mediaList = mediaFolder.mediaList) }
                 }.launchIn(viewModelScope)
             }
         }
+        mediaID?.let { id ->
+            _playerViewState.update { it.copy(currentMediaItemId = id) }
+        }
     }
+
+    fun saveState(index: Int, position: Long, playWhenReady: Boolean) {
+        viewModelScope.launch {
+            val media = playerViewState.value.mediaList[index]
+            _playerViewState.update { it.copy(currentMediaItemId = media.id, playWhenReady = playWhenReady) }
+            mediaRepository.updateMedia(media.id, position)
+        }
+    }
+
 
     fun invokeMedia(uri: Uri) {
         viewModelScope.launch {
             val mediaItem = getMediaFromUri(uri)
             mediaItem?.let { media ->
-                setMedia(listOf(media))
+                _playerViewState.update { it.copy(mediaList = listOf(media)) }
             }
         }
-    }
-
-    private fun setMedia(mediaList: List<Media>) {
-        _playerViewState.update { it.copy(mediaList = mediaList) }
-        val index = mediaList.indexOfFirst { it.id == mediaID }
-        val mediaItems = playerViewState.value.mediaList.map {
-            MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString())
-                .build()
-        }
-        player.setMediaItems(mediaItems)
-        player.prepare()
-        player.seekTo(index, C.TIME_UNSET)
     }
 
     fun showDialog(dialog: Dialog) {
         _playerViewState.update { it.copy(showDialog = dialog) }
     }
-
-    override fun onCleared() {
-        player.release()
-    }
 }
 
 data class PlayerViewState(
+    val playWhenReady: Boolean = true,
+    val currentMediaItemId: Long? = null,
     val mediaList: List<Media> = emptyList(),
     val showDialog: Dialog = Dialog.None
 )
