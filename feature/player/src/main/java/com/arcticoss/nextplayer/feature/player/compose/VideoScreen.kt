@@ -103,6 +103,7 @@ fun VideoScreen(
                         text = it.text.toString(),
                         textAlign = TextAlign.Center
                     )
+                    it.textAlignment
                 }
             }
         }
@@ -114,12 +115,28 @@ fun VideoScreen(
         )
         if (playerViewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->
-                AudioTrackSelectorDialog(
+                TrackSelectorDialog(
+                    title = {Text(text = "Select audio track")},
                     onDismiss = { viewModel.showDialog(Dialog.None) },
                     tracks = state.audioTracks,
                     onTrackClick = {
                         if (!it.isSelected && it.isSupported) {
-                            mediaState.player?.switchAudioTrack(it)
+                            mediaState.player?.switchTrack(it)
+                        }
+                    }
+                )
+            }
+        }
+
+        if (playerViewState.showDialog == Dialog.SubtitleTrack) {
+            mediaState.playerState?.let { state ->
+                TrackSelectorDialog(
+                    title = {Text(text = "Select audio track")},
+                    onDismiss = { viewModel.showDialog(Dialog.None) },
+                    tracks = state.subtitleTracks,
+                    onTrackClick = {
+                        if (!it.isSelected && it.isSupported) {
+                            mediaState.player?.switchTrack(it)
                         }
                     }
                 )
@@ -129,7 +146,7 @@ fun VideoScreen(
 }
 
 
-private fun Player.switchAudioTrack(trackGroup: Tracks.Group) {
+private fun Player.switchTrack(trackGroup: Tracks.Group) {
     if (!trackGroup.isSelected && trackGroup.isSupported) {
         this.trackSelectionParameters = this
             .trackSelectionParameters

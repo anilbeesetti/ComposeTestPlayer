@@ -43,7 +43,8 @@ fun NextPlayerUI(
             PlayerUIHeader(
                 title = exoPlayerState.currentPlayingMedia.title,
                 onBackClick = onBackPressed,
-                onAudioTrackButtonClick = {onUiEvent(UiEvent.ShowAudioTrackDialog(true))},
+                onAudioIconClick = {onUiEvent(UiEvent.ShowAudioTrackDialog(true))},
+                onSubtitleIconClick = { },
                 modifier = Modifier
                     .systemBarsPadding()
                     .padding(top = 5.dp)

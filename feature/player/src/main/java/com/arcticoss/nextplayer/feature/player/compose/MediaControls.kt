@@ -65,7 +65,8 @@ fun MediaControls(
             PlayerUIHeader(
                 title = currentMedia.title,
                 onBackClick = { activity?.finish() },
-                onAudioTrackButtonClick = { showDialog(Dialog.AudioTrack) },
+                onAudioIconClick = { showDialog(Dialog.AudioTrack) },
+                onSubtitleIconClick = { showDialog(Dialog.SubtitleTrack) },
                 modifier = Modifier
                     .systemBarsPadding()
                     .padding(top = 5.dp)

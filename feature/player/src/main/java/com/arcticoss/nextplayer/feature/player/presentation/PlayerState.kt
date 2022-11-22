@@ -296,6 +296,7 @@ internal class PlayerStateImpl(
 
         override fun onTracksChanged(tracks: Tracks) {
             this@PlayerStateImpl.audioTracks = tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }
+            this@PlayerStateImpl.subtitleTracks = tracks.groups.filter { it.type == C.TRACK_TYPE_TEXT }
         }
 
     }

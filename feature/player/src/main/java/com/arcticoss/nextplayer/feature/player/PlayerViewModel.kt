@@ -306,8 +306,8 @@ sealed interface PlayerEvent {
     data class AddAudioTracks(val value: List<AudioTrack>) : PlayerEvent
     data class SwitchAudioTrack(val value: String) : PlayerEvent
     data class PlayerError(val value: Boolean) : PlayerEvent
-    data class PlaybackState(val value: Int): PlayerEvent
-    data class PlaybackStarted(val value: Boolean): PlayerEvent
+    data class PlaybackState(val value: Int) : PlayerEvent
+    data class PlaybackStarted(val value: Boolean) : PlayerEvent
 }
 
 
@@ -324,5 +324,6 @@ data class AudioTrack(
 
 enum class Dialog {
     AudioTrack,
+    SubtitleTrack,
     None
 }

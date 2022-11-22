@@ -19,20 +19,21 @@ import java.util.*
 
 
 /***
- * Dialog to select Audio Track
+ * Dialog to select Track
  * @param onDismiss The callback to handle dismiss dialog
- * @param tracks The list of Audio [Tracks.Group]
+ * @param tracks The list of [Tracks.Group]
  * @param onTrackClick Then callback to handle on track item click
  */
 @Composable
-fun AudioTrackSelectorDialog(
+fun TrackSelectorDialog(
     onDismiss: () -> Unit,
+    title: @Composable () -> Unit,
     tracks: List<Tracks.Group>,
     onTrackClick: (Tracks.Group) -> Unit
 ) {
     CenterDialog(
         onDismiss = onDismiss,
-        title = { Text(text = "Select audio track") },
+        title = title,
         content = {
             Column(
                 modifier = Modifier
