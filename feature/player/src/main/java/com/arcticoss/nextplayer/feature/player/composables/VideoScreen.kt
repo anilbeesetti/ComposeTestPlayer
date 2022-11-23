@@ -65,21 +65,10 @@ fun VideoScreen(
     }
 
     /**
-     * Handling screen on while media is playing
+     * Handling screen onState while media is playing
      */
     LaunchedEffect(key1 = mediaState.playerState?.isPlaying) {
         activity?.keepScreenOn(mediaState.playerState?.isPlaying == true)
-    }
-
-    /**
-     * Saving media state on pause
-     */
-    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
-        if (it == Lifecycle.Event.ON_PAUSE) {
-            mediaState.playerState?.let { playerState ->
-                viewModel.saveState(playerState.mediaItemIndex, controller.positionMs, playerState.playWhenReady)
-            }
-        }
     }
 
     /**
@@ -97,23 +86,63 @@ fun VideoScreen(
     /**
      * Sets [MediaItem] list to player
      */
-    LaunchedEffect(player, playerViewState.mediaList) {
+    LaunchedEffect(player, playerViewState.mediaList.size) {
         player?.run {
             val mediaItems = playerViewState.mediaList.map {
-                MediaItem.Builder().setUri(File(it.path).toUri()).setMediaId(it.id.toString()).build()
+                MediaItem.Builder()
+                    .setUri(File(it.path).toUri())
+                    .setMediaId(it.id.toString())
+                    .setTag(it)
+                    .build()
             }
-            setMediaItems(mediaItems)
+            if (mediaItems.isNotEmpty()) {
+                this.setMediaItems(mediaItems)
+                playerViewState.currentMediaItemId?.let { id ->
+                    val index = playerViewState.mediaList.indexOfFirst { it.id == id }
+                    if (index >= 0) {
+                        val media = playerViewState.mediaList[index]
+                        seekTo(index, media.lastPlayedPosition)
+                    }
+                }
+                playWhenReady = playerViewState.playWhenReady
+                this.prepare()
+            }
+        }
+    }
 
-            playerViewState.currentMediaItemId?.let { id ->
-                val index = playerViewState.mediaList.indexOfFirst { it.id == id }
-                if (index >= 0) {
-                    val media = playerViewState.mediaList[index]
-                    seekTo(index, media.lastPlayedPosition)
+    /**
+     * Saving media state on pause
+     */
+    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
+        if (it == Lifecycle.Event.ON_PAUSE) {
+            mediaState.playerState?.let { playerState ->
+                viewModel.saveState(playerState.mediaItemIndex, controller.positionMs, playerState.playWhenReady)
+            }
+        }
+    }
+
+    /**
+     * Saving media state on mediaItemTransition
+     */
+    DisposableEffect(player) {
+
+        val listener = object : Player.Listener {
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                mediaState.playerState?.oldPosition?.let {
+                    if (mediaState.playerState?.firstFrameRendered == true) {
+                        if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+                            viewModel.saveState(it.mediaItemIndex, 0, player?.playWhenReady == true)
+                        } else {
+                            viewModel.saveState(it.mediaItemIndex, it.positionMs, player?.playWhenReady == true)
+                        }
+                    }
                 }
             }
-            playWhenReady = playerViewState.playWhenReady
-            prepare()
         }
+        
+        player?.addListener(listener)
+        
+        onDispose { player?.removeListener(listener) }
     }
 
     val currentMedia by remember {
