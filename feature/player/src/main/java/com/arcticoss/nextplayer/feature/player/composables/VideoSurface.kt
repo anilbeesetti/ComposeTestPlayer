@@ -61,5 +61,5 @@ fun VideoSurface(
 
 enum class SurfaceType {
     SurfaceView,
-    TextureView;
+    TextureView
 }
