@@ -1,5 +1,6 @@
 package com.arcticoss.nextplayer.feature.player.composables
 
+import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ fun ExoPlayerView(
         it.hideController()
         it.useController = false
         it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+        it.subtitleView?.visibility = View.GONE
     }) {
 
         onDispose {
