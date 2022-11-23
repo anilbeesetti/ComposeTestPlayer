@@ -17,7 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +37,7 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SeekParameters
+import kotlinx.coroutines.delay
 
 @Composable
 fun MediaControls(
@@ -46,6 +49,7 @@ fun MediaControls(
 
     val context = LocalContext.current
     val activity = context.findActivity()
+    var scrubing by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = mediaState.isControllerShowing) {
         when (mediaState.isControllerShowing) {
@@ -54,10 +58,13 @@ fun MediaControls(
         }
     }
 
+    val hideWhenTimeout = !mediaState.shouldShowControllerIndefinitely && !scrubing
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
+
         val isBufferingShowing by remember {
             derivedStateOf {
                 mediaState.playerState?.run {
@@ -71,6 +78,15 @@ fun MediaControls(
             )
         }
         if (mediaState.isControllerShowing) {
+
+            LaunchedEffect(key1 = hideWhenTimeout) {
+                if (hideWhenTimeout) {
+                    // hide after 3s
+                    delay(3000)
+                    mediaState.isControllerShowing = false
+                }
+            }
+
             PlayerUIHeader(
                 title = currentMedia.title,
                 onBackClick = { activity?.finish() },
@@ -113,7 +129,9 @@ fun MediaControls(
                 SeekBar(
                     durationMs = duration,
                     positionMs = controller.positionMs,
-                    onScrubStart = {},
+                    onScrubStart = {
+                        scrubing = true
+                    },
                     onScrubMove = {
                         if (mediaState.playerState?.playbackState == Player.STATE_READY) {
                             (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
@@ -123,6 +141,7 @@ fun MediaControls(
                     onScrubStop = {
                         (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
                         mediaState.player?.seekTo(it)
+                        scrubing = false
                     },
                     modifier = Modifier
                         .weight(1f),
