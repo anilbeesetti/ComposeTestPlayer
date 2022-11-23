@@ -2,11 +2,13 @@ package com.arcticoss.nextplayer.feature.player.composables
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
@@ -124,7 +126,10 @@ fun VideoScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Black)
+    ) {
         Box(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -135,11 +140,9 @@ fun VideoScreen(
                 }
         ) {
             mediaState.player?.let {
-                VideoSurface(
+                ExoPlayerView(
                     player = it,
-                    surfaceType = SurfaceType.SurfaceView,
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
