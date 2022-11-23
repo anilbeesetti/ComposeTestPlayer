@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.*
+import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.presentation.aspectRatio
 import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
 import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
@@ -28,6 +29,7 @@ import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player.*
+import com.google.android.exoplayer2.text.CueGroup
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import java.io.File
 import java.util.*
@@ -92,7 +94,6 @@ fun VideoScreen(
                 MediaItem.Builder()
                     .setUri(File(it.path).toUri())
                     .setMediaId(it.id.toString())
-                    .setTag(it)
                     .build()
             }
             if (mediaItems.isNotEmpty()) {
@@ -159,39 +160,21 @@ fun VideoScreen(
         .fillMaxSize()
         .background(Color.Black)
     ) {
-        Box(
+        MediaPlayer(
+            state = mediaState,
             modifier = Modifier
                 .align(Alignment.Center)
-                .run {
-                    val aspectRatio = mediaState.playerState?.videoSize?.aspectRatio ?: 0F
-                    if (aspectRatio <= 0) fillMaxSize()
-                    else resize(aspectRatio, ResizeMode.Fit)
-                }
-        ) {
-            mediaState.player?.let {
-                ExoPlayerView(
-                    player = it,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
+        )
         MediaGestures(
             mediaState = mediaState,
             controller = controller
         )
-        Column(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            mediaState.playerState?.cueGroup?.let { cueGroup ->
-                cueGroup.cues.forEach {
-                    Text(
-                        text = it.text.toString(),
-                        textAlign = TextAlign.Center
-                    )
-                    it.textAlignment
-                }
-            }
+        mediaState.playerState?.let {
+            Subtitles(
+                state = mediaState,
+                cueGroup = it.cueGroup,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
         }
         MediaControls(
             mediaState = mediaState,
@@ -227,6 +210,51 @@ fun VideoScreen(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun Subtitles(
+    state: MediaState,
+    cueGroup: CueGroup,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+            cueGroup.cues.forEach {
+                Text(
+                    text = it.text.toString(),
+                    textAlign = TextAlign.Center
+                )
+                it.textAlignment
+            }
+
+    }
+}
+
+@Composable
+private fun MediaPlayer(
+    state: MediaState,
+    modifier: Modifier = Modifier,
+    resizeMode: ResizeMode = ResizeMode.Fit
+) {
+    Box(
+        modifier = modifier
+            .run {
+                val aspectRatio = state.playerState?.videoSize?.aspectRatio ?: 0F
+                if (aspectRatio <= 0) fillMaxSize()
+                else resize(aspectRatio, resizeMode)
+            }
+    ) {
+        state.player?.let {
+            ExoPlayerView(
+                player = it,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
