@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.Player.PositionInfo
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.text.CueGroup
 import com.google.android.exoplayer2.trackselection.TrackSelectionParameters
@@ -29,6 +30,8 @@ fun Player.state(): PlayerState {
 interface PlayerState {
     val player: Player
 
+    val firstFrameRendered: Boolean
+
     val timeline: Timeline
 
     val mediaItemIndex: Int
@@ -36,6 +39,8 @@ interface PlayerState {
     val mediaMetadata: MediaMetadata
 
     val playlistMetadata: MediaMetadata
+
+    val oldPosition: PositionInfo?
 
     val videoFormat: Format?
 
@@ -96,6 +101,10 @@ interface PlayerState {
 internal class PlayerStateImpl(
     override val player: ExoPlayer
 ) : PlayerState {
+
+    override var firstFrameRendered: Boolean by mutableStateOf(false)
+        private set
+
     override var timeline: Timeline by mutableStateOf(player.currentTimeline)
         private set
 
@@ -106,6 +115,9 @@ internal class PlayerStateImpl(
         private set
 
     override var playlistMetadata: MediaMetadata by mutableStateOf(player.playlistMetadata)
+        private set
+
+    override var oldPosition: PositionInfo? by mutableStateOf(null)
         private set
 
     override var videoFormat: Format? by mutableStateOf(player.videoFormat)
@@ -187,6 +199,10 @@ internal class PlayerStateImpl(
         private set
 
     private val listener = object : Player.Listener {
+        override fun onRenderedFirstFrame() {
+            this@PlayerStateImpl.firstFrameRendered = true
+        }
+
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
             this@PlayerStateImpl.timeline = timeline
             this@PlayerStateImpl.mediaItemIndex = player.currentMediaItemIndex
@@ -250,6 +266,8 @@ internal class PlayerStateImpl(
             newPosition: Player.PositionInfo,
             reason: Int
         ) {
+            if (oldPosition.mediaItemIndex != newPosition.mediaItemIndex)
+                this@PlayerStateImpl.oldPosition = oldPosition
             this@PlayerStateImpl.mediaItemIndex = player.currentMediaItemIndex
         }
 
@@ -295,8 +313,10 @@ internal class PlayerStateImpl(
         }
 
         override fun onTracksChanged(tracks: Tracks) {
-            this@PlayerStateImpl.audioTracks = tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }
-            this@PlayerStateImpl.subtitleTracks = tracks.groups.filter { it.type == C.TRACK_TYPE_TEXT }
+            this@PlayerStateImpl.audioTracks =
+                tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }
+            this@PlayerStateImpl.subtitleTracks =
+                tracks.groups.filter { it.type == C.TRACK_TYPE_TEXT }
         }
 
     }
