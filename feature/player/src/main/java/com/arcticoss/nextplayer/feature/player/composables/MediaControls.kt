@@ -12,7 +12,6 @@ import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -108,22 +107,29 @@ fun MediaControls(
                     modifier = Modifier.padding(horizontal = 5.dp)
                 )
 
-                val duration = if (controller.durationMs == C.TIME_UNSET) currentMedia.duration else controller.durationMs
+                val duration =
+                    if (controller.durationMs == C.TIME_UNSET) currentMedia.duration / 1000 else controller.durationMs
 
-                Slider(
-                    value = controller.positionMs.toFloat(),
-                    valueRange = 0F..duration.toFloat(),
-                    onValueChange = {
+                SeekBar(
+                    durationMs = duration,
+                    positionMs = controller.positionMs,
+                    onScrubStart = {},
+                    onScrubMove = {
                         if (mediaState.playerState?.playbackState == Player.STATE_READY) {
                             (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                            mediaState.player?.seekTo(it.toLong())
+                            mediaState.player?.seekTo(it)
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    onScrubStop = {
+                        (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                        mediaState.player?.seekTo(it)
+                    },
+                    modifier = Modifier
+                        .weight(1f),
                 )
 
                 Text(
-                    text = TimeUtils.formatTime(context, controller.durationMs),
+                    text = TimeUtils.formatTime(context, duration),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(horizontal = 5.dp)
                 )
@@ -131,3 +137,9 @@ fun MediaControls(
         }
     }
 }
+
+
+//if (mediaState.playerState?.playbackState == Player.STATE_READY) {
+//    (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+//    mediaState.player?.seekTo(it.toLong())
+//}
