@@ -10,14 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.google.android.exoplayer2.SeekParameters
-import java.util.concurrent.TimeUnit
 
 
 private const val TAG = "MediaGestures"
@@ -45,6 +41,7 @@ fun MediaGestures(
                 )
             }
             .pointerInput(Unit) {
+                var isControllerShowing = mediaState.isControllerShowing
                 var totalOffset = Offset.Zero
                 var wasPlaying = false
                 var diffTime = 0f
@@ -60,7 +57,9 @@ fun MediaGestures(
                         currentPosition = controller.positionMs
                         duration = controller.durationMs
 
-                        // show seek bar
+                        isControllerShowing = mediaState.isControllerShowing
+                        if (!isControllerShowing)
+                            mediaState.controllerVisibility = ControllerVisibility.PartiallyVisible
                     },
                     onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
                         val previousOffset = totalOffset
@@ -82,7 +81,8 @@ fun MediaGestures(
                     },
                     onDragEnd = {
                         if (wasPlaying) controller.play()
-                        // hide seek bar
+                        if (!isControllerShowing)
+                            mediaState.controllerVisibility = ControllerVisibility.Invisible
                     }
                 )
             }
