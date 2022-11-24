@@ -19,6 +19,11 @@ interface ThumbnailDao {
     @Query("DELETE FROM thumbnail WHERE id = :id")
     suspend fun delete(id: Long)
 
-    @Query("SELECT EXISTS(SELECT * FROM thumbnail WHERE media_item_id = :mediaId )")
+    @Query("SELECT EXISTS(SELECT * FROM thumbnail WHERE media_id = :mediaId )")
     suspend fun isExist(mediaId: Long): Boolean
+
+
+    @Query("SELECT * FROM thumbnail")
+    suspend fun getThumbnailEntities(): List<ThumbnailEntity>
+
 }

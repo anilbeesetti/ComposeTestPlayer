@@ -3,13 +3,13 @@ package com.arcticoss.nextplayer.core.database.relations
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.arcticoss.nextplayer.core.database.entities.FolderEntity
-import com.arcticoss.nextplayer.core.database.entities.MediaItemEntity
+import com.arcticoss.nextplayer.core.database.entities.MediaEntity
 import com.arcticoss.nextplayer.core.model.Folder
 
 data class FolderAndMediaItemRelation(
     @Embedded val folderEntity: FolderEntity,
     @Relation(
-        entity = MediaItemEntity::class,
+        entity = MediaEntity::class,
         parentColumn = "id",
         entityColumn = "folder_id"
     )

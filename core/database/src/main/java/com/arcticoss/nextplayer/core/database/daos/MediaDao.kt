@@ -1,24 +1,24 @@
 package com.arcticoss.nextplayer.core.database.daos
 
 import androidx.room.*
-import com.arcticoss.nextplayer.core.database.entities.MediaItemEntity
+import com.arcticoss.nextplayer.core.database.entities.MediaEntity
 import com.arcticoss.nextplayer.core.database.relations.MediaItemAndThumbnailRelation
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface MediaItemDao {
+interface MediaDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(mediaItemEntity: MediaItemEntity): Long
+    suspend fun insert(mediaEntity: MediaEntity): Long
 
     @Delete
-    suspend fun delete(mediaItemEntity: MediaItemEntity)
+    suspend fun delete(mediaEntity: MediaEntity)
 
     @Update
-    suspend fun update(mediaItemEntity: MediaItemEntity)
+    suspend fun update(mediaEntity: MediaEntity)
 
     @Query("SELECT * FROM media WHERE id = :id")
-    suspend fun get(id: Long): MediaItemEntity
+    suspend fun get(id: Long): MediaEntity
 
     @Transaction
     @Query("SELECT * FROM media WHERE path = :path")
@@ -28,7 +28,7 @@ interface MediaItemDao {
     suspend fun isExist(path: String): Boolean
 
     @Query("SELECT * FROM media")
-    fun getMediaItemEntities(): List<MediaItemEntity>
+    fun getMediaEntities(): List<MediaEntity>
 
     @Transaction
     @Query("SELECT * FROM media")

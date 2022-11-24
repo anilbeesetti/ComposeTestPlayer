@@ -2,15 +2,15 @@ package com.arcticoss.nextplayer.core.database.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.arcticoss.nextplayer.core.database.entities.MediaItemEntity
+import com.arcticoss.nextplayer.core.database.entities.MediaEntity
 import com.arcticoss.nextplayer.core.database.entities.ThumbnailEntity
 import com.arcticoss.nextplayer.core.model.Media
 
 data class MediaItemAndThumbnailRelation(
-    @Embedded val mediaEntity: MediaItemEntity,
+    @Embedded val mediaEntity: MediaEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "media_item_id"
+        entityColumn = "media_id"
     )
     val thumbnail: ThumbnailEntity?
 )

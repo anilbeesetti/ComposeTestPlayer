@@ -1,26 +1,29 @@
 package com.arcticoss.nextplayer.core.database.entities
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 
 
 /**
- * Defines a video_track for [MediaItemEntity]
- * It has one to many relationship with [MediaItemEntity]
+ * Defines a video_track for [MediaEntity]
+ * It has one to many relationship with [MediaEntity]
  */
 @Entity(
+    primaryKeys = ["media_id", "stream_index"],
     tableName = "video_track",
     foreignKeys = [
         ForeignKey(
-            entity = MediaItemEntity::class,
+            entity = MediaEntity::class,
             parentColumns = arrayOf("id"),
-            childColumns = arrayOf("media_item_id"),
+            childColumns = arrayOf("media_id"),
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["media_item_id"])]
+    indices = [Index(value = ["media_id"])]
 )
 data class VideoTrackEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "stream_index") val streamIndex: Int,
     @ColumnInfo(name = "width") val width: Int,
     @ColumnInfo(name = "height") val height: Int,
@@ -29,5 +32,5 @@ data class VideoTrackEntity(
     @ColumnInfo(name = "video_codec") val codec: String,
     @ColumnInfo(name = "language") val language: String?,
     @ColumnInfo(name = "frame_rate") val frameRate: Double,
-    @ColumnInfo(name = "media_item_id") val mediaItemId: Long
+    @ColumnInfo(name = "media_id") val mediaId: Long
 )

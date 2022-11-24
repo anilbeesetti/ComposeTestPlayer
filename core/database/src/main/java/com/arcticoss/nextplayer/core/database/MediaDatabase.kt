@@ -7,7 +7,7 @@ import com.arcticoss.nextplayer.core.database.entities.*
 
 @Database(
     entities = [
-        MediaItemEntity::class,
+        MediaEntity::class,
         FolderEntity::class,
         ThumbnailEntity::class,
         VideoTrackEntity::class,
@@ -20,7 +20,7 @@ abstract class MediaDatabase: RoomDatabase() {
 
     abstract fun folderDao(): FolderDao
     abstract fun thumbnailDao(): ThumbnailDao
-    abstract fun mediaItemDao(): MediaItemDao
+    abstract fun mediaItemDao(): MediaDao
     abstract fun videoTrackDao(): VideoTrackDao
     abstract fun audioTrackDao(): AudioTrackDao
     abstract fun subtitleTrackDao(): SubtitleTrackDao
