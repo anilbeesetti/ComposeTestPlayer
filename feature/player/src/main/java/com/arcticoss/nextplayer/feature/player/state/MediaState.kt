@@ -1,9 +1,7 @@
-package com.arcticoss.nextplayer.feature.player.presentation
+package com.arcticoss.nextplayer.feature.player.state
 
 import android.os.Looper
 import androidx.compose.runtime.*
-import com.arcticoss.nextplayer.feature.player.state.PlayerState
-import com.arcticoss.nextplayer.feature.player.state.state
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
@@ -62,7 +60,7 @@ class MediaState(
     var controllerVisibility: ControllerVisibility by mutableStateOf(ControllerVisibility.Invisible)
 
     /**
-     *
+     * The current [visibility][ControllerBar] of the controller.
      */
     var controllerBar: ControllerBar by mutableStateOf(ControllerBar.None)
 

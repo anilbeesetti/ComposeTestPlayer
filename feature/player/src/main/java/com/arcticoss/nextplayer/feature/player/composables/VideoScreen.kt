@@ -20,10 +20,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.*
-import com.arcticoss.nextplayer.feature.player.presentation.MediaState
-import com.arcticoss.nextplayer.feature.player.presentation.aspectRatio
-import com.arcticoss.nextplayer.feature.player.presentation.isPortrait
-import com.arcticoss.nextplayer.feature.player.presentation.rememberMediaState
+import com.arcticoss.nextplayer.feature.player.state.MediaState
+import com.arcticoss.nextplayer.feature.player.state.aspectRatio
+import com.arcticoss.nextplayer.feature.player.state.isPortrait
+import com.arcticoss.nextplayer.feature.player.state.rememberBrightnessState
+import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
@@ -51,6 +52,7 @@ fun VideoScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val activity = context.findActivity()
+    val brightnessState = rememberBrightnessState(activity = activity)
 
 
     /**
@@ -167,7 +169,8 @@ fun VideoScreen(
         )
         MediaGestures(
             mediaState = mediaState,
-            controller = controller
+            controller = controller,
+            brightnessState = brightnessState,
         )
         mediaState.playerState?.let {
             Subtitles(
