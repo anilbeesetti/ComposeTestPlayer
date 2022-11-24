@@ -62,6 +62,11 @@ class MediaState(
     var controllerVisibility: ControllerVisibility by mutableStateOf(ControllerVisibility.Invisible)
 
     /**
+     *
+     */
+    var controllerBar: ControllerBar by mutableStateOf(ControllerBar.None)
+
+    /**
      * Typically, when controller is shown, it will be automatically hidden after a short time has
      * elapsed without user interaction. If [shouldShowControllerIndefinitely] is true, you should
      * consider disabling this behavior, and show the controller indefinitely.
@@ -158,3 +163,10 @@ val Format.isPortrait: Boolean
             this.height > this.width
         }
     }
+
+
+enum class ControllerBar {
+    Volume,
+    Brightness,
+    None
+}
