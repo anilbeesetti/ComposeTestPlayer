@@ -1,11 +1,24 @@
 package com.arcticoss.nextplayer.feature.media.screens.media
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -15,10 +28,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.media.R
 import com.arcticoss.nextplayer.feature.media.composables.CheckPermissionAndSetContent
 import com.arcticoss.nextplayer.feature.media.composables.FolderItem
@@ -30,18 +41,11 @@ fun MediaScreen(
     onNavigate: (NavigateTo) -> Unit,
     viewModel: MediaScreenViewModel = hiltViewModel(),
 ) {
-    val lifecycleOwner = LocalLifecycleOwner.current
     val interfacePreferences by viewModel.preferencesStateFlow.collectAsStateWithLifecycle()
     val folderUiState by viewModel.folderUiState.collectAsStateWithLifecycle()
     val mediaUiState by viewModel.mediaUiState.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-
-    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
-        if (event == Lifecycle.Event.ON_START) {
-            viewModel.syncMedia()
-        }
-    }
 
     CheckPermissionAndSetContent(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),

@@ -11,11 +11,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.arcticoss.nextplayer.core.domain.SyncMediaUseCase
 import com.arcticoss.nextplayer.navigation.MEDIA_ROUTE
 import com.arcticoss.nextplayer.navigation.mediaNavGraph
 import com.arcticoss.nextplayer.navigation.settingsNavGraph
 import com.arcticoss.nextplayer.ui.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 private const val TAG = "MainActivity"
@@ -23,6 +28,11 @@ private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var syncMediaUseCase: SyncMediaUseCase
+
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +57,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        scope.launch {
+            syncMediaUseCase()
+        }
+        super.onResume()
     }
 }
 

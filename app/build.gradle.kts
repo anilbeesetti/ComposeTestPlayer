@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":feature:media"))
     implementation(project(":feature:player"))
     implementation(project(":feature:settings"))
+    implementation(project(":core:domain"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
