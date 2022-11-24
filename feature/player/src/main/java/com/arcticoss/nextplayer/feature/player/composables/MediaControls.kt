@@ -30,9 +30,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.Dialog
-import com.arcticoss.nextplayer.feature.player.presentation.ControllerBar
-import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
-import com.arcticoss.nextplayer.feature.player.presentation.MediaState
+import com.arcticoss.nextplayer.feature.player.state.BrightnessState
+import com.arcticoss.nextplayer.feature.player.state.ControllerBar
+import com.arcticoss.nextplayer.feature.player.state.ControllerVisibility
+import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
@@ -49,6 +50,7 @@ fun MediaControls(
     currentMedia: Media,
     mediaState: MediaState,
     controller: ControllerState,
+    brightnessState: BrightnessState,
     showDialog: (Dialog) -> Unit
 ) {
 
@@ -171,6 +173,17 @@ fun MediaControls(
                     .fillMaxHeight(0.6f)
                     .padding(20.dp)
                     .align(Alignment.CenterStart)
+            )
+        }
+        if (mediaState.controllerBar == ControllerBar.Brightness) {
+            BrightnessAdjustmentBar(
+                brightness = brightnessState.currentBrightness,
+                maxBrightness = brightnessState.maxBrightness,
+                modifier = Modifier
+                    .heightIn(max = 500.dp)
+                    .fillMaxHeight(0.6f)
+                    .padding(20.dp)
+                    .align(Alignment.CenterEnd)
             )
         }
     }

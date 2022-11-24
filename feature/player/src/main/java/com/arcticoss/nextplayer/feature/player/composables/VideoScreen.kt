@@ -183,6 +183,7 @@ fun VideoScreen(
             mediaState = mediaState,
             currentMedia = currentMedia,
             controller = controller,
+            brightnessState = brightnessState,
             showDialog = viewModel::showDialog
         )
         if (playerViewState.showDialog == Dialog.AudioTrack) {
