@@ -6,14 +6,30 @@ import kotlinx.coroutines.flow.Flow
 
 interface IMediaRepository {
 
+    /**
+     * Get a single folder as flow
+     */
     fun getMediaFolderStream(id: Long): Flow<Folder>
 
+    /**
+     * Get list of folders as flow
+     */
     fun getFolderMediaStream(): Flow<List<Folder>>
 
-    suspend fun syncMedia()
+    /**
+     * Get media
+     * @param path: path of the media item
+     */
+    suspend fun getMedia(path: String): Media
 
+    /**
+     * Update media item
+     */
     suspend fun updateMedia(id: Long, lastPlayedPosition: Long)
 
-    suspend fun getMedia(path: String): Media
+    /**
+     * Sync media from storage
+     */
+    suspend fun syncMedia()
 
 }

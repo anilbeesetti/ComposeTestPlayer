@@ -20,6 +20,9 @@ interface FolderDao {
     @Query("SELECT EXISTS(SELECT * FROM folder WHERE path = :path )")
     suspend fun isExist(path: String): Boolean
 
+    @Query("SELECT * FROM folder")
+    suspend fun getFolderEntities(): List<FolderEntity>
+
     @Transaction
     @Query("SELECT * FROM folder")
     fun getFolderAndMediaItemStream(): Flow<List<FolderAndMediaItemRelation>>

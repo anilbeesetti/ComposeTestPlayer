@@ -1,7 +1,7 @@
 package com.arcticoss.nextplayer.core.data.utils
 
 import com.arcticoss.nextplayer.core.database.entities.AudioTrackEntity
-import com.arcticoss.nextplayer.core.database.entities.MediaItemEntity
+import com.arcticoss.nextplayer.core.database.entities.MediaEntity
 import com.arcticoss.nextplayer.core.database.entities.SubtitleTrackEntity
 import com.arcticoss.nextplayer.core.database.entities.VideoTrackEntity
 import com.arcticoss.nextplayer.mediainfo.models.AudioStream
@@ -10,8 +10,9 @@ import com.arcticoss.nextplayer.mediainfo.models.SubtitleStream
 import com.arcticoss.nextplayer.mediainfo.models.VideoStream
 
 
-fun MediaInfo.asMediaItemEntity(folderId: Long) =
-    MediaItemEntity(
+fun MediaInfo.asMediaItemEntity(id: Long = 0, folderId: Long) =
+    MediaEntity(
+        id = id,
         title = this.title,
         size = this.size,
         path = this.filePath,
@@ -32,7 +33,7 @@ fun VideoStream.asVideoTrackEntity(mediaItemId: Long) =
         codec = this.codecName,
         title = this.title,
         language = this.language,
-        mediaItemId = mediaItemId
+        mediaId = mediaItemId
     )
 
 fun AudioStream.asAudioTrackEntity(mediaItemId: Long) =
@@ -43,7 +44,7 @@ fun AudioStream.asAudioTrackEntity(mediaItemId: Long) =
         channels = this.channels,
         bitrate = this.bitRate,
         language = this.language,
-        mediaItemId = mediaItemId
+        mediaId = mediaItemId
     )
 
 fun SubtitleStream.asSubtitleTrackEntity(mediaItemId: Long) =
@@ -51,5 +52,5 @@ fun SubtitleStream.asSubtitleTrackEntity(mediaItemId: Long) =
         streamIndex = this.index,
         codec = this.codecName,
         language = this.language,
-        mediaItemId = mediaItemId
+        mediaId = mediaItemId
     )
