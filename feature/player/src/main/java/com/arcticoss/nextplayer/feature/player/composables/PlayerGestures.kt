@@ -44,7 +44,6 @@ package com.arcticoss.nextplayer.feature.player.composables
 //    var volumeKeyEvent by remember { mutableStateOf(false) }
 //    var whichBar by remember { mutableStateOf(Bar.None) }
 //
-//    val SCROLL_STEP = LocalDensity.current.run { 16.dp.toPx() }
 //    val SCROLL_STEP_SEEK = LocalDensity.current.run { 8.dp.toPx() }
 //    val SEEK_STEP = 1000
 //

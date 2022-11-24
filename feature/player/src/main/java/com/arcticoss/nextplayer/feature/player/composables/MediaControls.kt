@@ -1,9 +1,13 @@
 package com.arcticoss.nextplayer.feature.player.composables
 
+import android.content.Context
+import android.media.AudioManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -26,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.Dialog
+import com.arcticoss.nextplayer.feature.player.presentation.ControllerBar
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
@@ -49,16 +54,19 @@ fun MediaControls(
 
     val context = LocalContext.current
     val activity = context.findActivity()
-    var scrubing by remember { mutableStateOf(false) }
+    var scrubbing by remember { mutableStateOf(false) }
+
+    val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
 
     LaunchedEffect(key1 = mediaState.controllerVisibility) {
-        when (mediaState.controllerVisibility == ControllerVisibility.Visible) {
-            true -> activity?.showSystemBars()
-            false -> activity?.hideSystemBars()
+        when (mediaState.controllerVisibility) {
+            ControllerVisibility.Visible -> activity?.showSystemBars()
+            ControllerVisibility.Invisible,
+            ControllerVisibility.PartiallyVisible -> activity?.hideSystemBars()
         }
     }
 
-    val hideWhenTimeout = !mediaState.shouldShowControllerIndefinitely && !scrubing
+    val hideWhenTimeout = !mediaState.shouldShowControllerIndefinitely && !scrubbing
 
     Box(
         modifier = Modifier
@@ -130,7 +138,7 @@ fun MediaControls(
                     durationMs = duration,
                     positionMs = controller.positionMs,
                     onScrubStart = {
-                        scrubing = true
+                        scrubbing = true
                     },
                     onScrubMove = {
                         if (mediaState.playerState?.playbackState == Player.STATE_READY) {
@@ -141,7 +149,7 @@ fun MediaControls(
                     onScrubStop = {
                         (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
                         mediaState.player?.seekTo(it)
-                        scrubing = false
+                        scrubbing = false
                     },
                     modifier = Modifier
                         .weight(1f),
@@ -154,5 +162,22 @@ fun MediaControls(
                 )
             }
         }
+        if (mediaState.controllerBar == ControllerBar.Volume) {
+            AudioAdjustmentBar(
+                volumeLevel = mediaState.playerState?.deviceVolume ?: 0,
+                maxVolumeLevel = audioManager.maxStreamMusicVolume,
+                modifier = Modifier
+                    .heightIn(max = 500.dp)
+                    .fillMaxHeight(0.6f)
+                    .padding(20.dp)
+                    .align(Alignment.CenterStart)
+            )
+        }
     }
 }
+
+/**
+ * Get max music stream volume
+ */
+val AudioManager.maxStreamMusicVolume: Int
+    get() = getStreamMaxVolume(AudioManager.STREAM_MUSIC)
