@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemGesturesPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -15,11 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
-import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.SeekParameters
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
+import java.util.concurrent.TimeUnit
 
 
 private const val TAG = "MediaGestures"
@@ -27,12 +25,8 @@ private const val TAG = "MediaGestures"
 @Composable
 fun MediaGestures(
     mediaState: MediaState,
-    controller: ControllerState
+    controller: ControllerState,
 ) {
-
-    val SCROLL_STEP_SEEK = LocalDensity.current.run { 8.dp.toPx() }
-    val SEEK_STEP = 1000
-    val density = LocalDensity.current
 
     Box(
         modifier = Modifier
@@ -51,9 +45,9 @@ fun MediaGestures(
                 )
             }
             .pointerInput(Unit) {
-                var gestureScrollX = 0f
+                var totalOffset = Offset.Zero
                 var wasPlaying = false
-                var seekChange = 0L
+                var diffTime = 0f
 
                 var currentPosition = 0L
                 var duration = 0L
@@ -61,45 +55,36 @@ fun MediaGestures(
                     onDragStart = { offset ->
                         wasPlaying = controller.isPlaying
                         controller.pause()
-                        gestureScrollX = offset.x
+                        totalOffset = Offset.Zero
 
                         currentPosition = controller.positionMs
                         duration = controller.durationMs
+
                         // show seek bar
                     },
                     onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
-                        change.consume()
-                        val offset = gestureScrollX - change.position.x
-                        val position: Long
-                        if (abs(offset) > SCROLL_STEP_SEEK) {
-                            val distanceDiff =
-                                max(0.5f, min(abs(density.toDp(offset) / 4), 10.0f))
-                            if (offset > 0) {
-                                if (currentPosition + seekChange - SEEK_STEP * distanceDiff >= 0) {
-                                    controller.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
-                                    seekChange -= SEEK_STEP * distanceDiff.toLong()
-                                    position = currentPosition + seekChange
-                                    controller.seekTo(position)
-                                }
+                        val previousOffset = totalOffset
+                        totalOffset += Offset(x = dragAmount, y = 0f)
+
+                        val finalTime = currentPosition + (totalOffset.x * 100)
+
+                        if (finalTime >= 0 && finalTime < duration) {
+                            if (previousOffset.x < totalOffset.x) {
+                                controller.setSeekParameters(SeekParameters.NEXT_SYNC)
                             } else {
-                                if (duration == C.TIME_UNSET || currentPosition + seekChange + SEEK_STEP * distanceDiff < duration) {
-                                    controller.setSeekParameters(SeekParameters.NEXT_SYNC)
-                                    seekChange += SEEK_STEP * distanceDiff.toLong()
-                                    position = currentPosition + seekChange
-                                    controller.seekTo(position)
-                                }
+                                controller.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
                             }
-                            gestureScrollX = change.position.x
+                            diffTime = finalTime - currentPosition
+                            controller.seekTo(finalTime.toLong())
                         }
+                        // show time diff
+                        change.consume()
                     },
                     onDragEnd = {
                         if (wasPlaying) controller.play()
+                        // hide seek bar
                     }
                 )
             }
     )
-}
-
-fun Density.toDp(px: Float): Float {
-    return px / this.density
 }

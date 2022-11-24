@@ -51,8 +51,8 @@ fun MediaControls(
     val activity = context.findActivity()
     var scrubing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = mediaState.isControllerShowing) {
-        when (mediaState.isControllerShowing) {
+    LaunchedEffect(key1 = mediaState.controllerVisibility) {
+        when (mediaState.controllerVisibility == ControllerVisibility.Visible) {
             true -> activity?.showSystemBars()
             false -> activity?.hideSystemBars()
         }
@@ -77,7 +77,7 @@ fun MediaControls(
                 modifier = Modifier.align(Alignment.Center)
             )
         }
-        if (mediaState.isControllerShowing) {
+        if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
 
             LaunchedEffect(key1 = hideWhenTimeout) {
                 if (hideWhenTimeout) {
@@ -108,7 +108,7 @@ fun MediaControls(
                     .align(Alignment.Center)
             )
         }
-        if (mediaState.isControllerShowing || mediaState.controllerVisibility == ControllerVisibility.PartiallyVisible) {
+        if (mediaState.controllerVisibility.isShowing) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -156,9 +156,3 @@ fun MediaControls(
         }
     }
 }
-
-
-//if (mediaState.playerState?.playbackState == Player.STATE_READY) {
-//    (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-//    mediaState.player?.seekTo(it.toLong())
-//}
