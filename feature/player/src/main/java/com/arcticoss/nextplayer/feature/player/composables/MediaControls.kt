@@ -54,18 +54,19 @@ fun MediaControls(
 
     val context = LocalContext.current
     val activity = context.findActivity()
-    var scrubing by remember { mutableStateOf(false) }
+    var scrubbing by remember { mutableStateOf(false) }
 
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
 
     LaunchedEffect(key1 = mediaState.controllerVisibility) {
-        when (mediaState.controllerVisibility == ControllerVisibility.Visible) {
-            true -> activity?.showSystemBars()
-            false -> activity?.hideSystemBars()
+        when (mediaState.controllerVisibility) {
+            ControllerVisibility.Visible -> activity?.showSystemBars()
+            ControllerVisibility.Invisible,
+            ControllerVisibility.PartiallyVisible -> activity?.hideSystemBars()
         }
     }
 
-    val hideWhenTimeout = !mediaState.shouldShowControllerIndefinitely && !scrubing
+    val hideWhenTimeout = !mediaState.shouldShowControllerIndefinitely && !scrubbing
 
     Box(
         modifier = Modifier
@@ -137,7 +138,7 @@ fun MediaControls(
                     durationMs = duration,
                     positionMs = controller.positionMs,
                     onScrubStart = {
-                        scrubing = true
+                        scrubbing = true
                     },
                     onScrubMove = {
                         if (mediaState.playerState?.playbackState == Player.STATE_READY) {
@@ -148,7 +149,7 @@ fun MediaControls(
                     onScrubStop = {
                         (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
                         mediaState.player?.seekTo(it)
-                        scrubing = false
+                        scrubbing = false
                     },
                     modifier = Modifier
                         .weight(1f),
