@@ -21,8 +21,6 @@ import com.arcticoss.nextplayer.feature.player.presentation.ControllerBar
 import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
-import com.arcticoss.nextplayer.feature.player.utils.decreaseVolume
-import com.arcticoss.nextplayer.feature.player.utils.increaseVolume
 import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs
 
@@ -145,5 +143,22 @@ fun MediaGestures(
                     }
                 )
             }
+    )
+}
+
+
+fun AudioManager.increaseVolume() {
+    this.adjustStreamVolume(
+        AudioManager.STREAM_MUSIC,
+        AudioManager.ADJUST_RAISE,
+        AudioManager.FLAG_PLAY_SOUND
+    )
+}
+
+fun AudioManager.decreaseVolume() {
+    this.adjustStreamVolume(
+        AudioManager.STREAM_MUSIC,
+        AudioManager.ADJUST_LOWER,
+        AudioManager.FLAG_PLAY_SOUND
     )
 }
