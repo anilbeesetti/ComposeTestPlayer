@@ -24,8 +24,8 @@ import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.arcticoss.nextplayer.feature.player.state.aspectRatio
 import com.arcticoss.nextplayer.feature.player.state.isPortrait
 import com.arcticoss.nextplayer.feature.player.state.rememberBrightnessState
-import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
+import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
 import com.google.android.exoplayer2.*
@@ -119,7 +119,11 @@ fun VideoScreen(
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
         if (it == Lifecycle.Event.ON_PAUSE) {
             mediaState.playerState?.let { playerState ->
-                viewModel.saveState(playerState.mediaItemIndex, controller.positionMs, playerState.playWhenReady)
+                viewModel.saveState(
+                    playerState.mediaItemIndex,
+                    controller.positionMs,
+                    playerState.playWhenReady
+                )
             }
         }
     }
@@ -136,15 +140,19 @@ fun VideoScreen(
                         if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) {
                             viewModel.saveState(it.mediaItemIndex, 0, player?.playWhenReady == true)
                         } else {
-                            viewModel.saveState(it.mediaItemIndex, it.positionMs, player?.playWhenReady == true)
+                            viewModel.saveState(
+                                it.mediaItemIndex,
+                                it.positionMs,
+                                player?.playWhenReady == true
+                            )
                         }
                     }
                 }
             }
         }
-        
+
         player?.addListener(listener)
-        
+
         onDispose { player?.removeListener(listener) }
     }
 
@@ -158,9 +166,10 @@ fun VideoScreen(
         }
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.Black)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
     ) {
         MediaPlayer(
             state = mediaState,
@@ -189,7 +198,7 @@ fun VideoScreen(
         if (playerViewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->
                 TrackSelectorDialog(
-                    title = {Text(text = "Select audio track")},
+                    title = { Text(text = "Select audio track") },
                     onDismiss = { viewModel.showDialog(Dialog.None) },
                     tracks = state.audioTracks,
                     onTrackClick = {
@@ -204,7 +213,7 @@ fun VideoScreen(
         if (playerViewState.showDialog == Dialog.SubtitleTrack) {
             mediaState.playerState?.let { state ->
                 TrackSelectorDialog(
-                    title = {Text(text = "Select subtitle track")},
+                    title = { Text(text = "Select subtitle track") },
                     onDismiss = { viewModel.showDialog(Dialog.None) },
                     tracks = state.subtitleTracks,
                     onTrackClick = {
@@ -228,15 +237,13 @@ private fun Subtitles(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-            cueGroup.cues.forEach {
-                Text(
-                    text = it.text.toString(),
-                    textAlign = TextAlign.Center
-                )
-                it.textAlignment
-            }
-
+        cueGroup.cues.forEach {
+            Text(
+                text = it.text.toString(),
+                textAlign = TextAlign.Center
+            )
+            it.textAlignment
+        }
     }
 }
 
