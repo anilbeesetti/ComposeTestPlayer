@@ -17,10 +17,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.arcticoss.nextplayer.feature.player.presentation.ControllerBar
-import com.arcticoss.nextplayer.feature.player.presentation.ControllerVisibility
-import com.arcticoss.nextplayer.feature.player.presentation.MediaState
+import com.arcticoss.nextplayer.feature.player.state.BrightnessState
+import com.arcticoss.nextplayer.feature.player.state.ControllerBar
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
+import com.arcticoss.nextplayer.feature.player.state.ControllerVisibility
+import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.google.android.exoplayer2.SeekParameters
 import kotlin.math.abs
 
@@ -31,6 +32,7 @@ private const val TAG = "MediaGestures"
 fun MediaGestures(
     mediaState: MediaState,
     controller: ControllerState,
+    brightnessState: BrightnessState,
 ) {
 
     val context = LocalContext.current
@@ -127,12 +129,13 @@ fun MediaGestures(
                                 }
                                 ControllerBar.Brightness -> {
                                     if (offset > 0) {
-                                        // Increase brightness
+                                        brightnessState.increaseBrightness()
                                     } else {
-                                        // Decrease brightness
+                                        brightnessState.decreaseBrightness()
                                     }
                                 }
-                                ControllerBar.None -> {/* Do Nothing */}
+                                ControllerBar.None -> {/* Do Nothing */
+                                }
                             }
                             gestureScrollY = change.position.y
                             change.consume()
