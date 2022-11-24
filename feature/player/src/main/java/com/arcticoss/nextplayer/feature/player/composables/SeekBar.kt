@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * Custom seek bar for the player controls
+ */
 @Composable
 fun SeekBar(
     positionMs: Long,

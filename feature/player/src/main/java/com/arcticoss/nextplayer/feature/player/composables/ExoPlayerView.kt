@@ -16,19 +16,19 @@ fun ExoPlayerView(
 ) {
     var playerView: StyledPlayerView? = null
     DisposableEffect(
-    AndroidView(
-        factory = { StyledPlayerView(it) },
-        modifier = modifier
-    ) {
-        playerView = it
-        val previousPlayer = it.tag as? Player
-        if (previousPlayer == player) return@AndroidView
-        it.player = player
-        it.hideController()
-        it.useController = false
-        it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
-        it.subtitleView?.visibility = View.GONE
-    }) {
+        AndroidView(
+            factory = { StyledPlayerView(it) },
+            modifier = modifier
+        ) {
+            playerView = it
+            val previousPlayer = it.tag as? Player
+            if (previousPlayer == player) return@AndroidView
+            it.player = player
+            it.hideController()
+            it.useController = false
+            it.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+            it.subtitleView?.visibility = View.GONE
+        }) {
 
         onDispose {
             playerView?.player = null

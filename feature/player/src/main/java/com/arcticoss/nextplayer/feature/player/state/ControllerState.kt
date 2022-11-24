@@ -3,7 +3,9 @@ package com.arcticoss.nextplayer.feature.player.state
 import androidx.compose.runtime.*
 import com.arcticoss.nextplayer.feature.player.presentation.MediaState
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SeekParameters
 import kotlinx.coroutines.delay
 
 /**
@@ -49,6 +51,13 @@ class ControllerState internal constructor(
     }
 
     /**
+     * Is player currently playing
+     */
+    val isPlaying: Boolean by derivedStateOf {
+        playerState?.isPlaying ?: false
+    }
+
+    /**
      * Play or pause the player.
      */
     fun playOrPause() {
@@ -68,6 +77,36 @@ class ControllerState internal constructor(
             }
         }
     }
+
+    /**
+     * Sets seek parameters to player
+     */
+    fun setSeekParameters(seekParameters: SeekParameters) {
+        (player as? ExoPlayer)?.setSeekParameters(seekParameters)
+    }
+
+    /**
+     * Seek to specified position
+     */
+    fun seekTo(positionMs: Long) {
+        player?.seekTo(positionMs)
+    }
+
+
+    /**
+     * Play the player
+     */
+    fun play() {
+        player?.play()
+    }
+
+    /**
+     * Pause the player
+     */
+    fun pause() {
+        player?.pause()
+    }
+
 
     /**
      * The duration, in milliseconds. Return [C.TIME_UNSET] if it's unset or unknown.
