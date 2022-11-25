@@ -10,7 +10,7 @@ data class PlayerPreferences(
     val resume: Resume = Resume.Always,
     val playbackSpeed: Int = 100,
     val fastSeeking: Boolean = true,
-    val aspectRatio: AspectRatio = AspectRatio.FitScreen
+    val resizeMode: ResizeMode = ResizeMode.FitScreen
 )
 
 
@@ -20,7 +20,7 @@ enum class Resume(val title: String) {
     Ask(title = "Ask at startup")
 }
 
-enum class AspectRatio(val title: String) {
+enum class ResizeMode(val title: String) {
     FitScreen(title = "Fit to Screen"),
     FixedWidth(title = "Fixed width"),
     FixedHeight(title = "Fixed height"),

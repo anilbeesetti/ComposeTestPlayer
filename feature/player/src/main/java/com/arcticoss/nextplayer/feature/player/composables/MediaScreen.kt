@@ -1,40 +1,57 @@
 package com.arcticoss.nextplayer.feature.player.composables
 
+import Subtitle
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.ResizeMode
 import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
-import com.arcticoss.nextplayer.feature.player.*
+import com.arcticoss.nextplayer.feature.player.Dialog
+import com.arcticoss.nextplayer.feature.player.PersistableState
+import com.arcticoss.nextplayer.feature.player.PlayerViewModel
+import com.arcticoss.nextplayer.feature.player.PlayerViewState
+import com.arcticoss.nextplayer.feature.player.UIEvent
+import com.arcticoss.nextplayer.feature.player.rememberManagedExoPlayer
+import com.arcticoss.nextplayer.feature.player.state.BrightnessState
+import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.arcticoss.nextplayer.feature.player.state.rememberBrightnessState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.Player.*
-import com.google.android.exoplayer2.text.CueGroup
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.video.VideoSize
 import java.io.File
-import java.util.*
+import java.util.Objects
 
 
 private const val TAG = "VideoScreen"
@@ -42,13 +59,12 @@ private const val TAG = "VideoScreen"
 @SuppressLint("SourceLockedOrientationActivity")
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun VideoScreen(
+fun MediaScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
 
     val context = LocalContext.current
     val activity = context.findActivity()
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     val player by rememberManagedExoPlayer()
     val mediaState = rememberMediaState(player = player)
@@ -58,229 +74,23 @@ fun VideoScreen(
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
 
+    MediaScreen(
+        mediaState = mediaState,
+        controller = controller,
+        brightnessController = brightnessController,
+        viewState = playerViewState,
+        preferences = preferences,
+        player = player,
+        onEvent = viewModel::onEvent
+    )
 
-    /**
-     * Handling rotation on video format change
-     */
-    LaunchedEffect(key1 = mediaState.playerState?.videoFormat) {
-        mediaState.playerState?.videoFormat?.let {
-            if (it.isPortrait) {
-                activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-            } else {
-                activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            }
-        }
-    }
-
-    /**
-     * Handling screen onState while media is playing
-     */
-    LaunchedEffect(key1 = mediaState.playerState?.isPlaying) {
-        activity?.keepScreenOn(mediaState.playerState?.isPlaying == true)
-    }
-
-    /**
-     * Restoring media state on mediaItemIndexChange
-     */
-    LaunchedEffect(mediaState.playerState?.mediaItemIndex) {
-        mediaState.playerState?.let {
-            if (playerViewState.mediaList.isNotEmpty()) {
-                val position = playerViewState.mediaList[it.mediaItemIndex].lastPlayedPosition
-                player?.seekTo(position)
-            }
-        }
-    }
-
-    /**
-     * Restoring brightness level
-     */
-    LaunchedEffect(preferences.saveBrightnessLevel, preferences.brightnessLevel) {
-        Log.d(TAG, "VideoScreen: save")
-        if (preferences.saveBrightnessLevel) {
-            brightnessController.setBrightness(preferences.brightnessLevel)
-        }
-    }
-
-    /**
-     * Sets [MediaItem] list to player
-     */
-    LaunchedEffect(player, playerViewState.mediaList.size) {
-        player?.run {
-            val mediaItems = playerViewState.mediaList.map {
-                MediaItem.Builder()
-                    .setUri(File(it.path).toUri())
-                    .setMediaId(it.id.toString())
-                    .build()
-            }
-            if (mediaItems.isNotEmpty()) {
-                this.setMediaItems(mediaItems)
-                playerViewState.currentMediaItemId?.let { id ->
-                    val index = playerViewState.mediaList.indexOfFirst { it.id == id }
-                    if (index >= 0) {
-                        val media = playerViewState.mediaList[index]
-                        seekTo(index, media.lastPlayedPosition)
-                    }
-                }
-                playWhenReady = playerViewState.playWhenReady
-                this.prepare()
-            }
-        }
-    }
-
-
-    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
-
-        /**
-         * Saving media state on pause
-         */
-        if (it == Lifecycle.Event.ON_PAUSE) {
-            mediaState.playerState?.let { playerState ->
-                viewModel.saveState(
-                    index = playerState.mediaItemIndex,
-                    position = controller.positionMs,
-                    playWhenReady = playerState.playWhenReady,
-                    brightness = brightnessController.currentBrightness
-                )
-            }
-        }
-
-        /**
-         * Removing controller lock on resume
-         */
-        if (it == Lifecycle.Event.ON_RESUME) {
-            mediaState.isControllerLocked = false
-        }
-    }
-
-    /**
-     * Saving media state on mediaItemTransition
-     */
-    DisposableEffect(player) {
-
-        val listener = object : Player.Listener {
-            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                mediaState.playerState?.oldPosition?.let {
-                    if (mediaState.playerState?.firstFrameRendered == true) {
-                        if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-                            viewModel.saveState(
-                                index = it.mediaItemIndex,
-                                position = 0,
-                                playWhenReady = player?.playWhenReady == true
-                            )
-                        } else {
-                            viewModel.saveState(
-                                index = it.mediaItemIndex,
-                                position = it.positionMs,
-                                playWhenReady = player?.playWhenReady == true
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        player?.addListener(listener)
-        onDispose { player?.removeListener(listener) }
-    }
-
-    val currentMedia by remember {
-        derivedStateOf {
-            if (playerViewState.mediaList.isNotEmpty()) {
-                mediaState.playerState?.let {
-                    playerViewState.mediaList[it.mediaItemIndex]
-                } ?: Media()
-            } else Media()
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        MediaPlayer(
-            state = mediaState,
-            modifier = Modifier
-                .align(Alignment.Center),
-            resizeMode = preferences.aspectRatio.toResizeMode()
-        )
-        MediaGestures(
-            mediaState = mediaState,
-            controller = controller,
-            brightnessState = brightnessController,
-        )
-        mediaState.playerState?.let {
-            Subtitles(
-                cueGroup = it.cueGroup,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
-        }
-        MediaControls(
-            mediaState = mediaState,
-            currentMedia = currentMedia,
-            controller = controller,
-            preferences = preferences,
-            brightnessState = brightnessController,
-            showDialog = viewModel::showDialog,
-            onSwitchAspectClick = viewModel::switchAspectRatio,
-            onLockClick = mediaState::toggleControllerLock
-        )
-        if (playerViewState.showDialog == Dialog.AudioTrack) {
-            mediaState.playerState?.let { state ->
-                TrackSelectorDialog(
-                    title = { Text(text = "Select audio track") },
-                    onDismiss = { viewModel.showDialog(Dialog.None) },
-                    tracks = state.audioTracks,
-                    onTrackClick = {
-                        if (!it.isSelected && it.isSupported) {
-                            mediaState.player?.switchTrack(it)
-                        }
-                    }
-                )
-            }
-        }
-
-        if (playerViewState.showDialog == Dialog.SubtitleTrack) {
-            mediaState.playerState?.let { state ->
-                TrackSelectorDialog(
-                    title = { Text(text = "Select subtitle track") },
-                    onDismiss = { viewModel.showDialog(Dialog.None) },
-                    tracks = state.subtitleTracks,
-                    onTrackClick = {
-                        if (!it.isSelected && it.isSupported) {
-                            mediaState.player?.switchTrack(it)
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun Subtitles(
-    cueGroup: CueGroup,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        cueGroup.cues.forEach {
-            Text(
-                text = it.text.toString(),
-                textAlign = TextAlign.Center
-            )
-            it.textAlignment
-        }
-    }
 }
 
 @Composable
 private fun MediaPlayer(
     state: MediaState,
     modifier: Modifier = Modifier,
-    resizeMode: ResizeMode = ResizeMode.Fit
+    resizeMode: ResizeMode = ResizeMode.FitScreen
 ) {
     Box(
         modifier = modifier
@@ -325,17 +135,7 @@ private fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String): Tra
     return null
 }
 
-private fun AspectRatio.toResizeMode(): ResizeMode {
-    return when (this) {
-        AspectRatio.FitScreen -> ResizeMode.Fit
-        AspectRatio.FixedWidth -> ResizeMode.FixedWidth
-        AspectRatio.FixedHeight -> ResizeMode.FixedHeight
-        AspectRatio.Fill -> ResizeMode.Fill
-        AspectRatio.Zoom -> ResizeMode.Zoom
-    }
-}
-
-private val Format.isPortrait: Boolean
+val Format.isPortrait: Boolean
     get() {
         val isRotated = this.rotationDegrees == 90 || this.rotationDegrees == 270
         return if (isRotated) {
@@ -347,3 +147,220 @@ private val Format.isPortrait: Boolean
 
 val VideoSize.aspectRatio
     get() = if (height == 0) 0f else width * pixelWidthHeightRatio / height
+
+
+@SuppressLint("SourceLockedOrientationActivity")
+@Composable
+internal fun MediaScreen(
+    mediaState: MediaState,
+    controller: ControllerState,
+    brightnessController: BrightnessState,
+    viewState: PlayerViewState,
+    preferences: PlayerPreferences,
+    player: Player?,
+    onEvent: (UIEvent) -> Unit
+) {
+
+    val context = LocalContext.current
+    val activity = context.findActivity()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+
+    /**
+     * Handling rotation on video format change
+     */
+    LaunchedEffect(key1 = mediaState.playerState?.videoFormat) {
+        mediaState.playerState?.videoFormat?.let {
+            if (it.isPortrait) {
+                activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            } else {
+                activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            }
+        }
+    }
+
+    /**
+     * Handling screen onState while media is playing
+     */
+    LaunchedEffect(key1 = mediaState.playerState?.isPlaying) {
+        activity?.keepScreenOn(mediaState.playerState?.isPlaying == true)
+    }
+
+    /**
+     * Restoring media state on mediaItemIndexChange
+     */
+    LaunchedEffect(mediaState.playerState?.mediaItemIndex) {
+        mediaState.playerState?.let {
+            if (viewState.mediaList.isNotEmpty()) {
+                val position = viewState.mediaList[it.mediaItemIndex].lastPlayedPosition
+                player?.seekTo(position)
+            }
+        }
+    }
+
+    /**
+     * Restoring brightness level
+     */
+    LaunchedEffect(preferences.saveBrightnessLevel, preferences.brightnessLevel) {
+        Log.d(TAG, "VideoScreen: save")
+        if (preferences.saveBrightnessLevel) {
+            brightnessController.setBrightness(preferences.brightnessLevel)
+        }
+    }
+
+    /**
+     * Sets [MediaItem] list to player
+     */
+    LaunchedEffect(player, viewState.mediaList.size) {
+        player?.run {
+            val mediaItems = viewState.mediaList.map {
+                MediaItem.Builder()
+                    .setUri(File(it.path).toUri())
+                    .setMediaId(it.id.toString())
+                    .build()
+            }
+            if (mediaItems.isNotEmpty()) {
+                this.setMediaItems(mediaItems)
+                viewState.currentMediaItemId?.let { id ->
+                    val index = viewState.mediaList.indexOfFirst { it.id == id }
+                    if (index >= 0) {
+                        val media = viewState.mediaList[index]
+                        seekTo(index, media.lastPlayedPosition)
+                    }
+                }
+                playWhenReady = viewState.playWhenReady
+                this.prepare()
+            }
+        }
+    }
+
+
+    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
+
+        /**
+         * Saving media state on pause
+         */
+        if (it == Lifecycle.Event.ON_PAUSE) {
+            mediaState.playerState?.let { playerState ->
+                val state = PersistableState(
+                    index = playerState.mediaItemIndex,
+                    position = controller.positionMs,
+                    playWhenReady = playerState.playWhenReady,
+                    brightness = brightnessController.currentBrightness
+                )
+                onEvent(UIEvent.SaveState(state))
+            }
+        }
+
+        /**
+         * Removing controller lock on resume
+         */
+        if (it == Lifecycle.Event.ON_RESUME) {
+            mediaState.isControllerLocked = false
+        }
+    }
+
+
+    DisposableEffect(player) {
+        val listener = object : Player.Listener {
+
+            /**
+             * Saving media state on mediaItemTransition
+             */
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                mediaState.playerState?.oldPosition?.let {
+                    if (mediaState.playerState?.firstFrameRendered == true) {
+                        val position =
+                            if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) 0 else it.positionMs
+                        val state = PersistableState(
+                            index = it.mediaItemIndex,
+                            position = position,
+                            playWhenReady = player?.playWhenReady == true
+                        )
+                        onEvent(UIEvent.SaveState(state))
+                    }
+                }
+            }
+        }
+
+        player?.addListener(listener)
+
+        // Dispose
+        onDispose { player?.removeListener(listener) }
+    }
+
+    val currentMedia by remember {
+        derivedStateOf {
+            if (viewState.mediaList.isNotEmpty()) {
+                mediaState.playerState?.let { viewState.mediaList[it.mediaItemIndex] } ?: Media()
+            } else Media()
+        }
+    }
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        MediaPlayer(
+            state = mediaState,
+            modifier = Modifier
+                .align(Alignment.Center),
+            resizeMode = preferences.resizeMode
+        )
+        MediaGestures(
+            mediaState = mediaState,
+            controller = controller,
+            brightnessState = brightnessController,
+        )
+        mediaState.playerState?.let {
+            Subtitle(
+                cueGroup = it.cueGroup,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
+        MediaControls(
+            mediaState = mediaState,
+            currentMedia = currentMedia,
+            controller = controller,
+            preferences = preferences,
+            brightnessState = brightnessController,
+            showDialog = { onEvent(UIEvent.ShowDialog(it)) },
+            onSwitchAspectClick = { onEvent(UIEvent.SwitchResizeMode()) },
+            onLockClick = mediaState::toggleControllerLock
+        )
+
+        // Show audio track selector dialog
+        if (viewState.showDialog == Dialog.AudioTrack) {
+            mediaState.playerState?.let { state ->
+                TrackSelectorDialog(
+                    title = { Text(text = "Select audio track") },
+                    onDismiss = { onEvent(UIEvent.ShowDialog(Dialog.None)) },
+                    tracks = state.audioTracks,
+                    onTrackClick = {
+                        if (!it.isSelected && it.isSupported) {
+                            mediaState.player?.switchTrack(it)
+                        }
+                    }
+                )
+            }
+        }
+
+        // Show subtitle track selector dialog
+        if (viewState.showDialog == Dialog.SubtitleTrack) {
+            mediaState.playerState?.let { state ->
+                TrackSelectorDialog(
+                    title = { Text(text = "Select subtitle track") },
+                    onDismiss = { onEvent(UIEvent.ShowDialog(Dialog.None)) },
+                    tracks = state.subtitleTracks,
+                    onTrackClick = {
+                        if (!it.isSelected && it.isSupported) {
+                            mediaState.player?.switchTrack(it)
+                        }
+                    }
+                )
+            }
+        }
+    }
+}

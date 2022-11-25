@@ -20,7 +20,7 @@ fun VideoSurface(
     val context = LocalContext.current
 
     fun Player.clearVideoView(view: View) {
-        when(surfaceType) {
+        when (surfaceType) {
             SurfaceType.SurfaceView -> clearVideoSurfaceView(view as SurfaceView)
             SurfaceType.TextureView -> clearVideoTextureView(view as TextureView)
         }

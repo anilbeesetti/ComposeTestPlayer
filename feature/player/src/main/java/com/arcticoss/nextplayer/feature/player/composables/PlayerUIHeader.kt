@@ -29,7 +29,7 @@ fun PlayerUIHeader(
         IconButton(onClick = onBackClick) {
             Icon(
                 imageVector = Icons.Rounded.ArrowBack,
-                contentDescription = "",
+                contentDescription = "Back button",
             )
         }
         Text(
