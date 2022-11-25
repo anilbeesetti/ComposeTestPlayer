@@ -36,15 +36,14 @@ import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.player.Dialog
 import com.arcticoss.nextplayer.feature.player.state.BrightnessState
 import com.arcticoss.nextplayer.feature.player.state.ControllerBar
+import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.state.MediaState
-import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.hideSystemBars
 import com.arcticoss.nextplayer.feature.player.utils.showSystemBars
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SeekParameters
 import kotlinx.coroutines.delay
@@ -129,53 +128,23 @@ fun MediaControls(
                     .padding(bottom = 10.dp)
                     .align(Alignment.BottomCenter),
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = TimeUtils.formatTime(context, controller.positionMs),
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(horizontal = 5.dp)
-                    )
-
-                    val duration =
-                        if (controller.durationMs == C.TIME_UNSET) currentMedia.duration / 1000 else controller.durationMs
-
-                    SeekBar(
-                        durationMs = duration,
-                        positionMs = controller.positionMs,
-                        onScrubStart = {
-                            scrubbing = true
-                        },
-                        onScrubMove = {
-                            if (mediaState.playerState?.playbackState == Player.STATE_READY) {
-                                (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                                mediaState.player?.seekTo(it)
-                            }
-                        },
-                        onScrubStop = {
-                            (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                            mediaState.player?.seekTo(it)
-                            scrubbing = false
-                        },
-                        modifier = Modifier
-                            .weight(1f),
-                    )
-
-                    Text(
-                        text = TimeUtils.formatTime(context, duration),
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(horizontal = 5.dp)
-                    )
-                }
-                Row {
-                    IconButton(onClick = switchAspectRatio) {
-                        Icon(
-                            imageVector = Icons.Rounded.FitScreen,
-                            contentDescription = ""
-                        )
+                val duration =
+                    if (controller.durationMs == C.TIME_UNSET) currentMedia.duration / 1000 else controller.durationMs
+                TimeAndSeekbar(
+                    duration = duration,
+                    mediaState = mediaState,
+                    controller = controller,
+                    onScrubbingStarted = { scrubbing = true },
+                    onScrubbingStopped = { scrubbing = false }
+                )
+                if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
+                    Row {
+                        IconButton(onClick = switchAspectRatio) {
+                            Icon(
+                                imageVector = Icons.Rounded.FitScreen,
+                                contentDescription = ""
+                            )
+                        }
                     }
                 }
             }
@@ -204,6 +173,59 @@ fun MediaControls(
         }
     }
 }
+
+
+@Composable
+private fun TimeAndSeekbar(
+    duration: Long,
+    mediaState: MediaState,
+    controller: ControllerState,
+    modifier: Modifier = Modifier,
+    onScrubbingStarted: (() -> Unit)? = null,
+    onScrubbingStopped: (() -> Unit)? = null
+) {
+
+    val context = LocalContext.current
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = TimeUtils.formatTime(context, controller.positionMs),
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 5.dp)
+        )
+        SeekBar(
+            durationMs = duration,
+            positionMs = controller.positionMs,
+            onScrubStart = {
+                onScrubbingStarted?.invoke()
+            },
+            onScrubMove = {
+                if (mediaState.playerState?.playbackState == Player.STATE_READY) {
+                    controller.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                    controller.seekTo(it)
+                }
+            },
+            onScrubStop = {
+                controller.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                controller.seekTo(it)
+                onScrubbingStopped?.invoke()
+            },
+            modifier = Modifier
+                .weight(1f),
+        )
+
+        Text(
+            text = TimeUtils.formatTime(context, duration),
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 5.dp)
+        )
+    }
+}
+
 
 /**
  * Get max music stream volume
