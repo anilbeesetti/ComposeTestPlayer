@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.arcticoss.nextplayer.feature.player.composables.VideoScreen
+import com.arcticoss.nextplayer.feature.player.composables.MediaScreen
 import com.arcticoss.nextplayer.feature.player.theme.NextPlayerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -45,7 +45,7 @@ class PlayerActivity : ComponentActivity() {
                         intentData?.let { viewModel.invokeMedia(it) }
                     }
                     CompositionLocalProvider(LocalContentColor provides Color.White) {
-                        VideoScreen()
+                        MediaScreen()
                     }
                 }
             }

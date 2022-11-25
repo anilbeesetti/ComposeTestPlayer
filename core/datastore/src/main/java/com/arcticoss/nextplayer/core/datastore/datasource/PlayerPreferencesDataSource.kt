@@ -1,7 +1,7 @@
 package com.arcticoss.nextplayer.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
-import com.arcticoss.nextplayer.core.model.AspectRatio
+import com.arcticoss.nextplayer.core.model.ResizeMode
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.model.next
 import javax.inject.Inject
@@ -42,13 +42,13 @@ class PlayerPreferencesDataSource @Inject constructor(
 
     suspend fun switchAspectRatio() {
         playerPreferences.updateData {
-            it.copy(aspectRatio = it.aspectRatio.next())
+            it.copy(resizeMode = it.resizeMode.next())
         }
     }
 
-    suspend fun changeAspectRatio(aspectRatio: AspectRatio) {
+    suspend fun changeAspectRatio(resizeMode: ResizeMode) {
         playerPreferences.updateData {
-            it.copy(aspectRatio = aspectRatio)
+            it.copy(resizeMode = resizeMode)
         }
     }
 }

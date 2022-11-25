@@ -9,6 +9,7 @@ import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataS
 import com.arcticoss.nextplayer.core.domain.GetMediaFromUriUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
+import com.arcticoss.nextplayer.core.model.ResizeMode
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,18 +59,6 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun saveState(index: Int, position: Long, playWhenReady: Boolean, brightness: Int? = null) {
-        viewModelScope.launch {
-            val media = playerViewState.value.mediaList[index]
-            _playerViewState.update { it.copy(currentMediaItemId = media.id, playWhenReady = playWhenReady) }
-            mediaRepository.updateMedia(media.id, position)
-            brightness?.let {
-                preferencesDataSource.updateBrightnessLevel(brightness)
-            }
-        }
-    }
-
-
     fun invokeMedia(uri: Uri) {
         viewModelScope.launch {
             val mediaItem = getMediaFromUri(uri)
@@ -79,15 +68,40 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun showDialog(dialog: Dialog) {
+
+    fun onEvent(event: UIEvent) {
+        when(event) {
+            is UIEvent.SaveState -> saveState(event.state)
+            is UIEvent.ShowDialog -> showDialog(event.dialog)
+            is UIEvent.SwitchResizeMode -> switchAspectRatio(event.resizeMode)
+        }
+    }
+
+    private fun saveState(state: PersistableState) {
+        viewModelScope.launch {
+            val media = playerViewState.value.mediaList[state.index]
+            _playerViewState.update { it.copy(currentMediaItemId = media.id, playWhenReady = state.playWhenReady) }
+            mediaRepository.updateMedia(media.id, state.position)
+            state.brightness?.let {
+                preferencesDataSource.updateBrightnessLevel(it)
+            }
+        }
+    }
+
+    private fun showDialog(dialog: Dialog) {
         _playerViewState.update { it.copy(showDialog = dialog) }
     }
 
-    fun switchAspectRatio() {
-        viewModelScope.launch {
-            preferencesDataSource.switchAspectRatio()
+    private fun switchAspectRatio(resizeMode: ResizeMode?) {
+        if (resizeMode == null) {
+            viewModelScope.launch {
+                preferencesDataSource.switchAspectRatio()
+            }
+        } else {
+            // TODO
         }
     }
+
 }
 
 data class PlayerViewState(
@@ -95,6 +109,34 @@ data class PlayerViewState(
     val currentMediaItemId: Long? = null,
     val mediaList: List<Media> = emptyList(),
     val showDialog: Dialog = Dialog.None
+)
+
+
+sealed class UIEvent {
+
+    /**
+     * Show dialog
+     */
+    data class ShowDialog(val dialog: Dialog): UIEvent()
+
+    /**
+     * Save State
+     */
+    data class SaveState(val state: PersistableState): UIEvent()
+
+    /**
+     * @param resizeMode if it is null toggle between [ResizeMode]
+     * if specified switches to the given [ResizeMode]
+     */
+    data class SwitchResizeMode(val resizeMode: ResizeMode? = null): UIEvent()
+}
+
+
+data class PersistableState(
+    val index: Int,
+    val position: Long,
+    val playWhenReady: Boolean,
+    val brightness: Int? = null
 )
 
 enum class Dialog {

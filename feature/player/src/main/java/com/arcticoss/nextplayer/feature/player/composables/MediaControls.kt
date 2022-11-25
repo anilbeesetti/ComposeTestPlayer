@@ -25,8 +25,6 @@ import androidx.compose.material.icons.rounded.ZoomOutMap
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -38,16 +36,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.ResizeMode
 import com.arcticoss.nextplayer.feature.player.Dialog
 import com.arcticoss.nextplayer.feature.player.state.BrightnessState
 import com.arcticoss.nextplayer.feature.player.state.ControllerBar
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.state.MediaState
-import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.hideSystemBars
 import com.arcticoss.nextplayer.feature.player.utils.showSystemBars
@@ -178,7 +175,7 @@ fun MediaControls(
                 )
                 if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
                     Controls(
-                        aspectRatio = preferences.aspectRatio,
+                        resizeMode = preferences.resizeMode,
                         modifier = Modifier.padding(horizontal = 5.dp),
                         onAspectRatioClick = {
                             interactingWithControllerTrigger++
@@ -218,61 +215,19 @@ fun MediaControls(
 
 }
 
-
-@Composable
-private fun TimeAndSeekbar(
-    positionMs: Long,
-    durationMs: Long,
-    modifier: Modifier = Modifier,
-    onScrubStart: (() -> Unit)?,
-    onScrubMove: (positionMs: Long) -> Unit,
-    onScrubStop: ((positionMs: Long) -> Unit)?,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TimeText(time = positionMs)
-        SeekBar(
-            durationMs = durationMs,
-            positionMs = positionMs,
-            onScrubStart = onScrubStart,
-            onScrubMove = onScrubMove,
-            onScrubStop = onScrubStop,
-            modifier = Modifier
-                .weight(1f),
-        )
-        TimeText(time = durationMs)
-    }
-}
-
-@Composable
-private fun TimeText(
-    time: Long,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    Text(
-        text = TimeUtils.formatTime(context, time),
-        style = MaterialTheme.typography.labelSmall,
-        modifier = modifier.padding(horizontal = 5.dp)
-    )
-}
-
 @Composable
 fun Controls(
-    aspectRatio: AspectRatio,
+    resizeMode: ResizeMode,
     modifier: Modifier = Modifier,
     onAspectRatioClick: () -> Unit,
     onLockClick: () -> Unit
 ) {
-    val aspectRatioIcon = when (aspectRatio) {
-        AspectRatio.FitScreen -> Icons.Rounded.FitScreen
-        AspectRatio.FixedWidth -> Icons.Rounded.Crop
-        AspectRatio.FixedHeight -> Icons.Rounded.Crop
-        AspectRatio.Fill -> Icons.Rounded.AspectRatio
-        AspectRatio.Zoom -> Icons.Rounded.ZoomOutMap
+    val resizeModeIcon = when (resizeMode) {
+        ResizeMode.FitScreen -> Icons.Rounded.FitScreen
+        ResizeMode.FixedWidth -> Icons.Rounded.Crop
+        ResizeMode.FixedHeight -> Icons.Rounded.Crop
+        ResizeMode.Fill -> Icons.Rounded.AspectRatio
+        ResizeMode.Zoom -> Icons.Rounded.ZoomOutMap
     }
 
     Row(
@@ -287,7 +242,7 @@ fun Controls(
         }
         Row {
             IconButton(onClick = onAspectRatioClick) {
-                Icon(imageVector = aspectRatioIcon, contentDescription = aspectRatio.title)
+                Icon(imageVector = resizeModeIcon, contentDescription = resizeMode.title)
             }
         }
     }
