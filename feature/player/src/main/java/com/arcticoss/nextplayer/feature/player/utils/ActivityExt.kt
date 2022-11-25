@@ -28,12 +28,8 @@ fun Activity.showSystemBars() {
 
 fun Activity.keepScreenOn(value: Boolean) {
     when (value) {
-        true -> {
-            this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
-        false -> {
-            this.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
+        true -> this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        false -> this.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
     swipeToShowStatusBars()
 }

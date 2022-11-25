@@ -22,8 +22,10 @@ enum class Resume(val title: String) {
 
 enum class AspectRatio(val title: String) {
     FitScreen(title = "Fit to Screen"),
-    Stretch(title = "Stretch"),
-    Crop(title = "Crop")
+    FixedWidth(title = "Fixed width"),
+    FixedHeight(title = "Fixed height"),
+    Fill(title = "Fill"),
+    Zoom(title = "Zoom")
 }
 
 inline fun <reified T: Enum<T>> T.next(): T {

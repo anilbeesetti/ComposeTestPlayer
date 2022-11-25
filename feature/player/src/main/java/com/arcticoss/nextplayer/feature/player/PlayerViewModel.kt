@@ -79,6 +79,12 @@ class PlayerViewModel @Inject constructor(
     fun showDialog(dialog: Dialog) {
         _playerViewState.update { it.copy(showDialog = dialog) }
     }
+
+    fun switchAspectRation() {
+        viewModelScope.launch {
+            preferencesDataSource.switchAspectRatio()
+        }
+    }
 }
 
 data class PlayerViewState(

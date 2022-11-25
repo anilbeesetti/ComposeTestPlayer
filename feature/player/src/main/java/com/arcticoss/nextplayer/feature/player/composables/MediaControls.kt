@@ -3,6 +3,7 @@ package com.arcticoss.nextplayer.feature.player.composables
 import android.content.Context
 import android.media.AudioManager
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +13,12 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.FitScreen
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,7 +55,8 @@ fun MediaControls(
     mediaState: MediaState,
     controller: ControllerState,
     brightnessState: BrightnessState,
-    showDialog: (Dialog) -> Unit
+    showDialog: (Dialog) -> Unit,
+    switchAspectRatio: () -> Unit,
 ) {
 
     val context = LocalContext.current
@@ -74,7 +79,6 @@ fun MediaControls(
         modifier = Modifier
             .fillMaxSize()
     ) {
-
         val isBufferingShowing by remember {
             derivedStateOf {
                 mediaState.playerState?.run {
@@ -119,49 +123,61 @@ fun MediaControls(
             )
         }
         if (mediaState.controllerVisibility.isShowing) {
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(bottom = 30.dp)
+                    .padding(bottom = 10.dp)
                     .align(Alignment.BottomCenter),
-                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = TimeUtils.formatTime(context, controller.positionMs),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(horizontal = 5.dp)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = TimeUtils.formatTime(context, controller.positionMs),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    )
 
-                val duration =
-                    if (controller.durationMs == C.TIME_UNSET) currentMedia.duration / 1000 else controller.durationMs
+                    val duration =
+                        if (controller.durationMs == C.TIME_UNSET) currentMedia.duration / 1000 else controller.durationMs
 
-                SeekBar(
-                    durationMs = duration,
-                    positionMs = controller.positionMs,
-                    onScrubStart = {
-                        scrubbing = true
-                    },
-                    onScrubMove = {
-                        if (mediaState.playerState?.playbackState == Player.STATE_READY) {
+                    SeekBar(
+                        durationMs = duration,
+                        positionMs = controller.positionMs,
+                        onScrubStart = {
+                            scrubbing = true
+                        },
+                        onScrubMove = {
+                            if (mediaState.playerState?.playbackState == Player.STATE_READY) {
+                                (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                                mediaState.player?.seekTo(it)
+                            }
+                        },
+                        onScrubStop = {
                             (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
                             mediaState.player?.seekTo(it)
-                        }
-                    },
-                    onScrubStop = {
-                        (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                        mediaState.player?.seekTo(it)
-                        scrubbing = false
-                    },
-                    modifier = Modifier
-                        .weight(1f),
-                )
+                            scrubbing = false
+                        },
+                        modifier = Modifier
+                            .weight(1f),
+                    )
 
-                Text(
-                    text = TimeUtils.formatTime(context, duration),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(horizontal = 5.dp)
-                )
+                    Text(
+                        text = TimeUtils.formatTime(context, duration),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    )
+                }
+                Row {
+                    IconButton(onClick = switchAspectRatio) {
+                        Icon(
+                            imageVector = Icons.Rounded.FitScreen,
+                            contentDescription = ""
+                        )
+                    }
+                }
             }
         }
         if (mediaState.controllerBar == ControllerBar.Volume) {
