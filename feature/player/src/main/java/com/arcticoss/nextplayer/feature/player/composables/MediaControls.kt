@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.feature.player.composables
 
 import android.content.Context
 import android.media.AudioManager
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +14,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AspectRatio
+import androidx.compose.material.icons.rounded.Crop
 import androidx.compose.material.icons.rounded.FitScreen
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.ZoomOutMap
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import com.arcticoss.nextplayer.feature.player.Dialog
 import com.arcticoss.nextplayer.feature.player.state.BrightnessState
 import com.arcticoss.nextplayer.feature.player.state.ControllerBar
@@ -53,6 +60,7 @@ fun MediaControls(
     currentMedia: Media,
     mediaState: MediaState,
     controller: ControllerState,
+    preferences: PlayerPreferences,
     brightnessState: BrightnessState,
     showDialog: (Dialog) -> Unit,
     switchAspectRatio: () -> Unit,
@@ -147,14 +155,11 @@ fun MediaControls(
                     }
                 )
                 if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
-                    Row {
-                        IconButton(onClick = switchAspectRatio) {
-                            Icon(
-                                imageVector = Icons.Rounded.FitScreen,
-                                contentDescription = ""
-                            )
-                        }
-                    }
+                    Controls(
+                        aspectRatio = preferences.aspectRatio,
+                        onAspectRatioClick = switchAspectRatio,
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    )
                 }
             }
         }
@@ -223,6 +228,38 @@ private fun TimeText(
         style = MaterialTheme.typography.labelSmall,
         modifier = modifier.padding(horizontal = 5.dp)
     )
+}
+
+@Composable
+fun Controls(
+    aspectRatio: AspectRatio,
+    modifier: Modifier = Modifier,
+    onAspectRatioClick: () -> Unit
+) {
+    val aspectRatioIcon = when(aspectRatio) {
+        AspectRatio.FitScreen -> Icons.Rounded.FitScreen
+        AspectRatio.FixedWidth -> Icons.Rounded.Crop
+        AspectRatio.FixedHeight -> Icons.Rounded.Crop
+        AspectRatio.Fill -> Icons.Rounded.AspectRatio
+        AspectRatio.Zoom -> Icons.Rounded.ZoomOutMap
+    }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
+            }
+        }
+        Row {
+            IconButton(onClick = onAspectRatioClick) {
+                Icon(imageVector = aspectRatioIcon, contentDescription = aspectRatio.title)
+            }
+        }
+    }
 }
 
 

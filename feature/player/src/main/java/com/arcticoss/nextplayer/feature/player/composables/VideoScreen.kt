@@ -193,6 +193,7 @@ fun VideoScreen(
             mediaState = mediaState,
             currentMedia = currentMedia,
             controller = controller,
+            preferences = preferences,
             brightnessState = brightnessState,
             showDialog = viewModel::showDialog,
             switchAspectRatio = viewModel::switchAspectRation
