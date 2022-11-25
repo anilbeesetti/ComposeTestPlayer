@@ -23,8 +23,6 @@ import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.*
 import com.arcticoss.nextplayer.feature.player.state.MediaState
-import com.arcticoss.nextplayer.feature.player.state.aspectRatio
-import com.arcticoss.nextplayer.feature.player.state.isPortrait
 import com.arcticoss.nextplayer.feature.player.state.rememberBrightnessState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
@@ -34,6 +32,7 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.text.CueGroup
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import com.google.android.exoplayer2.video.VideoSize
 import java.io.File
 import java.util.*
 
@@ -47,15 +46,18 @@ fun VideoScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
 
+    val context = LocalContext.current
+    val activity = context.findActivity()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val player by rememberManagedExoPlayer()
     val mediaState = rememberMediaState(player = player)
     val controller = rememberControllerState(mediaState = mediaState)
+    val brightnessController = rememberBrightnessState(activity = activity)
+
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val context = LocalContext.current
-    val activity = context.findActivity()
-    val brightnessController = rememberBrightnessState(activity = activity)
+
 
     /**
      * Handling rotation on video format change
@@ -125,10 +127,12 @@ fun VideoScreen(
         }
     }
 
-    /**
-     * Saving media state on pause
-     */
+
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
+
+        /**
+         * Saving media state on pause
+         */
         if (it == Lifecycle.Event.ON_PAUSE) {
             mediaState.playerState?.let { playerState ->
                 viewModel.saveState(
@@ -138,6 +142,13 @@ fun VideoScreen(
                     brightness = brightnessController.currentBrightness
                 )
             }
+        }
+
+        /**
+         * Removing controller lock on resume
+         */
+        if (it == Lifecycle.Event.ON_RESUME) {
+            mediaState.isControllerLocked = false
         }
     }
 
@@ -211,7 +222,8 @@ fun VideoScreen(
             preferences = preferences,
             brightnessState = brightnessController,
             showDialog = viewModel::showDialog,
-            switchAspectRatio = viewModel::switchAspectRation
+            onSwitchAspectClick = viewModel::switchAspectRatio,
+            onLockClick = mediaState::toggleControllerLock
         )
         if (playerViewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->
@@ -322,3 +334,16 @@ private fun AspectRatio.toResizeMode(): ResizeMode {
         AspectRatio.Zoom -> ResizeMode.Zoom
     }
 }
+
+private val Format.isPortrait: Boolean
+    get() {
+        val isRotated = this.rotationDegrees == 90 || this.rotationDegrees == 270
+        return if (isRotated) {
+            this.width > this.height
+        } else {
+            this.height > this.width
+        }
+    }
+
+val VideoSize.aspectRatio
+    get() = if (height == 0) 0f else width * pixelWidthHeightRatio / height

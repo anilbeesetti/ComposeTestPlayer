@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AspectRatio
@@ -63,24 +64,31 @@ fun MediaControls(
     preferences: PlayerPreferences,
     brightnessState: BrightnessState,
     showDialog: (Dialog) -> Unit,
-    switchAspectRatio: () -> Unit,
+    onSwitchAspectClick: () -> Unit,
+    onLockClick: () -> Unit
 ) {
 
     val context = LocalContext.current
     val activity = context.findActivity()
     var scrubbing by remember { mutableStateOf(false) }
+    var interactingWithControllerTrigger by remember { mutableStateOf(0) }
 
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
 
-    LaunchedEffect(key1 = mediaState.controllerVisibility) {
-        when (mediaState.controllerVisibility) {
-            ControllerVisibility.Visible -> activity?.showSystemBars()
-            ControllerVisibility.Invisible,
-            ControllerVisibility.PartiallyVisible -> activity?.hideSystemBars()
+    LaunchedEffect(mediaState.controllerVisibility, mediaState.isControllerLocked) {
+        if (mediaState.isControllerLocked) {
+            activity?.hideSystemBars()
+        } else {
+            when (mediaState.controllerVisibility) {
+                ControllerVisibility.Visible -> activity?.showSystemBars()
+                ControllerVisibility.Invisible,
+                ControllerVisibility.PartiallyVisible -> activity?.hideSystemBars()
+            }
         }
     }
 
     val hideWhenTimeout = !mediaState.shouldShowControllerIndefinitely && !scrubbing
+
 
     Box(
         modifier = Modifier
@@ -100,7 +108,7 @@ fun MediaControls(
         }
         if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
 
-            LaunchedEffect(key1 = hideWhenTimeout) {
+            LaunchedEffect(hideWhenTimeout, interactingWithControllerTrigger) {
                 if (hideWhenTimeout) {
                     // hide after 3s
                     delay(3000)
@@ -108,28 +116,42 @@ fun MediaControls(
                 }
             }
 
-            PlayerUIHeader(
-                title = currentMedia.title,
-                onBackClick = { activity?.finish() },
-                onAudioIconClick = { showDialog(Dialog.AudioTrack) },
-                onSubtitleIconClick = { showDialog(Dialog.SubtitleTrack) },
-                modifier = Modifier
-                    .systemBarsPadding()
-                    .padding(top = 5.dp)
-                    .align(Alignment.TopCenter)
-            )
-            PlayerUIMainControls(
-                playPauseIcon = if (controller.showPause) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                onPlayPauseClick = {
-                    controller.playOrPause()
-                },
-                onSkipNextClick = { mediaState.player?.seekToNext() },
-                onSkipPreviousClick = { mediaState.player?.seekToPrevious() },
-                modifier = Modifier
-                    .align(Alignment.Center)
-            )
+            if (mediaState.isControllerLocked) {
+                IconButton(
+                    onClick = {
+                        interactingWithControllerTrigger++
+                        onLockClick()
+                    },
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .align(Alignment.TopStart)
+                ) {
+                    Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
+                }
+            } else {
+                PlayerUIHeader(
+                    title = currentMedia.title,
+                    onBackClick = { activity?.finish() },
+                    onAudioIconClick = { showDialog(Dialog.AudioTrack) },
+                    onSubtitleIconClick = { showDialog(Dialog.SubtitleTrack) },
+                    modifier = Modifier
+                        .systemBarsPadding()
+                        .padding(top = 5.dp)
+                        .align(Alignment.TopCenter)
+                )
+                PlayerUIMainControls(
+                    playPauseIcon = if (controller.showPause) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                    onPlayPauseClick = {
+                        controller.playOrPause()
+                    },
+                    onSkipNextClick = { mediaState.player?.seekToNext() },
+                    onSkipPreviousClick = { mediaState.player?.seekToPrevious() },
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
         }
-        if (mediaState.controllerVisibility.isShowing) {
+        if (mediaState.controllerVisibility.isShowing && !mediaState.isControllerLocked) {
             Column(
                 modifier = Modifier
                     .navigationBarsPadding()
@@ -157,8 +179,15 @@ fun MediaControls(
                 if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
                     Controls(
                         aspectRatio = preferences.aspectRatio,
-                        onAspectRatioClick = switchAspectRatio,
-                        modifier = Modifier.padding(horizontal = 5.dp)
+                        modifier = Modifier.padding(horizontal = 5.dp),
+                        onAspectRatioClick = {
+                            interactingWithControllerTrigger++
+                            onSwitchAspectClick()
+                        },
+                        onLockClick = {
+                            interactingWithControllerTrigger++
+                            onLockClick()
+                        }
                     )
                 }
             }
@@ -186,6 +215,7 @@ fun MediaControls(
             )
         }
     }
+
 }
 
 
@@ -234,9 +264,10 @@ private fun TimeText(
 fun Controls(
     aspectRatio: AspectRatio,
     modifier: Modifier = Modifier,
-    onAspectRatioClick: () -> Unit
+    onAspectRatioClick: () -> Unit,
+    onLockClick: () -> Unit
 ) {
-    val aspectRatioIcon = when(aspectRatio) {
+    val aspectRatioIcon = when (aspectRatio) {
         AspectRatio.FitScreen -> Icons.Rounded.FitScreen
         AspectRatio.FixedWidth -> Icons.Rounded.Crop
         AspectRatio.FixedHeight -> Icons.Rounded.Crop
@@ -250,7 +281,7 @@ fun Controls(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = onLockClick) {
                 Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
             }
         }
