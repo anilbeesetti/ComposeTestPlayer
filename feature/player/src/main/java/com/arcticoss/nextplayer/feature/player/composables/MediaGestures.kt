@@ -33,6 +33,7 @@ fun MediaGestures(
     mediaState: MediaState,
     controller: ControllerState,
     brightnessState: BrightnessState,
+    isControllerLocked: Boolean,
 ) {
 
     val context = LocalContext.current
@@ -48,104 +49,112 @@ fun MediaGestures(
                     onTap = {
                         mediaState.controllerVisibility = when (mediaState.controllerVisibility) {
                             ControllerVisibility.Visible -> ControllerVisibility.Invisible
-                            ControllerVisibility.PartiallyVisible -> ControllerVisibility.Visible
+
+                            ControllerVisibility.PartiallyVisible,
                             ControllerVisibility.Invisible -> ControllerVisibility.Visible
                         }
                     },
                     onDoubleTap = { controller.playOrPause() }
                 )
             }
-            .pointerInput(Unit) {
-                var isControllerShowing = mediaState.isControllerShowing
-                var totalOffset = Offset.Zero
-                var wasPlaying = false
-                var diffTime = 0f
+            .then(
+                if (isControllerLocked) {
+                    Modifier
+                } else {
+                    Modifier
+                        .pointerInput(Unit) {
+                            var isControllerShowing = mediaState.isControllerShowing
+                            var totalOffset = Offset.Zero
+                            var wasPlaying = false
+                            var diffTime = 0f
 
-                var currentPosition = 0L
-                var duration = 0L
-                detectHorizontalDragGestures(
-                    onDragStart = { offset ->
-                        wasPlaying = controller.isPlaying
-                        controller.pause()
-                        totalOffset = Offset.Zero
+                            var currentPosition = 0L
+                            var duration = 0L
+                            detectHorizontalDragGestures(
+                                onDragStart = { offset ->
+                                    wasPlaying = controller.isPlaying
+                                    controller.pause()
+                                    totalOffset = Offset.Zero
 
-                        currentPosition = controller.positionMs
-                        duration = controller.durationMs
+                                    currentPosition = controller.positionMs
+                                    duration = controller.durationMs
 
-                        isControllerShowing = mediaState.isControllerShowing
-                        if (!isControllerShowing)
-                            mediaState.controllerVisibility = ControllerVisibility.PartiallyVisible
-                    },
-                    onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
-                        val previousOffset = totalOffset
-                        totalOffset += Offset(x = dragAmount, y = 0f)
+                                    isControllerShowing = mediaState.isControllerShowing
+                                    if (!isControllerShowing)
+                                        mediaState.controllerVisibility = ControllerVisibility.PartiallyVisible
+                                },
+                                onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
+                                    val previousOffset = totalOffset
+                                    totalOffset += Offset(x = dragAmount, y = 0f)
 
-                        val finalTime = currentPosition + (totalOffset.x * 100)
+                                    val finalTime = currentPosition + (totalOffset.x * 100)
 
-                        if (finalTime >= 0 && finalTime < duration) {
-                            if (previousOffset.x < totalOffset.x) {
-                                controller.setSeekParameters(SeekParameters.NEXT_SYNC)
-                            } else {
-                                controller.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
-                            }
-                            diffTime = finalTime - currentPosition
-                            controller.seekTo(finalTime.toLong())
-                        }
-                        // show time diff
-                        change.consume()
-                    },
-                    onDragEnd = {
-                        if (wasPlaying) controller.play()
-                        if (!isControllerShowing)
-                            mediaState.controllerVisibility = ControllerVisibility.Invisible
-                    }
-                )
-            }
-            .pointerInput(Unit) {
-                var gestureScrollY = 0f
-                detectVerticalDragGestures(
-                    onDragStart = { offset ->
-                        val width = context.resources.displayMetrics.widthPixels
-                        gestureScrollY = offset.y
-
-                        if (offset.x < (width / 2)) {
-                            mediaState.controllerBar = ControllerBar.Brightness
-                        } else {
-                            mediaState.controllerBar = ControllerBar.Volume
-                        }
-                    },
-                    onVerticalDrag = { change, dragAmount ->
-
-                        val offset = gestureScrollY - change.position.y
-
-                        if (abs(offset * dragAmount) > SCROLL_STEP) {
-                            when (mediaState.controllerBar) {
-                                ControllerBar.Volume -> {
-                                    if (offset > 0) {
-                                        audioManager.increaseVolume()
-                                    } else {
-                                        audioManager.decreaseVolume()
+                                    if (finalTime >= 0 && finalTime < duration) {
+                                        if (previousOffset.x < totalOffset.x) {
+                                            controller.setSeekParameters(SeekParameters.NEXT_SYNC)
+                                        } else {
+                                            controller.setSeekParameters(SeekParameters.PREVIOUS_SYNC)
+                                        }
+                                        diffTime = finalTime - currentPosition
+                                        controller.seekTo(finalTime.toLong())
                                     }
+                                    // show time diff
+                                    change.consume()
+                                },
+                                onDragEnd = {
+                                    if (wasPlaying) controller.play()
+                                    if (!isControllerShowing)
+                                        mediaState.controllerVisibility = ControllerVisibility.Invisible
                                 }
-                                ControllerBar.Brightness -> {
-                                    if (offset > 0) {
-                                        brightnessState.increaseBrightness()
-                                    } else {
-                                        brightnessState.decreaseBrightness()
-                                    }
-                                }
-                                ControllerBar.None -> {/* Do Nothing */
-                                }
-                            }
-                            gestureScrollY = change.position.y
-                            change.consume()
+                            )
                         }
-                    },
-                    onDragEnd = {
-                        mediaState.controllerBar = ControllerBar.None
-                    }
-                )
-            }
+                        .pointerInput(Unit) {
+                            var gestureScrollY = 0f
+                            detectVerticalDragGestures(
+                                onDragStart = { offset ->
+                                    val width = context.resources.displayMetrics.widthPixels
+                                    gestureScrollY = offset.y
+
+                                    if (offset.x < (width / 2)) {
+                                        mediaState.controllerBar = ControllerBar.Brightness
+                                    } else {
+                                        mediaState.controllerBar = ControllerBar.Volume
+                                    }
+                                },
+                                onVerticalDrag = { change, dragAmount ->
+
+                                    val offset = gestureScrollY - change.position.y
+
+                                    if (abs(offset * dragAmount) > SCROLL_STEP) {
+                                        when (mediaState.controllerBar) {
+                                            ControllerBar.Volume -> {
+                                                if (offset > 0) {
+                                                    audioManager.increaseVolume()
+                                                } else {
+                                                    audioManager.decreaseVolume()
+                                                }
+                                            }
+                                            ControllerBar.Brightness -> {
+                                                if (offset > 0) {
+                                                    brightnessState.increaseBrightness()
+                                                } else {
+                                                    brightnessState.decreaseBrightness()
+                                                }
+                                            }
+                                            ControllerBar.None -> {/* Do Nothing */
+                                            }
+                                        }
+                                        gestureScrollY = change.position.y
+                                        change.consume()
+                                    }
+                                },
+                                onDragEnd = {
+                                    mediaState.controllerBar = ControllerBar.None
+                                }
+                            )
+                        }
+                }
+            )
     )
 }
 

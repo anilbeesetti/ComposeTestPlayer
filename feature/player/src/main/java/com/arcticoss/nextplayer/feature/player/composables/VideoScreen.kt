@@ -47,15 +47,20 @@ fun VideoScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
 
+    val context = LocalContext.current
+    val activity = context.findActivity()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val player by rememberManagedExoPlayer()
     val mediaState = rememberMediaState(player = player)
     val controller = rememberControllerState(mediaState = mediaState)
+    val brightnessController = rememberBrightnessState(activity = activity)
+
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val context = LocalContext.current
-    val activity = context.findActivity()
-    val brightnessController = rememberBrightnessState(activity = activity)
+
+    var isControllerLocked by remember { mutableStateOf(false) }
+
 
     /**
      * Handling rotation on video format change
@@ -197,6 +202,7 @@ fun VideoScreen(
             mediaState = mediaState,
             controller = controller,
             brightnessState = brightnessController,
+            isControllerLocked = isControllerLocked,
         )
         mediaState.playerState?.let {
             Subtitles(
@@ -211,7 +217,9 @@ fun VideoScreen(
             preferences = preferences,
             brightnessState = brightnessController,
             showDialog = viewModel::showDialog,
-            switchAspectRatio = viewModel::switchAspectRatio
+            onSwitchAspectClick = viewModel::switchAspectRatio,
+            isControllerLocked = isControllerLocked,
+            onLockClick = { isControllerLocked = !isControllerLocked }
         )
         if (playerViewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->
