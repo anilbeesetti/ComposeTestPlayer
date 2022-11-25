@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.feature.player.composables
 
 import android.content.Context
 import android.media.AudioManager
+import android.util.Log
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -44,17 +45,22 @@ fun MediaGestures(
         modifier = Modifier
             .systemGesturesPadding()
             .fillMaxSize()
-            .pointerInput(controller) {
+            .pointerInput(isControllerLocked) {
                 detectTapGestures(
                     onTap = {
-                        mediaState.controllerVisibility = when (mediaState.controllerVisibility) {
-                            ControllerVisibility.Visible -> ControllerVisibility.Invisible
+                        mediaState.controllerVisibility =
+                            when (mediaState.controllerVisibility) {
+                                ControllerVisibility.Visible -> ControllerVisibility.Invisible
 
-                            ControllerVisibility.PartiallyVisible,
-                            ControllerVisibility.Invisible -> ControllerVisibility.Visible
-                        }
+                                ControllerVisibility.PartiallyVisible,
+                                ControllerVisibility.Invisible -> ControllerVisibility.Visible
+                            }
                     },
-                    onDoubleTap = { controller.playOrPause() }
+                    onDoubleTap = {
+                        if (!isControllerLocked) {
+                            controller.playOrPause()
+                        }
+                    }
                 )
             }
             .then(
@@ -81,7 +87,8 @@ fun MediaGestures(
 
                                     isControllerShowing = mediaState.isControllerShowing
                                     if (!isControllerShowing)
-                                        mediaState.controllerVisibility = ControllerVisibility.PartiallyVisible
+                                        mediaState.controllerVisibility =
+                                            ControllerVisibility.PartiallyVisible
                                 },
                                 onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
                                     val previousOffset = totalOffset
@@ -104,7 +111,8 @@ fun MediaGestures(
                                 onDragEnd = {
                                     if (wasPlaying) controller.play()
                                     if (!isControllerShowing)
-                                        mediaState.controllerVisibility = ControllerVisibility.Invisible
+                                        mediaState.controllerVisibility =
+                                            ControllerVisibility.Invisible
                                 }
                             )
                         }
