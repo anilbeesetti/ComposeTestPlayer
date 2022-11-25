@@ -54,7 +54,7 @@ fun VideoScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val activity = context.findActivity()
-    val brightnessState = rememberBrightnessState(activity = activity)
+    val brightnessController = rememberBrightnessState(activity = activity)
 
     /**
      * Handling rotation on video format change
@@ -84,6 +84,9 @@ fun VideoScreen(
             if (playerViewState.mediaList.isNotEmpty()) {
                 val position = playerViewState.mediaList[it.mediaItemIndex].lastPlayedPosition
                 player?.seekTo(position)
+            }
+            if (preferences.saveBrightnessLevel) {
+                brightnessController.setBrightness(preferences.brightnessLevel)
             }
         }
     }
@@ -121,9 +124,10 @@ fun VideoScreen(
         if (it == Lifecycle.Event.ON_PAUSE) {
             mediaState.playerState?.let { playerState ->
                 viewModel.saveState(
-                    playerState.mediaItemIndex,
-                    controller.positionMs,
-                    playerState.playWhenReady
+                    index = playerState.mediaItemIndex,
+                    position = controller.positionMs,
+                    playWhenReady = playerState.playWhenReady,
+                    brightness = brightnessController.currentBrightness
                 )
             }
         }
@@ -139,12 +143,16 @@ fun VideoScreen(
                 mediaState.playerState?.oldPosition?.let {
                     if (mediaState.playerState?.firstFrameRendered == true) {
                         if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-                            viewModel.saveState(it.mediaItemIndex, 0, player?.playWhenReady == true)
+                            viewModel.saveState(
+                                index = it.mediaItemIndex,
+                                position = 0,
+                                playWhenReady = player?.playWhenReady == true
+                            )
                         } else {
                             viewModel.saveState(
-                                it.mediaItemIndex,
-                                it.positionMs,
-                                player?.playWhenReady == true
+                                index = it.mediaItemIndex,
+                                position = it.positionMs,
+                                playWhenReady = player?.playWhenReady == true
                             )
                         }
                     }
@@ -153,7 +161,6 @@ fun VideoScreen(
         }
 
         player?.addListener(listener)
-
         onDispose { player?.removeListener(listener) }
     }
 
@@ -181,7 +188,7 @@ fun VideoScreen(
         MediaGestures(
             mediaState = mediaState,
             controller = controller,
-            brightnessState = brightnessState,
+            brightnessState = brightnessController,
         )
         mediaState.playerState?.let {
             Subtitles(
@@ -194,7 +201,7 @@ fun VideoScreen(
             currentMedia = currentMedia,
             controller = controller,
             preferences = preferences,
-            brightnessState = brightnessState,
+            brightnessState = brightnessController,
             showDialog = viewModel::showDialog,
             switchAspectRatio = viewModel::switchAspectRation
         )

@@ -58,11 +58,14 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun saveState(index: Int, position: Long, playWhenReady: Boolean) {
+    fun saveState(index: Int, position: Long, playWhenReady: Boolean, brightness: Int? = null) {
         viewModelScope.launch {
             val media = playerViewState.value.mediaList[index]
             _playerViewState.update { it.copy(currentMediaItemId = media.id, playWhenReady = playWhenReady) }
             mediaRepository.updateMedia(media.id, position)
+            brightness?.let {
+                preferencesDataSource.updateBrightnessLevel(brightness)
+            }
         }
     }
 

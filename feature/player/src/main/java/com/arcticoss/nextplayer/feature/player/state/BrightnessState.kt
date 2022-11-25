@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.feature.player.state
 
 import android.app.Activity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +14,13 @@ import com.arcticoss.nextplayer.feature.player.utils.swipeToShowStatusBars
 fun rememberBrightnessState(
     activity: Activity?,
     maxBrightness: Int = 25,
-): BrightnessState = remember { BrightnessState(maxBrightness,activity) }
+): BrightnessState {
+    val brightnessState = remember { BrightnessState(maxBrightness,activity) }
+    LaunchedEffect(Unit) {
+        brightnessState.setBrightness(5)
+    }
+    return brightnessState
+}
 
 @Stable
 class BrightnessState(
