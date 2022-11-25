@@ -127,10 +127,12 @@ fun VideoScreen(
         }
     }
 
-    /**
-     * Saving media state on pause
-     */
+
     AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
+
+        /**
+         * Saving media state on pause
+         */
         if (it == Lifecycle.Event.ON_PAUSE) {
             mediaState.playerState?.let { playerState ->
                 viewModel.saveState(
@@ -140,6 +142,13 @@ fun VideoScreen(
                     brightness = brightnessController.currentBrightness
                 )
             }
+        }
+
+        /**
+         * Removing controller lock on resume
+         */
+        if (it == Lifecycle.Event.ON_RESUME) {
+            mediaState.isControllerLocked = false
         }
     }
 
