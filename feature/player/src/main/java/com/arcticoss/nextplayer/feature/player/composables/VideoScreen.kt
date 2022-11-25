@@ -211,7 +211,7 @@ fun VideoScreen(
             preferences = preferences,
             brightnessState = brightnessController,
             showDialog = viewModel::showDialog,
-            switchAspectRatio = viewModel::switchAspectRation
+            switchAspectRatio = viewModel::switchAspectRatio
         )
         if (playerViewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->

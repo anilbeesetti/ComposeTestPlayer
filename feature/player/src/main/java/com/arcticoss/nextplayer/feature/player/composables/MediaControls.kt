@@ -69,6 +69,7 @@ fun MediaControls(
     val context = LocalContext.current
     val activity = context.findActivity()
     var scrubbing by remember { mutableStateOf(false) }
+    var interactingWithController by remember { mutableStateOf(0) }
 
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
 
@@ -100,7 +101,7 @@ fun MediaControls(
         }
         if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
 
-            LaunchedEffect(key1 = hideWhenTimeout) {
+            LaunchedEffect(hideWhenTimeout, interactingWithController) {
                 if (hideWhenTimeout) {
                     // hide after 3s
                     delay(3000)
@@ -157,8 +158,11 @@ fun MediaControls(
                 if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
                     Controls(
                         aspectRatio = preferences.aspectRatio,
-                        onAspectRatioClick = switchAspectRatio,
-                        modifier = Modifier.padding(horizontal = 5.dp)
+                        modifier = Modifier.padding(horizontal = 5.dp),
+                        onAspectRatioClick = {
+                            interactingWithController++
+                            switchAspectRatio()
+                        }
                     )
                 }
             }
