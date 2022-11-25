@@ -2,7 +2,9 @@ package com.arcticoss.nextplayer.feature.player.composables
 
 import android.content.Context
 import android.media.AudioManager
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +14,16 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AspectRatio
+import androidx.compose.material.icons.rounded.Crop
+import androidx.compose.material.icons.rounded.FitScreen
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.ZoomOutMap
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,19 +37,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import com.arcticoss.nextplayer.feature.player.Dialog
 import com.arcticoss.nextplayer.feature.player.state.BrightnessState
 import com.arcticoss.nextplayer.feature.player.state.ControllerBar
+import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.ControllerVisibility
 import com.arcticoss.nextplayer.feature.player.state.MediaState
-import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.hideSystemBars
 import com.arcticoss.nextplayer.feature.player.utils.showSystemBars
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SeekParameters
 import kotlinx.coroutines.delay
@@ -50,8 +60,10 @@ fun MediaControls(
     currentMedia: Media,
     mediaState: MediaState,
     controller: ControllerState,
+    preferences: PlayerPreferences,
     brightnessState: BrightnessState,
-    showDialog: (Dialog) -> Unit
+    showDialog: (Dialog) -> Unit,
+    switchAspectRatio: () -> Unit,
 ) {
 
     val context = LocalContext.current
@@ -74,7 +86,6 @@ fun MediaControls(
         modifier = Modifier
             .fillMaxSize()
     ) {
-
         val isBufferingShowing by remember {
             derivedStateOf {
                 mediaState.playerState?.run {
@@ -119,49 +130,37 @@ fun MediaControls(
             )
         }
         if (mediaState.controllerVisibility.isShowing) {
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(bottom = 30.dp)
+                    .padding(bottom = 10.dp)
                     .align(Alignment.BottomCenter),
-                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = TimeUtils.formatTime(context, controller.positionMs),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(horizontal = 5.dp)
-                )
-
                 val duration =
                     if (controller.durationMs == C.TIME_UNSET) currentMedia.duration / 1000 else controller.durationMs
-
-                SeekBar(
-                    durationMs = duration,
+                TimeAndSeekbar(
                     positionMs = controller.positionMs,
-                    onScrubStart = {
-                        scrubbing = true
-                    },
+                    durationMs = duration,
+                    onScrubStart = { scrubbing = true },
                     onScrubMove = {
                         if (mediaState.playerState?.playbackState == Player.STATE_READY) {
-                            (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                            mediaState.player?.seekTo(it)
+                            controller.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                            controller.seekTo(it)
                         }
                     },
                     onScrubStop = {
-                        (mediaState.player as? ExoPlayer)?.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                        mediaState.player?.seekTo(it)
+                        controller.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                        controller.seekTo(it)
                         scrubbing = false
-                    },
-                    modifier = Modifier
-                        .weight(1f),
+                    }
                 )
-
-                Text(
-                    text = TimeUtils.formatTime(context, duration),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(horizontal = 5.dp)
-                )
+                if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
+                    Controls(
+                        aspectRatio = preferences.aspectRatio,
+                        onAspectRatioClick = switchAspectRatio,
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    )
+                }
             }
         }
         if (mediaState.controllerBar == ControllerBar.Volume) {
@@ -188,6 +187,81 @@ fun MediaControls(
         }
     }
 }
+
+
+@Composable
+private fun TimeAndSeekbar(
+    positionMs: Long,
+    durationMs: Long,
+    modifier: Modifier = Modifier,
+    onScrubStart: (() -> Unit)?,
+    onScrubMove: (positionMs: Long) -> Unit,
+    onScrubStop: ((positionMs: Long) -> Unit)?,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TimeText(time = positionMs)
+        SeekBar(
+            durationMs = durationMs,
+            positionMs = positionMs,
+            onScrubStart = onScrubStart,
+            onScrubMove = onScrubMove,
+            onScrubStop = onScrubStop,
+            modifier = Modifier
+                .weight(1f),
+        )
+        TimeText(time = durationMs)
+    }
+}
+
+@Composable
+private fun TimeText(
+    time: Long,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    Text(
+        text = TimeUtils.formatTime(context, time),
+        style = MaterialTheme.typography.labelSmall,
+        modifier = modifier.padding(horizontal = 5.dp)
+    )
+}
+
+@Composable
+fun Controls(
+    aspectRatio: AspectRatio,
+    modifier: Modifier = Modifier,
+    onAspectRatioClick: () -> Unit
+) {
+    val aspectRatioIcon = when(aspectRatio) {
+        AspectRatio.FitScreen -> Icons.Rounded.FitScreen
+        AspectRatio.FixedWidth -> Icons.Rounded.Crop
+        AspectRatio.FixedHeight -> Icons.Rounded.Crop
+        AspectRatio.Fill -> Icons.Rounded.AspectRatio
+        AspectRatio.Zoom -> Icons.Rounded.ZoomOutMap
+    }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
+            }
+        }
+        Row {
+            IconButton(onClick = onAspectRatioClick) {
+                Icon(imageVector = aspectRatioIcon, contentDescription = aspectRatio.title)
+            }
+        }
+    }
+}
+
 
 /**
  * Get max music stream volume

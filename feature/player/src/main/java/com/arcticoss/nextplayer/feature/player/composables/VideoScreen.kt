@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arcticoss.nextplayer.core.model.AspectRatio
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.*
@@ -49,11 +50,11 @@ fun VideoScreen(
     val mediaState = rememberMediaState(player = player)
     val controller = rememberControllerState(mediaState = mediaState)
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
+    val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val activity = context.findActivity()
     val brightnessState = rememberBrightnessState(activity = activity)
-
 
     /**
      * Handling rotation on video format change
@@ -174,7 +175,8 @@ fun VideoScreen(
         MediaPlayer(
             state = mediaState,
             modifier = Modifier
-                .align(Alignment.Center)
+                .align(Alignment.Center),
+            resizeMode = preferences.aspectRatio.toResizeMode()
         )
         MediaGestures(
             mediaState = mediaState,
@@ -183,7 +185,6 @@ fun VideoScreen(
         )
         mediaState.playerState?.let {
             Subtitles(
-                state = mediaState,
                 cueGroup = it.cueGroup,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
@@ -192,8 +193,10 @@ fun VideoScreen(
             mediaState = mediaState,
             currentMedia = currentMedia,
             controller = controller,
+            preferences = preferences,
             brightnessState = brightnessState,
-            showDialog = viewModel::showDialog
+            showDialog = viewModel::showDialog,
+            switchAspectRatio = viewModel::switchAspectRation
         )
         if (playerViewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->
@@ -229,7 +232,6 @@ fun VideoScreen(
 
 @Composable
 private fun Subtitles(
-    state: MediaState,
     cueGroup: CueGroup,
     modifier: Modifier = Modifier
 ) {
@@ -294,4 +296,14 @@ private fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String): Tra
         }
     }
     return null
+}
+
+private fun AspectRatio.toResizeMode(): ResizeMode {
+    return when (this) {
+        AspectRatio.FitScreen -> ResizeMode.Fit
+        AspectRatio.FixedWidth -> ResizeMode.FixedWidth
+        AspectRatio.FixedHeight -> ResizeMode.FixedHeight
+        AspectRatio.Fill -> ResizeMode.Fill
+        AspectRatio.Zoom -> ResizeMode.Zoom
+    }
 }
