@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class PlayerPreferences(
     val saveBrightnessLevel: Boolean = true,
     val savePlayBackSpeed: Boolean = false,
-    val brightnessLevel: Int = 15,
+    val brightnessLevel: Int = 5,
     val resume: Resume = Resume.Always,
     val playbackSpeed: Int = 100,
     val fastSeeking: Boolean = true,

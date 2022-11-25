@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.feature.player.composables
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -85,9 +86,16 @@ fun VideoScreen(
                 val position = playerViewState.mediaList[it.mediaItemIndex].lastPlayedPosition
                 player?.seekTo(position)
             }
-            if (preferences.saveBrightnessLevel) {
-                brightnessController.setBrightness(preferences.brightnessLevel)
-            }
+        }
+    }
+
+    /**
+     * Restoring brightness level
+     */
+    LaunchedEffect(preferences.saveBrightnessLevel, preferences.brightnessLevel) {
+        Log.d(TAG, "VideoScreen: save")
+        if (preferences.saveBrightnessLevel) {
+            brightnessController.setBrightness(preferences.brightnessLevel)
         }
     }
 
