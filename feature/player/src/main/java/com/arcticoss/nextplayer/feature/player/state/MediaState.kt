@@ -1,12 +1,14 @@
 package com.arcticoss.nextplayer.feature.player.state
 
 import android.os.Looper
-import androidx.compose.runtime.*
-import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.PlaybackException
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.video.VideoSize
-import kotlin.math.absoluteValue
 
 @Composable
 fun rememberMediaState(
@@ -43,7 +45,6 @@ class MediaState(
      */
     val playerState: PlayerState? get() = stateOfPlayerState.value
 
-    // Controller visibility related properties and functions
     /**
      * Whether the controller is showing.
      */
@@ -58,6 +59,13 @@ class MediaState(
      * The current [visibility][ControllerVisibility] of the controller.
      */
     var controllerVisibility: ControllerVisibility by mutableStateOf(ControllerVisibility.Invisible)
+
+
+    /**
+     * The current lock state of controller
+     */
+    var isControllerLocked: Boolean by mutableStateOf(false)
+
 
     /**
      * The current [visibility][ControllerBar] of the controller.
@@ -79,19 +87,15 @@ class MediaState(
         } ?: true
     }
 
-    internal var controllerAutoShow: Boolean by mutableStateOf(true)
+    private var controllerAutoShow: Boolean by mutableStateOf(true)
 
-    internal fun maybeShowController() {
-        if (shouldShowControllerIndefinitely) {
-            controllerVisibility = ControllerVisibility.Visible
-        }
+    fun toggleControllerLock() {
+        isControllerLocked = !isControllerLocked
     }
 
     // internally used properties and functions
     private val listener = object : Player.Listener {
-        override fun onRenderedFirstFrame() {
-
-        }
+        // PlayerListener
     }
     private var _player: Player? by mutableStateOf(initPlayer)
     private fun onPlayerChanged(previous: Player?, current: Player?) {
@@ -105,22 +109,6 @@ class MediaState(
     }
 
     internal val stateOfPlayerState = mutableStateOf(initPlayer?.state())
-
-
-    private var _contentAspectRatio by mutableStateOf(0f)
-    internal var contentAspectRatio
-        internal set(value) {
-            val aspectDeformation: Float = value / contentAspectRatio - 1f
-            if (aspectDeformation.absoluteValue > 0.01f) {
-                // Not within the allowed tolerance, populate the new aspectRatio.
-                _contentAspectRatio = value
-            }
-        }
-        get() = _contentAspectRatio
-
-    internal val playerError: PlaybackException? by derivedStateOf {
-        playerState?.playerError
-    }
 
     init {
         initPlayer?.addListener(listener)
@@ -148,20 +136,6 @@ enum class ControllerVisibility(
      */
     Invisible(false)
 }
-
-val VideoSize.aspectRatio
-    get() = if (height == 0) 0f else width * pixelWidthHeightRatio / height
-
-val Format.isPortrait: Boolean
-    get() {
-        val isRotated = this.rotationDegrees == 90 || this.rotationDegrees == 270
-        return if (isRotated) {
-            this.width > this.height
-        } else {
-            this.height > this.width
-        }
-    }
-
 
 enum class ControllerBar {
     Volume,

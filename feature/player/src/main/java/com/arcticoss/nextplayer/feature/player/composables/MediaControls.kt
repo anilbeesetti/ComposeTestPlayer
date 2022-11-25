@@ -61,7 +61,6 @@ fun MediaControls(
     currentMedia: Media,
     mediaState: MediaState,
     controller: ControllerState,
-    isControllerLocked: Boolean,
     preferences: PlayerPreferences,
     brightnessState: BrightnessState,
     showDialog: (Dialog) -> Unit,
@@ -72,12 +71,12 @@ fun MediaControls(
     val context = LocalContext.current
     val activity = context.findActivity()
     var scrubbing by remember { mutableStateOf(false) }
-    var interactingWithController by remember { mutableStateOf(0) }
+    var interactingWithControllerTrigger by remember { mutableStateOf(0) }
 
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
 
-    LaunchedEffect(mediaState.controllerVisibility, isControllerLocked) {
-        if (isControllerLocked) {
+    LaunchedEffect(mediaState.controllerVisibility, mediaState.isControllerLocked) {
+        if (mediaState.isControllerLocked) {
             activity?.hideSystemBars()
         } else {
             when (mediaState.controllerVisibility) {
@@ -109,7 +108,7 @@ fun MediaControls(
         }
         if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
 
-            LaunchedEffect(hideWhenTimeout, interactingWithController) {
+            LaunchedEffect(hideWhenTimeout, interactingWithControllerTrigger) {
                 if (hideWhenTimeout) {
                     // hide after 3s
                     delay(3000)
@@ -117,9 +116,12 @@ fun MediaControls(
                 }
             }
 
-            if (isControllerLocked) {
+            if (mediaState.isControllerLocked) {
                 IconButton(
-                    onClick = onLockClick,
+                    onClick = {
+                        interactingWithControllerTrigger++
+                        onLockClick()
+                    },
                     modifier = Modifier
                         .statusBarsPadding()
                         .align(Alignment.TopStart)
@@ -149,7 +151,7 @@ fun MediaControls(
                 )
             }
         }
-        if (mediaState.controllerVisibility.isShowing && !isControllerLocked) {
+        if (mediaState.controllerVisibility.isShowing && !mediaState.isControllerLocked) {
             Column(
                 modifier = Modifier
                     .navigationBarsPadding()
@@ -179,10 +181,13 @@ fun MediaControls(
                         aspectRatio = preferences.aspectRatio,
                         modifier = Modifier.padding(horizontal = 5.dp),
                         onAspectRatioClick = {
-                            interactingWithController++
+                            interactingWithControllerTrigger++
                             onSwitchAspectClick()
                         },
-                        onLockClick = onLockClick
+                        onLockClick = {
+                            interactingWithControllerTrigger++
+                            onLockClick()
+                        }
                     )
                 }
             }

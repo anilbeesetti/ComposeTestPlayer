@@ -2,7 +2,6 @@ package com.arcticoss.nextplayer.feature.player.composables
 
 import android.content.Context
 import android.media.AudioManager
-import android.util.Log
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -34,7 +33,6 @@ fun MediaGestures(
     mediaState: MediaState,
     controller: ControllerState,
     brightnessState: BrightnessState,
-    isControllerLocked: Boolean,
 ) {
 
     val context = LocalContext.current
@@ -45,7 +43,7 @@ fun MediaGestures(
         modifier = Modifier
             .systemGesturesPadding()
             .fillMaxSize()
-            .pointerInput(isControllerLocked) {
+            .pointerInput(mediaState.isControllerLocked) {
                 detectTapGestures(
                     onTap = {
                         mediaState.controllerVisibility =
@@ -57,14 +55,14 @@ fun MediaGestures(
                             }
                     },
                     onDoubleTap = {
-                        if (!isControllerLocked) {
+                        if (!mediaState.isControllerLocked) {
                             controller.playOrPause()
                         }
                     }
                 )
             }
             .then(
-                if (isControllerLocked) {
+                if (mediaState.isControllerLocked) {
                     Modifier
                 } else {
                     Modifier

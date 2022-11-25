@@ -23,8 +23,6 @@ import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.ui.AddLifecycleEventObserver
 import com.arcticoss.nextplayer.feature.player.*
 import com.arcticoss.nextplayer.feature.player.state.MediaState
-import com.arcticoss.nextplayer.feature.player.state.aspectRatio
-import com.arcticoss.nextplayer.feature.player.state.isPortrait
 import com.arcticoss.nextplayer.feature.player.state.rememberBrightnessState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
@@ -34,6 +32,7 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player.*
 import com.google.android.exoplayer2.text.CueGroup
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import com.google.android.exoplayer2.video.VideoSize
 import java.io.File
 import java.util.*
 
@@ -58,8 +57,6 @@ fun VideoScreen(
 
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
-
-    var isControllerLocked by remember { mutableStateOf(false) }
 
 
     /**
@@ -202,7 +199,6 @@ fun VideoScreen(
             mediaState = mediaState,
             controller = controller,
             brightnessState = brightnessController,
-            isControllerLocked = isControllerLocked,
         )
         mediaState.playerState?.let {
             Subtitles(
@@ -218,8 +214,7 @@ fun VideoScreen(
             brightnessState = brightnessController,
             showDialog = viewModel::showDialog,
             onSwitchAspectClick = viewModel::switchAspectRatio,
-            isControllerLocked = isControllerLocked,
-            onLockClick = { isControllerLocked = !isControllerLocked }
+            onLockClick = mediaState::toggleControllerLock
         )
         if (playerViewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->
@@ -330,3 +325,16 @@ private fun AspectRatio.toResizeMode(): ResizeMode {
         AspectRatio.Zoom -> ResizeMode.Zoom
     }
 }
+
+private val Format.isPortrait: Boolean
+    get() {
+        val isRotated = this.rotationDegrees == 90 || this.rotationDegrees == 270
+        return if (isRotated) {
+            this.width > this.height
+        } else {
+            this.height > this.width
+        }
+    }
+
+val VideoSize.aspectRatio
+    get() = if (height == 0) 0f else width * pixelWidthHeightRatio / height
