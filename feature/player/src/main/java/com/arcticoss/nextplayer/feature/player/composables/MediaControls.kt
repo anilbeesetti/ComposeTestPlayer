@@ -131,11 +131,20 @@ fun MediaControls(
                 val duration =
                     if (controller.durationMs == C.TIME_UNSET) currentMedia.duration / 1000 else controller.durationMs
                 TimeAndSeekbar(
-                    duration = duration,
-                    mediaState = mediaState,
-                    controller = controller,
-                    onScrubbingStarted = { scrubbing = true },
-                    onScrubbingStopped = { scrubbing = false }
+                    positionMs = controller.positionMs,
+                    durationMs = duration,
+                    onScrubStart = { scrubbing = true },
+                    onScrubMove = {
+                        if (mediaState.playerState?.playbackState == Player.STATE_READY) {
+                            controller.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                            controller.seekTo(it)
+                        }
+                    },
+                    onScrubStop = {
+                        controller.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                        controller.seekTo(it)
+                        scrubbing = false
+                    }
                 )
                 if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
                     Row {
@@ -177,53 +186,43 @@ fun MediaControls(
 
 @Composable
 private fun TimeAndSeekbar(
-    duration: Long,
-    mediaState: MediaState,
-    controller: ControllerState,
+    positionMs: Long,
+    durationMs: Long,
     modifier: Modifier = Modifier,
-    onScrubbingStarted: (() -> Unit)? = null,
-    onScrubbingStopped: (() -> Unit)? = null
+    onScrubStart: (() -> Unit)?,
+    onScrubMove: (positionMs: Long) -> Unit,
+    onScrubStop: ((positionMs: Long) -> Unit)?,
 ) {
-
-    val context = LocalContext.current
-
     Row(
         modifier = modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = TimeUtils.formatTime(context, controller.positionMs),
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 5.dp)
-        )
+        TimeText(time = positionMs)
         SeekBar(
-            durationMs = duration,
-            positionMs = controller.positionMs,
-            onScrubStart = {
-                onScrubbingStarted?.invoke()
-            },
-            onScrubMove = {
-                if (mediaState.playerState?.playbackState == Player.STATE_READY) {
-                    controller.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                    controller.seekTo(it)
-                }
-            },
-            onScrubStop = {
-                controller.setSeekParameters(SeekParameters.CLOSEST_SYNC)
-                controller.seekTo(it)
-                onScrubbingStopped?.invoke()
-            },
+            durationMs = durationMs,
+            positionMs = positionMs,
+            onScrubStart = onScrubStart,
+            onScrubMove = onScrubMove,
+            onScrubStop = onScrubStop,
             modifier = Modifier
                 .weight(1f),
         )
-
-        Text(
-            text = TimeUtils.formatTime(context, duration),
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 5.dp)
-        )
+        TimeText(time = durationMs)
     }
+}
+
+@Composable
+private fun TimeText(
+    time: Long,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    Text(
+        text = TimeUtils.formatTime(context, time),
+        style = MaterialTheme.typography.labelSmall,
+        modifier = modifier.padding(horizontal = 5.dp)
+    )
 }
 
 
