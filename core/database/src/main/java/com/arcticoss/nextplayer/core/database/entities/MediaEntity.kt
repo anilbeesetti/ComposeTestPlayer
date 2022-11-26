@@ -16,5 +16,7 @@ data class MediaEntity(
     @ColumnInfo(name = "height") val height: Int,
     @ColumnInfo(name = "frame_rate") val frameRate: Double,
     @ColumnInfo(name = "last_played_position") val lastPlayedPosition: Long = 0,
+    @ColumnInfo(name = "audio_track_id") val audioTrackId: String? = null,
+    @ColumnInfo(name = "subtitle_track_id") val subtitleTrackId: String? = null,
     @ColumnInfo(name = "folder_id") val folderId: Long
 )

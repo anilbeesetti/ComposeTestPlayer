@@ -18,7 +18,7 @@ import com.arcticoss.nextplayer.core.database.daos.ThumbnailDao
 import com.arcticoss.nextplayer.core.database.daos.VideoTrackDao
 import com.arcticoss.nextplayer.core.database.entities.FolderEntity
 import com.arcticoss.nextplayer.core.database.entities.ThumbnailEntity
-import com.arcticoss.nextplayer.core.database.relations.FolderAndMediaItemRelation
+import com.arcticoss.nextplayer.core.database.relations.FolderAndMediaRelation
 import com.arcticoss.nextplayer.core.database.relations.asExternalModel
 import com.arcticoss.nextplayer.core.model.Folder
 import com.arcticoss.nextplayer.core.model.Media
@@ -53,7 +53,7 @@ class MediaRepository @Inject constructor(
 
     override fun getFolderMediaStream(): Flow<List<Folder>> = folderDao
         .getFolderAndMediaItemStream()
-        .map { it.map(FolderAndMediaItemRelation::asExternalModel) }
+        .map { it.map(FolderAndMediaRelation::asExternalModel) }
 
 
     override suspend fun getMedia(path: String): Media {
@@ -94,7 +94,10 @@ class MediaRepository @Inject constructor(
 
     private suspend fun syncFolder(folder: File) {
         if (!folderDao.isExist(folder.path)) {
-            val folderEntity = FolderEntity(name = folder.name, path = folder.path)
+            val folderEntity = FolderEntity(
+                name = if (folder.name == "0") "Internal Storage" else folder.name,
+                path = folder.path
+            )
             folderDao.insert(folderEntity)
         }
     }

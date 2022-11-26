@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -149,7 +148,7 @@ fun MediaScreen(
                                 }
                                 items((mediaUiState as MediaUiState.Success).mediaItems, key = { it.id }) { mediaItem ->
                                     MediaListItem(
-                                        mediaItem = mediaItem,
+                                        media = mediaItem,
                                         onClick = { onNavigate(NavigateTo.Player(mediaItem.id)) }
                                     )
                                 }

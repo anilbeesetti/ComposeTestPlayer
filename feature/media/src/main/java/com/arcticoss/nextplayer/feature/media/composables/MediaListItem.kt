@@ -31,7 +31,7 @@ import com.arcticoss.nextplayer.feature.media.utils.TimeUtils
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaListItem(
-    mediaItem: Media,
+    media: Media,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -57,10 +57,10 @@ fun MediaListItem(
                     .fillMaxWidth(0.45f)
                     .aspectRatio(16f / 10f)
             ) {
-                if (mediaItem.thumbnailPath.isNotEmpty()) {
+                if (media.thumbnailPath.isNotEmpty()) {
                     Image(
                         bitmap = remember {
-                            BitmapFactory.decodeFile(mediaItem.thumbnailPath).asImageBitmap()
+                            BitmapFactory.decodeFile(media.thumbnailPath).asImageBitmap()
                         },
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
@@ -75,7 +75,7 @@ fun MediaListItem(
                 verticalArrangement = Arrangement.Top
             ) {
                 Text(
-                    text = mediaItem.title,
+                    text = media.title,
                     maxLines = 2,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
                     overflow = TextOverflow.Ellipsis
@@ -84,10 +84,13 @@ fun MediaListItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    FieldChip(text = TimeUtils.formatTime(context, mediaItem.duration / 1000))
+                    FieldChip(text = TimeUtils.formatTime(context, media.duration / 1000))
+                    if (media.subtitleTracks.isNotEmpty()) {
+                        FieldChip(text = "SRT")
+                    }
                 }
             }
         }

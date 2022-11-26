@@ -5,7 +5,10 @@ import androidx.room.Relation
 import com.arcticoss.nextplayer.core.database.entities.AudioTrackEntity
 import com.arcticoss.nextplayer.core.database.entities.MediaEntity
 import com.arcticoss.nextplayer.core.database.entities.SubtitleTrackEntity
+import com.arcticoss.nextplayer.core.database.entities.ThumbnailEntity
 import com.arcticoss.nextplayer.core.database.entities.VideoTrackEntity
+import com.arcticoss.nextplayer.core.database.entities.asExternalModel
+import com.arcticoss.nextplayer.core.model.Media
 
 data class MediaInfoRelation(
     @Embedded val mediaEntity: MediaEntity,
@@ -23,5 +26,28 @@ data class MediaInfoRelation(
         parentColumn = "id",
         entityColumn = "media_id"
     )
-    val subtitleTracks: List<SubtitleTrackEntity>
+    val subtitleTracks: List<SubtitleTrackEntity>,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "media_id"
+    )
+    val thumbnail: ThumbnailEntity?
+)
+
+fun MediaInfoRelation.asExternalModel() = Media(
+    id = mediaEntity.id,
+    size = mediaEntity.size,
+    width = mediaEntity.width,
+    height = mediaEntity.height,
+    path = mediaEntity.path,
+    title = mediaEntity.title,
+    frameRate = mediaEntity.frameRate,
+    duration = mediaEntity.duration,
+    lastPlayedPosition = mediaEntity.lastPlayedPosition,
+    audioTrackId = mediaEntity.audioTrackId,
+    subtitleTrackId = mediaEntity.subtitleTrackId,
+    thumbnailPath = thumbnail?.path ?: "",
+    videoTracks = videoTracks.map { it.asExternalModel() },
+    audioTracks = audioTracks.map { it.asExternalModel() },
+    subtitleTracks = subtitleTracks.map { it.asExternalModel() }
 )

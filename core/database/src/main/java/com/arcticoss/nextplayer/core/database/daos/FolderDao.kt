@@ -2,7 +2,7 @@ package com.arcticoss.nextplayer.core.database.daos
 
 import androidx.room.*
 import com.arcticoss.nextplayer.core.database.entities.FolderEntity
-import com.arcticoss.nextplayer.core.database.relations.FolderAndMediaItemRelation
+import com.arcticoss.nextplayer.core.database.relations.FolderAndMediaRelation
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -25,10 +25,10 @@ interface FolderDao {
 
     @Transaction
     @Query("SELECT * FROM folder")
-    fun getFolderAndMediaItemStream(): Flow<List<FolderAndMediaItemRelation>>
+    fun getFolderAndMediaItemStream(): Flow<List<FolderAndMediaRelation>>
 
     @Transaction
     @Query("SELECT * FROM folder WHERE id = :folderId")
-    fun getFolderAndMediaItemStream(folderId: Long): Flow<FolderAndMediaItemRelation>
+    fun getFolderAndMediaItemStream(folderId: Long): Flow<FolderAndMediaRelation>
 
 }

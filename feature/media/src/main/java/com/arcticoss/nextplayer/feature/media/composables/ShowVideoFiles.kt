@@ -56,7 +56,7 @@ fun ShowVideoFiles(
             }
                 items(mediaItems, key = { it.id }) { mediaItem ->
                     MediaListItem(
-                        mediaItem = mediaItem,
+                        media = mediaItem,
                         onClick = { onMediaItemClick(mediaItem.path) }
                     )
                 }

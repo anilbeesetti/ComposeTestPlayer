@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.core.database.daos
 
 import androidx.room.*
 import com.arcticoss.nextplayer.core.database.entities.MediaEntity
+import com.arcticoss.nextplayer.core.database.relations.MediaInfoRelation
 import com.arcticoss.nextplayer.core.database.relations.MediaItemAndThumbnailRelation
 import kotlinx.coroutines.flow.Flow
 
@@ -32,6 +33,6 @@ interface MediaDao {
 
     @Transaction
     @Query("SELECT * FROM media")
-    fun getMediaItemEntitiesStream(): Flow<List<MediaItemAndThumbnailRelation>>
+    fun getMediaInfoRelationEntitiesStream(): Flow<List<MediaInfoRelation>>
 
 }

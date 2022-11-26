@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.arcticoss.nextplayer.core.model.SubtitleTrack
 
 
 /**
@@ -28,4 +29,11 @@ data class SubtitleTrackEntity(
     @ColumnInfo(name = "codec") val codec: String,
     @ColumnInfo(name = "language") val language: String?,
     @ColumnInfo(name = "media_id") val mediaId: Long
+)
+
+
+fun SubtitleTrackEntity.asExternalModel() = SubtitleTrack(
+    streamIndex = streamIndex,
+    codec = codec,
+    language = language
 )
