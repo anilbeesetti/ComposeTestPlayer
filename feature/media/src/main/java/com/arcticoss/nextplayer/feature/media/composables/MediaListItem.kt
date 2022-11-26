@@ -84,10 +84,13 @@ fun MediaListItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     FieldChip(text = TimeUtils.formatTime(context, media.duration / 1000))
+                    if (media.subtitleTracks.isNotEmpty()) {
+                        FieldChip(text = "SRT")
+                    }
                 }
             }
         }
