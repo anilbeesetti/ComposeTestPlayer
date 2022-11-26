@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,7 +50,7 @@ import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.video.VideoSize
 import java.io.File
-import java.util.Objects
+import java.util.*
 
 
 private const val TAG = "VideoScreen"
@@ -289,12 +288,10 @@ internal fun MediaScreen(
         onDispose { player?.removeListener(listener) }
     }
 
-    val currentMedia by remember {
-        derivedStateOf {
-            if (viewState.mediaList.isNotEmpty()) {
-                mediaState.playerState?.let { viewState.mediaList[it.mediaItemIndex] } ?: Media()
-            } else Media()
-        }
+    val currentMedia = remember(viewState.mediaList, mediaState.playerState?.mediaItemIndex) {
+        if (viewState.mediaList.isNotEmpty()) {
+            mediaState.playerState?.let { viewState.mediaList[it.mediaItemIndex] } ?: Media()
+        } else Media()
     }
 
 
