@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.arcticoss.nextplayer.core.model.VideoTrack
 
 
 /**
@@ -33,4 +34,15 @@ data class VideoTrackEntity(
     @ColumnInfo(name = "language") val language: String?,
     @ColumnInfo(name = "frame_rate") val frameRate: Double,
     @ColumnInfo(name = "media_id") val mediaId: Long
+)
+
+
+
+fun VideoTrackEntity.asExternalModel() = VideoTrack(
+    streamIndex = streamIndex,
+    bitrate = bitrate,
+    title = title,
+    codec = codec,
+    language = language,
+    frameRate = frameRate
 )

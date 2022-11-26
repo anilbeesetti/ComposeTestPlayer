@@ -89,7 +89,7 @@ fun VideosScreen(
                     items(mediaFolder.mediaList, key = { it.id }) { mediaItem ->
                         Log.d("TAG", "ShowVideoFiles: ${mediaItem.id}")
                         MediaListItem(
-                            mediaItem = mediaItem,
+                            media = mediaItem,
                             onClick = { onMediaItemClick(mediaItem.id, mediaFolder.id) }
                         )
                     }

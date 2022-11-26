@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.arcticoss.nextplayer.core.model.AudioTrack
 
 
 /**
@@ -31,4 +32,14 @@ data class AudioTrackEntity(
     @ColumnInfo(name = "bitrate") val bitrate: Long,
     @ColumnInfo(name = "language") val language: String?,
     @ColumnInfo(name = "media_id") val mediaId: Long
+)
+
+
+fun AudioTrackEntity.asExternalModel() = AudioTrack(
+    streamIndex = streamIndex,
+    codec = codec,
+    sampleRate = sampleRate,
+    channels = channels,
+    bitrate = bitrate,
+    language = language
 )
