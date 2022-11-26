@@ -15,8 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.arcticoss.nextplayer.feature.player.composables.MediaScreen
+import com.arcticoss.nextplayer.feature.player.composables.MediaPlayerScreen
 import com.arcticoss.nextplayer.feature.player.theme.NextPlayerTheme
+import com.arcticoss.nextplayer.feature.player.utils.hideSystemBars
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,6 +33,8 @@ class PlayerActivity : ComponentActivity() {
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
 
+        this.hideSystemBars()
+
         setContent {
             NextPlayerTheme {
                 // A surface container using the 'background' color from the theme
@@ -45,7 +48,7 @@ class PlayerActivity : ComponentActivity() {
                         intentData?.let { viewModel.invokeMedia(it) }
                     }
                     CompositionLocalProvider(LocalContentColor provides Color.White) {
-                        MediaScreen()
+                        MediaPlayerScreen()
                     }
                 }
             }

@@ -58,7 +58,7 @@ private const val TAG = "VideoScreen"
 @SuppressLint("SourceLockedOrientationActivity")
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun MediaScreen(
+fun MediaPlayerScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
 
@@ -73,7 +73,7 @@ fun MediaScreen(
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
 
-    MediaScreen(
+    MediaPlayerScreen(
         mediaState = mediaState,
         controller = controller,
         brightnessController = brightnessController,
@@ -150,7 +150,7 @@ val VideoSize.aspectRatio
 
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
-internal fun MediaScreen(
+internal fun MediaPlayerScreen(
     mediaState: MediaState,
     controller: ControllerState,
     brightnessController: BrightnessState,
