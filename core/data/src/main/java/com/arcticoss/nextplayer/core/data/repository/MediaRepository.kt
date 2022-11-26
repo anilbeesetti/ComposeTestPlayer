@@ -94,7 +94,10 @@ class MediaRepository @Inject constructor(
 
     private suspend fun syncFolder(folder: File) {
         if (!folderDao.isExist(folder.path)) {
-            val folderEntity = FolderEntity(name = folder.name, path = folder.path)
+            val folderEntity = FolderEntity(
+                name = if (folder.name == "0") "Internal Storage" else folder.name,
+                path = folder.path
+            )
             folderDao.insert(folderEntity)
         }
     }
