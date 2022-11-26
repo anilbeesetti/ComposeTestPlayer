@@ -1,5 +1,6 @@
 package com.arcticoss.nextplayer.feature.player.composables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.feature.player.utils.TimeUtils
@@ -28,13 +31,24 @@ fun TimeAndSeekbar(
     positionMs: Long,
     durationMs: Long,
     modifier: Modifier = Modifier,
+    showOverlay: Boolean = false,
     onScrubStart: (() -> Unit)?,
     onScrubMove: (positionMs: Long) -> Unit,
     onScrubStop: ((positionMs: Long) -> Unit)?,
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .run {
+                if (showOverlay) background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.3f),
+                        )
+                    )
+                ) else background(Color.Transparent)
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         TimeText(time = positionMs)

@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.feature.player.composables
 
 import android.content.Context
 import android.media.AudioManager
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
@@ -126,6 +128,11 @@ fun MediaControls(
                     Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
                 }
             } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f))
+                )
                 PlayerUIHeader(
                     title = currentMedia.title,
                     onBackClick = { activity?.finish() },
@@ -152,7 +159,6 @@ fun MediaControls(
             Column(
                 modifier = Modifier
                     .navigationBarsPadding()
-                    .padding(bottom = 10.dp)
                     .align(Alignment.BottomCenter),
             ) {
                 val duration =
@@ -160,6 +166,7 @@ fun MediaControls(
                 TimeAndSeekbar(
                     positionMs = controller.positionMs,
                     durationMs = duration,
+                    showOverlay = mediaState.controllerVisibility == ControllerVisibility.PartiallyVisible,
                     onScrubStart = { scrubbing = true },
                     onScrubMove = {
                         if (mediaState.playerState?.playbackState == Player.STATE_READY) {
@@ -176,7 +183,8 @@ fun MediaControls(
                 if (mediaState.controllerVisibility == ControllerVisibility.Visible) {
                     Controls(
                         resizeMode = preferences.resizeMode,
-                        modifier = Modifier.padding(horizontal = 5.dp),
+                        modifier = Modifier
+                            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
                         onAspectRatioClick = {
                             interactingWithControllerTrigger++
                             onSwitchAspectClick()
