@@ -1,10 +1,10 @@
 package com.arcticoss.nextplayer.core.domain
 
 import com.arcticoss.nextplayer.core.data.repository.MediaRepository
-import com.arcticoss.nextplayer.core.model.SortBy
-import com.arcticoss.nextplayer.core.model.SortOrder
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.models.Folder
+import com.arcticoss.nextplayer.core.model.SortBy
+import com.arcticoss.nextplayer.core.model.SortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject

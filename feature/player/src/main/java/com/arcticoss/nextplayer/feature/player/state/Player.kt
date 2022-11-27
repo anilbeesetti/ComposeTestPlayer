@@ -2,7 +2,12 @@ package com.arcticoss.nextplayer.feature.player.state
 
 import android.content.Context
 import android.os.Build
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.RememberObserver
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
@@ -39,10 +44,9 @@ fun rememberManagedPlayer(
 }
 
 
-
 internal class PlayerManager(
     private val factory: () -> Player
-): RememberObserver {
+) : RememberObserver {
     var player = mutableStateOf<Player?>(null)
 
     internal fun initialize() {
@@ -55,6 +59,7 @@ internal class PlayerManager(
         }
         player.value = null
     }
+
     override fun onAbandoned() {
         release()
     }

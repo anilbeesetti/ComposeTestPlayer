@@ -34,7 +34,8 @@ fun SettingsScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Rounded.ArrowBack,
-                            contentDescription = "")
+                            contentDescription = ""
+                        )
                     }
                 }
             )

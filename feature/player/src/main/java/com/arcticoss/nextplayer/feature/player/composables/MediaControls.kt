@@ -62,9 +62,9 @@ fun MediaControls(
     controller: ControllerState,
     preferences: PlayerPreferences,
     brightnessState: BrightnessState,
+    onLockClick: () -> Unit,
     showDialog: (Dialog) -> Unit,
-    onSwitchAspectClick: () -> Unit,
-    onLockClick: () -> Unit
+    onSwitchAspectClick: () -> Unit
 ) {
 
     val context = LocalContext.current

@@ -5,12 +5,12 @@ import android.content.Intent
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.navigation
-import com.arcticoss.nextplayer.feature.player.PlayerActivity
 import com.arcticoss.nextplayer.feature.media.navigation.mediaScreen
 import com.arcticoss.nextplayer.feature.media.navigation.mediaScreenNavigationRoute
 import com.arcticoss.nextplayer.feature.media.navigation.navigateToVideosScreen
 import com.arcticoss.nextplayer.feature.media.navigation.videoScreen
 import com.arcticoss.nextplayer.feature.media.screens.media.NavigateTo
+import com.arcticoss.nextplayer.feature.player.PlayerActivity
 import com.arcticoss.nextplayer.feature.settings.navigation.navigateToSettings
 
 

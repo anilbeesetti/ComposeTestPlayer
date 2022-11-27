@@ -1,7 +1,7 @@
 package com.arcticoss.nextplayer.core.data.repository
 
-import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.model.Folder
+import com.arcticoss.nextplayer.core.model.Media
 import kotlinx.coroutines.flow.Flow
 
 interface IMediaRepository {
@@ -25,7 +25,12 @@ interface IMediaRepository {
     /**
      * Update media item
      */
-    suspend fun updateMedia(id: Long, lastPlayedPosition: Long, audioTrackId: String?, subtitleTrackId: String?)
+    suspend fun updateMedia(
+        id: Long,
+        lastPlayedPosition: Long,
+        audioTrackId: String?,
+        subtitleTrackId: String?
+    )
 
     /**
      * Sync media from storage

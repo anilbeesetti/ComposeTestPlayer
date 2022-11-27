@@ -1,8 +1,8 @@
 package com.arcticoss.nextplayer.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
-import com.arcticoss.nextplayer.core.model.ResizeMode
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.ResizeMode
 import com.arcticoss.nextplayer.core.model.next
 import javax.inject.Inject
 

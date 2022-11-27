@@ -10,7 +10,7 @@ fun Bitmap.saveThumbnail(storagePath: String, quality: Int = 100): String {
     try {
         var file: File
         do {
-            thumbPath = storagePath + "/" + Random.nextInt(1,Int.MAX_VALUE) + ".jpg"
+            thumbPath = storagePath + "/" + Random.nextInt(1, Int.MAX_VALUE) + ".jpg"
             file = File(thumbPath)
         } while (file.exists())
         val fos = FileOutputStream(file)

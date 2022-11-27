@@ -5,7 +5,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.arcticoss.nextplayer.feature.settings.screens.about.AboutScreen
-import com.arcticoss.nextplayer.feature.settings.screens.display.InterfacePreferencesScreen
 
 const val aboutNavigationRoute = "about_route"
 

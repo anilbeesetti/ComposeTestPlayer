@@ -7,9 +7,9 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
-* Defines thumbnail for [MediaEntity]
-* It has one to one relationship with [MediaEntity]
-*/
+ * Defines thumbnail for [MediaEntity]
+ * It has one to one relationship with [MediaEntity]
+ */
 @Entity(
     tableName = "thumbnail",
     foreignKeys = [

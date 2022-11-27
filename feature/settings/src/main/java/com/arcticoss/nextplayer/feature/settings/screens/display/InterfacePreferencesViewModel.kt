@@ -2,8 +2,8 @@ package com.arcticoss.nextplayer.feature.settings.screens.display
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.nextplayer.core.model.InterfacePreferences
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
+import com.arcticoss.nextplayer.core.model.InterfacePreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -23,7 +23,7 @@ class InterfacePreferencesViewModel @Inject constructor(
             initialValue = InterfacePreferences()
         )
 
-    fun toggleFloatingButton(){
+    fun toggleFloatingButton() {
         viewModelScope.launch {
             preferencesDataSource.toggleShowFloatingButton()
         }

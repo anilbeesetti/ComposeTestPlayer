@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
 
-object PlayerPreferencesSerializer: Serializer<PlayerPreferences> {
+object PlayerPreferencesSerializer : Serializer<PlayerPreferences> {
     override val defaultValue: PlayerPreferences
         get() = PlayerPreferences()
 
