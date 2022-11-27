@@ -32,12 +32,12 @@ import com.arcticoss.nextplayer.feature.player.PersistableState
 import com.arcticoss.nextplayer.feature.player.PlayerViewModel
 import com.arcticoss.nextplayer.feature.player.PlayerViewState
 import com.arcticoss.nextplayer.feature.player.UIEvent
-import com.arcticoss.nextplayer.feature.player.rememberManagedExoPlayer
 import com.arcticoss.nextplayer.feature.player.state.BrightnessState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.arcticoss.nextplayer.feature.player.state.rememberBrightnessState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
+import com.arcticoss.nextplayer.feature.player.state.rememberManagedExoPlayer
 import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn

@@ -1,4 +1,4 @@
-package com.arcticoss.nextplayer.feature.player
+package com.arcticoss.nextplayer.feature.player.state
 
 import android.content.Context
 import android.os.Build
