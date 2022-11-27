@@ -36,7 +36,7 @@ import com.google.android.exoplayer2.C.TrackType
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
+import com.google.android.exoplayer2.Player.STATE_ENDED
 import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import java.io.File
@@ -138,9 +138,10 @@ internal fun MediaPlayerScreen(
      * Restoring media state on mediaItemIndexChange
      */
     LaunchedEffect(mediaState.playerState?.mediaItemIndex) {
-        mediaState.playerState?.let {
+        mediaState.playerState?.let { playerState ->
             if (viewState.mediaList.isNotEmpty()) {
-                val position = viewState.mediaList[it.mediaItemIndex].lastPlayedPosition
+                val media = viewState.mediaList[playerState.mediaItemIndex]
+                val position = media.lastPlayedPosition.takeIf { it != media.duration } ?: 0
                 player?.seekTo(position)
             }
         }
@@ -172,7 +173,8 @@ internal fun MediaPlayerScreen(
                     val index = viewState.mediaList.indexOfFirst { it.id == id }
                     if (index >= 0) {
                         val media = viewState.mediaList[index]
-                        this.seekTo(index, media.lastPlayedPosition)
+                        val position = media.lastPlayedPosition.takeIf { it != media.duration } ?: 0
+                        this.seekTo(index, position)
                     }
                 }
                 playWhenReady = viewState.playWhenReady
@@ -217,11 +219,9 @@ internal fun MediaPlayerScreen(
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 mediaState.playerState?.oldPosition?.let {
                     if (mediaState.playerState?.firstFrameRendered == true) {
-                        val position =
-                            if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) 0 else it.positionMs
                         val state = PersistableState(
                             index = it.mediaItemIndex,
-                            position = position,
+                            position = it.positionMs,
                             playWhenReady = player?.playWhenReady == true
                         )
                         onEvent(UIEvent.SaveState(state))
