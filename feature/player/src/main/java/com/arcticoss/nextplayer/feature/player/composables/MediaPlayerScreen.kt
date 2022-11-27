@@ -66,7 +66,6 @@ fun MediaPlayerScreen(
         brightnessController = brightnessController,
         viewState = playerViewState,
         preferences = preferences,
-        player = player,
         onEvent = viewModel::onEvent
     )
 
@@ -81,7 +80,6 @@ internal fun MediaPlayerScreen(
     brightnessController: BrightnessState,
     viewState: PlayerViewState,
     preferences: PlayerPreferences,
-    player: Player?,
     onEvent: (UIEvent) -> Unit
 ) {
 
@@ -142,7 +140,7 @@ internal fun MediaPlayerScreen(
             if (viewState.mediaList.isNotEmpty()) {
                 val media = viewState.mediaList[playerState.mediaItemIndex]
                 val position = media.lastPlayedPosition.takeIf { it != media.duration } ?: 0
-                player?.seekTo(position)
+                controller.seekTo(position)
             }
         }
     }
@@ -159,8 +157,8 @@ internal fun MediaPlayerScreen(
     /**
      * Sets [MediaItem] list to player
      */
-    LaunchedEffect(player, viewState.mediaList.size) {
-        player?.run {
+    LaunchedEffect(mediaState.player, viewState.mediaList.size) {
+        mediaState.player?.run {
             val mediaItems = viewState.mediaList.map {
                 MediaItem.Builder()
                     .setUri(File(it.path).toUri())
@@ -210,7 +208,7 @@ internal fun MediaPlayerScreen(
     }
 
 
-    DisposableEffect(player) {
+    DisposableEffect(mediaState.player) {
         val listener = object : Player.Listener {
 
             /**
@@ -222,7 +220,7 @@ internal fun MediaPlayerScreen(
                         val state = PersistableState(
                             index = it.mediaItemIndex,
                             position = it.positionMs,
-                            playWhenReady = player?.playWhenReady == true
+                            playWhenReady = mediaState.player?.playWhenReady == true
                         )
                         onEvent(UIEvent.SaveState(state))
                     }
@@ -239,10 +237,11 @@ internal fun MediaPlayerScreen(
             }
         }
 
-        player?.addListener(listener)
+        // Add listener
+        mediaState.player?.addListener(listener)
 
-        // Dispose
-        onDispose { player?.removeListener(listener) }
+        // Remove listener on dispose
+        onDispose { mediaState.player?.removeListener(listener) }
     }
 
 
