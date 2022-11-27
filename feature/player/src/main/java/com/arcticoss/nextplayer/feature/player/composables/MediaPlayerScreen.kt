@@ -228,6 +228,15 @@ internal fun MediaPlayerScreen(
                     }
                 }
             }
+
+            /**
+             * Close activity on [Player.STATE_ENDED]
+             */
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == STATE_ENDED) {
+                    activity?.finish()
+                }
+            }
         }
 
         player?.addListener(listener)
