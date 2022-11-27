@@ -1,6 +1,5 @@
 package com.arcticoss.nextplayer.feature.player.composables
 
-import Subtitle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

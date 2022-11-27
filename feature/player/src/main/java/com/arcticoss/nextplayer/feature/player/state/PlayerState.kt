@@ -271,8 +271,8 @@ internal class PlayerStateImpl(
         }
 
         override fun onPositionDiscontinuity(
-            oldPosition: Player.PositionInfo,
-            newPosition: Player.PositionInfo,
+            oldPosition: PositionInfo,
+            newPosition: PositionInfo,
             reason: Int
         ) {
             if (oldPosition.mediaItemIndex != newPosition.mediaItemIndex)

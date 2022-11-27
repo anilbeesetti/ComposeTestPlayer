@@ -48,7 +48,7 @@ static void onMediaFileFound(jobject jMediaMetadataBuilder, AVFormatContext *avF
     utils_call_instance_method_void(jMediaMetadataBuilder,
                                     fields.MediaMetadataBuilder.onMediaFileFoundID,
                                     jFileFormatName,
-                                    avFormatContext->duration);
+                                    avFormatContext->duration / 1000);
 }
 
 static void onVideoStreamFound(jobject jMediaMetadataBuilder,
@@ -59,12 +59,12 @@ static void onVideoStreamFound(jobject jMediaMetadataBuilder,
     auto codecDescriptor = avcodec_descriptor_get(parameters->codec_id);
     jstring jCodecName = utils_get_env()->NewStringUTF(codecDescriptor->long_name);
     AVRational guessedFrameRate = av_guess_frame_rate(
-                avFormatContext,
-                stream,
-                nullptr
-            );
+            avFormatContext,
+            stream,
+            nullptr
+    );
 
-    jdouble resultFrameRate = guessedFrameRate.num / (double)guessedFrameRate.den;
+    jdouble resultFrameRate = guessedFrameRate.num / (double) guessedFrameRate.den;
 
     utils_call_instance_method_void(jMediaMetadataBuilder,
                                     fields.MediaMetadataBuilder.onVideoStreamFoundID,
