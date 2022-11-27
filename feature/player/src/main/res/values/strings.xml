@@ -12,4 +12,6 @@
     <string name="settings">settings</string>
     <string name="next_player">NextPlayer</string>
     <string name="title_activity_player">PlayerActivity</string>
+    <string name="select_subtitle_track">Select subtitle track</string>
+    <string name="select_audio_track">Select audio track</string>
 </resources>

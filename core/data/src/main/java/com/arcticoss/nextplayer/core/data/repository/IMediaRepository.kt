@@ -25,7 +25,7 @@ interface IMediaRepository {
     /**
      * Update media item
      */
-    suspend fun updateMedia(id: Long, lastPlayedPosition: Long)
+    suspend fun updateMedia(id: Long, lastPlayedPosition: Long, audioTrackId: String?, subtitleTrackId: String?)
 
     /**
      * Sync media from storage
