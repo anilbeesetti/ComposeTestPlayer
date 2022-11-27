@@ -1,18 +1,30 @@
 package com.arcticoss.nextplayer.feature.media.screens.video
 
-import android.util.Log
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -37,9 +49,9 @@ fun VideosScreen(
             LargeTopAppBar(
                 title = {
                     Text(
-                        text = if (mediaFolderState is VideoUiState.Success)
-                            (mediaFolderState as VideoUiState.Success).folder.name
-                        else ""
+                        text = (mediaFolderState as? VideoUiState.Success)?.folder?.name ?: "",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 scrollBehavior = scrollBehavior,
@@ -87,7 +99,6 @@ fun VideosScreen(
                     }
                     val mediaFolder = (mediaFolderState as VideoUiState.Success).folder
                     items(mediaFolder.mediaList, key = { it.id }) { mediaItem ->
-                        Log.d("TAG", "ShowVideoFiles: ${mediaItem.id}")
                         MediaListItem(
                             media = mediaItem,
                             onClick = { onMediaItemClick(mediaItem.id, mediaFolder.id) }
