@@ -73,7 +73,7 @@ fun MediaScreen(
          */
         when (interfacePreferences.groupVideos) {
             true ->
-                when(folderUiState) {
+                when (folderUiState) {
                     FolderUiState.Loading -> {
                         Column(
                             modifier = Modifier
@@ -94,7 +94,10 @@ fun MediaScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Text(text = "No folders with media found.", style = MaterialTheme.typography.labelLarge)
+                                Text(
+                                    text = "No folders with media found.",
+                                    style = MaterialTheme.typography.labelLarge
+                                )
                             }
                         } else {
                             LazyColumn(
@@ -104,7 +107,9 @@ fun MediaScreen(
                                 item {
                                     Spacer(modifier = Modifier.height(5.dp))
                                 }
-                                items((folderUiState as FolderUiState.Success).folders, key = { it.id }) { mediaFolder ->
+                                items(
+                                    (folderUiState as FolderUiState.Success).folders,
+                                    key = { it.id }) { mediaFolder ->
                                     FolderItem(
                                         folder = mediaFolder,
                                         onClick = { onNavigate(NavigateTo.Videos(mediaFolder.id)) }
@@ -115,7 +120,7 @@ fun MediaScreen(
                     }
                 }
             false ->
-                when(mediaUiState) {
+                when (mediaUiState) {
                     MediaUiState.Loading -> {
                         Column(
                             modifier = Modifier
@@ -136,7 +141,10 @@ fun MediaScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
+                                Text(
+                                    text = "No videos found.",
+                                    style = MaterialTheme.typography.labelLarge
+                                )
                             }
                         } else {
                             LazyColumn(
@@ -146,7 +154,9 @@ fun MediaScreen(
                                 item {
                                     Spacer(modifier = Modifier.height(5.dp))
                                 }
-                                items((mediaUiState as MediaUiState.Success).mediaItems, key = { it.id }) { mediaItem ->
+                                items(
+                                    (mediaUiState as MediaUiState.Success).mediaItems,
+                                    key = { it.id }) { mediaItem ->
                                     MediaListItem(
                                         media = mediaItem,
                                         onClick = { onNavigate(NavigateTo.Player(mediaItem.id)) }
