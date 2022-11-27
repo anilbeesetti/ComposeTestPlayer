@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
-import com.arcticoss.nextplayer.core.model.InterfacePreferences
-import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.datastore.serializer.InterfacePreferencesSerializer
 import com.arcticoss.nextplayer.core.datastore.serializer.PlayerPreferencesSerializer
+import com.arcticoss.nextplayer.core.model.InterfacePreferences
+import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

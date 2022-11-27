@@ -37,7 +37,6 @@ data class VideoTrackEntity(
 )
 
 
-
 fun VideoTrackEntity.asExternalModel() = VideoTrack(
     streamIndex = streamIndex,
     bitrate = bitrate,

@@ -41,11 +41,11 @@ class MediaScreenViewModel @Inject constructor(
 
     val mediaUiState: StateFlow<MediaUiState> =
         getSortedMediaItemsStream().map { MediaUiState.Success(it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = MediaUiState.Loading
-        )
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = MediaUiState.Loading
+            )
 }
 
 sealed interface FolderUiState {

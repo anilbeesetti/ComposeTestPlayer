@@ -1,6 +1,12 @@
 package com.arcticoss.nextplayer.feature.media.composables
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,12 +60,12 @@ fun ShowVideoFiles(
             item {
                 Spacer(modifier = Modifier.height(5.dp))
             }
-                items(mediaItems, key = { it.id }) { mediaItem ->
-                    MediaListItem(
-                        media = mediaItem,
-                        onClick = { onMediaItemClick(mediaItem.path) }
-                    )
-                }
+            items(mediaItems, key = { it.id }) { mediaItem ->
+                MediaListItem(
+                    media = mediaItem,
+                    onClick = { onMediaItemClick(mediaItem.path) }
+                )
+            }
         }
     }
 }

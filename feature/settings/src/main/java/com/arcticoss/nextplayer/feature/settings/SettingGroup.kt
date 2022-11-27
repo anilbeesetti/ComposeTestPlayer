@@ -36,7 +36,6 @@ val settingGroupList: List<SettingGroup> = listOf(
 )
 
 
-
 enum class SettingsNavigateTo {
     Interface, Player, About
 }

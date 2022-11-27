@@ -9,11 +9,17 @@ import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataS
 import com.arcticoss.nextplayer.core.domain.GetMediaFromUriUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
-import com.arcticoss.nextplayer.core.model.ResizeMode
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
+import com.arcticoss.nextplayer.core.model.ResizeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -70,7 +76,7 @@ class PlayerViewModel @Inject constructor(
 
 
     fun onEvent(event: UIEvent) {
-        when(event) {
+        when (event) {
             is UIEvent.SaveState -> saveState(event.state)
             is UIEvent.ShowDialog -> showDialog(event.dialog)
             is UIEvent.SwitchResizeMode -> switchAspectRatio(event.resizeMode)
@@ -80,8 +86,18 @@ class PlayerViewModel @Inject constructor(
     private fun saveState(state: PersistableState) {
         viewModelScope.launch {
             val media = playerViewState.value.mediaList[state.index]
-            _playerViewState.update { it.copy(currentMediaItemId = media.id, playWhenReady = state.playWhenReady) }
-            mediaRepository.updateMedia(media.id, state.position, state.audioTrackId, state.subtitleTrackId)
+            _playerViewState.update {
+                it.copy(
+                    currentMediaItemId = media.id,
+                    playWhenReady = state.playWhenReady
+                )
+            }
+            mediaRepository.updateMedia(
+                media.id,
+                state.position,
+                state.audioTrackId,
+                state.subtitleTrackId
+            )
             state.brightness?.let {
                 preferencesDataSource.updateBrightnessLevel(it)
             }
@@ -117,18 +133,18 @@ sealed class UIEvent {
     /**
      * Show dialog
      */
-    data class ShowDialog(val dialog: Dialog): UIEvent()
+    data class ShowDialog(val dialog: Dialog) : UIEvent()
 
     /**
      * Save State
      */
-    data class SaveState(val state: PersistableState): UIEvent()
+    data class SaveState(val state: PersistableState) : UIEvent()
 
     /**
      * @param resizeMode if it is null toggle between [ResizeMode]
      * if specified switches to the given [ResizeMode]
      */
-    data class SwitchResizeMode(val resizeMode: ResizeMode? = null): UIEvent()
+    data class SwitchResizeMode(val resizeMode: ResizeMode? = null) : UIEvent()
 }
 
 

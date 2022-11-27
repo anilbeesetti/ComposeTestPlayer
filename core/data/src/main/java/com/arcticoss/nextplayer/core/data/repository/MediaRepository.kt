@@ -42,7 +42,7 @@ class MediaRepository @Inject constructor(
     private val subtitleTrackDao: SubtitleTrackDao,
     private val thumbnailDao: ThumbnailDao,
     @ApplicationContext private val context: Context
-): IMediaRepository {
+) : IMediaRepository {
 
     private val storageDir = Environment.getExternalStorageDirectory()
     private val dataDir = context.getExternalFilesDir(null)
@@ -130,13 +130,16 @@ class MediaRepository @Inject constructor(
         }
     }
 
-    private suspend fun syncMediaItem(mediaId: Long = 0, videoFile: File){
+    private suspend fun syncMediaItem(mediaId: Long = 0, videoFile: File) {
         val mediaInfoBuilder = MediaInfoBuilder()
         val mediaInfo = mediaInfoBuilder.from(videoFile).build()
 
         // Syncing media item
         val mediaItemId = mediaDao.insert(
-            mediaInfo.asMediaItemEntity(id = mediaId, folderId = folderDao.id(videoFile.parentFile!!.path))
+            mediaInfo.asMediaItemEntity(
+                id = mediaId,
+                folderId = folderDao.id(videoFile.parentFile!!.path)
+            )
         )
 
         // Syncing video streams

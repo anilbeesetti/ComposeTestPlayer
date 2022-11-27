@@ -13,7 +13,7 @@ import com.arcticoss.nextplayer.feature.player.utils.swipeToShowStatusBars
 fun rememberBrightnessState(
     activity: Activity?,
     maxBrightness: Int = 25,
-): BrightnessState = remember { BrightnessState(maxBrightness,activity) }
+): BrightnessState = remember { BrightnessState(maxBrightness, activity) }
 
 @Stable
 class BrightnessState(

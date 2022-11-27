@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
 
-object InterfacePreferencesSerializer: Serializer<InterfacePreferences> {
+object InterfacePreferencesSerializer : Serializer<InterfacePreferences> {
     override val defaultValue: InterfacePreferences
         get() = InterfacePreferences()
 
