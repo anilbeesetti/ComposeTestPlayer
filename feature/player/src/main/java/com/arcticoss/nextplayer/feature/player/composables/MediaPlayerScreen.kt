@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -31,17 +32,19 @@ import com.arcticoss.nextplayer.feature.player.Dialog
 import com.arcticoss.nextplayer.feature.player.PersistableState
 import com.arcticoss.nextplayer.feature.player.PlayerViewModel
 import com.arcticoss.nextplayer.feature.player.PlayerViewState
+import com.arcticoss.nextplayer.feature.player.R
 import com.arcticoss.nextplayer.feature.player.UIEvent
-import com.arcticoss.nextplayer.feature.player.rememberManagedExoPlayer
 import com.arcticoss.nextplayer.feature.player.state.BrightnessState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.arcticoss.nextplayer.feature.player.state.rememberBrightnessState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
+import com.arcticoss.nextplayer.feature.player.state.rememberManagedExoPlayer
 import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
-import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
+import com.google.android.exoplayer2.C.TRACK_TYPE_TEXT
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -121,7 +124,7 @@ private fun Player.switchTrack(trackGroup: Tracks.Group) {
 }
 
 
-private fun ExoPlayer.getTrackGroupFromFormatId(trackType: Int, id: String): Tracks.Group? {
+private fun Player.getTrackGroupFromFormatId(trackType: Int, id: String): Tracks.Group? {
     for (group in this.currentTracks.groups) {
         if (group.type == trackType) {
             val trackGroup = group.mediaTrackGroup
@@ -165,10 +168,34 @@ internal fun MediaPlayerScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
+    val currentMedia = remember(viewState.mediaList, mediaState.playerState?.mediaItemIndex) {
+        if (viewState.mediaList.isNotEmpty()) {
+            mediaState.playerState?.let { viewState.mediaList[it.mediaItemIndex] } ?: Media()
+        } else Media()
+    }
+
+    /**
+     * Changing tracks to previous remembered tracks on tracks changes
+     */
+    LaunchedEffect(currentMedia, mediaState.playerState?.audioTracks) {
+        currentMedia.audioTrackId?.let { id ->
+            val trackGroup = mediaState.player?.getTrackGroupFromFormatId(TRACK_TYPE_AUDIO, id)
+            trackGroup?.let {
+                mediaState.player?.switchTrack(it)
+            }
+        }
+        currentMedia.subtitleTrackId?.let { id ->
+            val trackGroup = mediaState.player?.getTrackGroupFromFormatId(TRACK_TYPE_TEXT, id)
+            trackGroup?.let {
+                mediaState.player?.switchTrack(it)
+            }
+        }
+    }
+
     /**
      * Handling rotation on video format change
      */
-    LaunchedEffect(key1 = mediaState.playerState?.videoFormat) {
+    LaunchedEffect(mediaState.playerState?.videoFormat) {
         mediaState.playerState?.videoFormat?.let {
             if (it.isPortrait) {
                 activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
@@ -181,7 +208,7 @@ internal fun MediaPlayerScreen(
     /**
      * Handling screen onState while media is playing
      */
-    LaunchedEffect(key1 = mediaState.playerState?.isPlaying) {
+    LaunchedEffect(mediaState.playerState?.isPlaying) {
         activity?.keepScreenOn(mediaState.playerState?.isPlaying == true)
     }
 
@@ -224,7 +251,7 @@ internal fun MediaPlayerScreen(
                     val index = viewState.mediaList.indexOfFirst { it.id == id }
                     if (index >= 0) {
                         val media = viewState.mediaList[index]
-                        seekTo(index, media.lastPlayedPosition)
+                        this.seekTo(index, media.lastPlayedPosition)
                     }
                 }
                 playWhenReady = viewState.playWhenReady
@@ -234,18 +261,18 @@ internal fun MediaPlayerScreen(
     }
 
 
-    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) {
+    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
 
         /**
          * Saving media state on pause
          */
-        if (it == Lifecycle.Event.ON_PAUSE) {
+        if (event == Lifecycle.Event.ON_PAUSE) {
             mediaState.playerState?.let { playerState ->
                 val state = PersistableState(
                     index = playerState.mediaItemIndex,
                     position = controller.positionMs,
                     playWhenReady = playerState.playWhenReady,
-                    brightness = brightnessController.currentBrightness
+                    brightness = brightnessController.currentBrightness,
                 )
                 onEvent(UIEvent.SaveState(state))
             }
@@ -254,7 +281,7 @@ internal fun MediaPlayerScreen(
         /**
          * Removing controller lock on resume
          */
-        if (it == Lifecycle.Event.ON_RESUME) {
+        if (event == Lifecycle.Event.ON_RESUME) {
             mediaState.isControllerLocked = false
         }
     }
@@ -286,12 +313,6 @@ internal fun MediaPlayerScreen(
 
         // Dispose
         onDispose { player?.removeListener(listener) }
-    }
-
-    val currentMedia = remember(viewState.mediaList, mediaState.playerState?.mediaItemIndex) {
-        if (viewState.mediaList.isNotEmpty()) {
-            mediaState.playerState?.let { viewState.mediaList[it.mediaItemIndex] } ?: Media()
-        } else Media()
     }
 
 
@@ -332,12 +353,21 @@ internal fun MediaPlayerScreen(
         if (viewState.showDialog == Dialog.AudioTrack) {
             mediaState.playerState?.let { state ->
                 TrackSelectorDialog(
-                    title = { Text(text = "Select audio track") },
+                    title = { Text(text = stringResource(R.string.select_audio_track)) },
                     onDismiss = { onEvent(UIEvent.ShowDialog(Dialog.None)) },
                     tracks = state.audioTracks,
                     onTrackClick = {
                         if (!it.isSelected && it.isSupported) {
-                            mediaState.player?.switchTrack(it)
+                            mediaState.playerState?.let { playerState ->
+                                val persistableState = PersistableState(
+                                    index = playerState.mediaItemIndex,
+                                    position = controller.positionMs,
+                                    playWhenReady = playerState.playWhenReady,
+                                    brightness = brightnessController.currentBrightness,
+                                    audioTrackId = it.getTrackFormat(0).id
+                                )
+                                onEvent(UIEvent.SaveState(persistableState))
+                            }
                         }
                     }
                 )
@@ -348,12 +378,21 @@ internal fun MediaPlayerScreen(
         if (viewState.showDialog == Dialog.SubtitleTrack) {
             mediaState.playerState?.let { state ->
                 TrackSelectorDialog(
-                    title = { Text(text = "Select subtitle track") },
+                    title = { Text(text = stringResource(R.string.select_subtitle_track)) },
                     onDismiss = { onEvent(UIEvent.ShowDialog(Dialog.None)) },
                     tracks = state.subtitleTracks,
                     onTrackClick = {
                         if (!it.isSelected && it.isSupported) {
-                            mediaState.player?.switchTrack(it)
+                            mediaState.playerState?.let { playerState ->
+                                val persistableState = PersistableState(
+                                    index = playerState.mediaItemIndex,
+                                    position = controller.positionMs,
+                                    playWhenReady = playerState.playWhenReady,
+                                    brightness = brightnessController.currentBrightness,
+                                    subtitleTrackId = it.getTrackFormat(0).id
+                                )
+                                onEvent(UIEvent.SaveState(persistableState))
+                            }
                         }
                     }
                 )

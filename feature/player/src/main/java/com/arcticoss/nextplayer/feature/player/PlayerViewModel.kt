@@ -81,7 +81,7 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             val media = playerViewState.value.mediaList[state.index]
             _playerViewState.update { it.copy(currentMediaItemId = media.id, playWhenReady = state.playWhenReady) }
-            mediaRepository.updateMedia(media.id, state.position)
+            mediaRepository.updateMedia(media.id, state.position, state.audioTrackId, state.subtitleTrackId)
             state.brightness?.let {
                 preferencesDataSource.updateBrightnessLevel(it)
             }
@@ -136,7 +136,9 @@ data class PersistableState(
     val index: Int,
     val position: Long,
     val playWhenReady: Boolean,
-    val brightness: Int? = null
+    val brightness: Int? = null,
+    val audioTrackId: String? = null,
+    val subtitleTrackId: String? = null
 )
 
 enum class Dialog {

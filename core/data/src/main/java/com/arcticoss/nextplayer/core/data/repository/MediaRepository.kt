@@ -3,6 +3,7 @@ package com.arcticoss.nextplayer.core.data.repository
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
+import android.util.Log
 import com.arcticoss.nextplayer.core.data.utils.asAudioTrackEntity
 import com.arcticoss.nextplayer.core.data.utils.asMediaItemEntity
 import com.arcticoss.nextplayer.core.data.utils.asSubtitleTrackEntity
@@ -60,11 +61,24 @@ class MediaRepository @Inject constructor(
         return mediaDao.get(path).asExternalModel()
     }
 
-    override suspend fun updateMedia(id: Long, lastPlayedPosition: Long) {
-        val mediaEntity = mediaDao.get(id)
-        mediaDao.update(
-            mediaEntity.copy(lastPlayedPosition = lastPlayedPosition)
+    override suspend fun updateMedia(
+        id: Long,
+        lastPlayedPosition: Long,
+        audioTrackId: String?,
+        subtitleTrackId: String?
+    ) {
+        var mediaEntity = mediaDao.get(id)
+        mediaEntity = mediaEntity.copy(
+            lastPlayedPosition = lastPlayedPosition
         )
+        if (audioTrackId != null) {
+            mediaEntity = mediaEntity.copy(audioTrackId = audioTrackId)
+        }
+        if (subtitleTrackId != null) {
+            mediaEntity = mediaEntity.copy(subtitleTrackId = subtitleTrackId)
+        }
+        Log.d("TAG", "updateMedia: $mediaEntity")
+        mediaDao.update(mediaEntity)
     }
 
     override suspend fun syncMedia() = withContext(Dispatchers.IO) {
