@@ -10,7 +10,6 @@ android {
 dependencies {
 
     implementation(project(":core:model"))
-    implementation(project(":core:datastore"))
     implementation(project(":core:data"))
 
     testImplementation(libs.junit4)
