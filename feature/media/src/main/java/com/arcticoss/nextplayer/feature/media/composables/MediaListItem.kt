@@ -27,6 +27,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.media.utils.TimeUtils
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import java.util.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -49,22 +54,36 @@ fun MediaListItem(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
-            Surface(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier
-                    .widthIn(max = 420.dp)
-                    .fillMaxWidth(0.45f)
-                    .aspectRatio(16f / 10f)
-            ) {
-                if (media.thumbnailPath.isNotEmpty()) {
-                    Image(
-                        bitmap = remember {
-                            BitmapFactory.decodeFile(media.thumbnailPath).asImageBitmap()
-                        },
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+            Box() {
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier
+                        .widthIn(max = 420.dp)
+                        .fillMaxWidth(0.45f)
+                        .aspectRatio(16f / 10f)
+                ) {
+                    if (media.thumbnailPath.isNotEmpty()) {
+                        Image(
+                            bitmap = remember {
+                                BitmapFactory.decodeFile(media.thumbnailPath).asImageBitmap()
+                            },
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+                val instant = Instant.fromEpochMilliseconds(media.addedOn)
+                val noOfDayUntil = instant.daysUntil(Clock.System.now(), TimeZone.currentSystemDefault())
+                if (noOfDayUntil <= 7) {
+                    FieldChip(
+                        text = "NEW",
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .align(Alignment.TopStart),
+                        backgroundColor = Color.Red,
+                        color = MaterialTheme.colorScheme.onError
                     )
                 }
             }

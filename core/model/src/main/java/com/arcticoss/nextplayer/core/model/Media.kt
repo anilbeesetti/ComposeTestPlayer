@@ -11,6 +11,7 @@ data class Media(
     val frameRate: Double = 0.0,
     val thumbnailPath: String = "",
     val lastPlayedPosition: Long = 0,
+    val addedOn: Long = 0,
     val audioTrackId: String? = null,
     val subtitleTrackId: String? = null,
     val videoTracks: List<VideoTrack> = emptyList(),
