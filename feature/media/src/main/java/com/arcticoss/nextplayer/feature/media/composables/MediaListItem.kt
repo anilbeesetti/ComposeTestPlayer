@@ -1,6 +1,7 @@
 package com.arcticoss.nextplayer.feature.media.composables
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -74,11 +75,13 @@ fun MediaListItem(
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.Top
             ) {
+                Log.d("TAG", "MediaListItem: $media")
                 Text(
                     text = media.title,
                     maxLines = 2,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = if (media.lastPlayedPosition >= media.duration) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) else Color.Unspecified
                 )
                 Row(
                     modifier = Modifier
