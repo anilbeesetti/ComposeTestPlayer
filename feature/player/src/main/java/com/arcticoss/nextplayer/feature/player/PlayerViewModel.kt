@@ -111,7 +111,7 @@ class PlayerViewModel @Inject constructor(
     private fun switchAspectRatio(resizeMode: ResizeMode?) {
         if (resizeMode == null) {
             viewModelScope.launch {
-                preferencesDataSource.switchAspectRatio()
+                preferencesDataSource.switchResizeMode()
             }
         } else {
             // TODO

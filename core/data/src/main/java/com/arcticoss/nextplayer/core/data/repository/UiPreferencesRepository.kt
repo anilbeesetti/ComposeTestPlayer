@@ -14,7 +14,7 @@ interface UiPreferencesRepository {
     val preferencesFlow: Flow<UiPreferences>
 
     /**
-     * Updates [UiPreferences]
+     * Updates the [UiPreferences]
      */
     suspend fun updatePreferences(preferences: UiPreferences)
 
@@ -34,7 +34,7 @@ interface UiPreferencesRepository {
     suspend fun setSortOrder(sortOrder: SortOrder)
 
     /**
-     * Toggles show floating button or not
+     * Toggles whether to show floating button or not
      */
     suspend fun toggleShowFloatingButton()
 

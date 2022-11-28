@@ -50,7 +50,7 @@ class PlayerPreferencesDataSource @Inject constructor(
         }
     }
 
-    suspend fun switchAspectRatio() {
+    suspend fun switchResizeMode() {
         try {
             playerPreferences.updateData { it.copy(resizeMode = it.resizeMode.next()) }
         } catch (ioException: IOException) {
@@ -58,7 +58,7 @@ class PlayerPreferencesDataSource @Inject constructor(
         }
     }
 
-    suspend fun changeAspectRatio(resizeMode: ResizeMode) {
+    suspend fun changeResizeMode(resizeMode: ResizeMode) {
         try {
             playerPreferences.updateData { it.copy(resizeMode = resizeMode) }
         } catch (ioException: IOException) {
