@@ -1,5 +1,9 @@
 package com.arcticoss.nextplayer.feature.player.composables
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.pm.ActivityInfo
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
@@ -20,6 +25,7 @@ import com.arcticoss.nextplayer.feature.player.UIEvent
 import com.arcticoss.nextplayer.feature.player.state.BrightnessState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.MediaState
+import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.google.android.exoplayer2.video.VideoSize
 
 @Composable
@@ -32,6 +38,10 @@ fun MediaPlayerScreenContent(
     brightnessController: BrightnessState,
     onEvent: (UIEvent) -> Unit
 ) {
+
+    val context = LocalContext.current
+    val activity = context.findActivity()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +72,8 @@ fun MediaPlayerScreenContent(
             brightnessState = brightnessController,
             showDialog = { onEvent(UIEvent.ShowDialog(it)) },
             onSwitchAspectClick = { onEvent(UIEvent.SwitchResizeMode()) },
-            onLockClick = mediaState::toggleControllerLock
+            onLockClick = mediaState::toggleControllerLock,
+            onRotationClick = { activity?.setNextOrientation() }
         )
 
         // Show audio track selector dialog
@@ -147,3 +158,18 @@ private fun MediaPlayer(
  */
 private val VideoSize.aspectRatio
     get() = if (height == 0) 0f else width * pixelWidthHeightRatio / height
+
+
+@SuppressLint("SourceLockedOrientationActivity")
+private fun Activity.setNextOrientation() {
+    val isLandscape = requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+    if (isLandscape) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+    } else {
+        requestedOrientation =ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+    }
+
+    Log.d("TAG", "setNextOrientation: $requestedOrientation")
+}
