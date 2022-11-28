@@ -12,7 +12,7 @@ class UserUiPreferencesRepository @Inject constructor(
     private val uiPreferencesDataSource: UiPreferencesDataSource
 ) : UiPreferencesRepository {
 
-    override val uiPreferencesStream: Flow<UiPreferences> =
+    override val preferencesFlow: Flow<UiPreferences> =
         uiPreferencesDataSource.uiPreferencesFlow
 
     override suspend fun updatePreferences(preferences: UiPreferences) =

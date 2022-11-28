@@ -2,7 +2,7 @@ package com.arcticoss.nextplayer.feature.settings.screens.display
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.nextplayer.core.datastore.datasource.UiPreferencesDataSource
+import com.arcticoss.nextplayer.core.data.repository.UiPreferencesRepository
 import com.arcticoss.nextplayer.core.model.UiPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,11 +12,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InterfacePreferencesViewModel @Inject constructor(
-    private val preferencesDataSource: UiPreferencesDataSource
+    private val preferencesRepository: UiPreferencesRepository
 ) : ViewModel() {
 
-    val preferencesFlow = preferencesDataSource
-        .uiPreferencesFlow
+    val preferencesFlow = preferencesRepository.preferencesFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -25,19 +24,19 @@ class InterfacePreferencesViewModel @Inject constructor(
 
     fun toggleFloatingButton() {
         viewModelScope.launch {
-            preferencesDataSource.toggleShowFloatingButton()
+            preferencesRepository.toggleShowFloatingButton()
         }
     }
 
     fun toggleShowHidden() {
         viewModelScope.launch {
-            preferencesDataSource.toggleShowHidden()
+            preferencesRepository.toggleShowHidden()
         }
     }
 
     fun toggleGroupVideos() {
         viewModelScope.launch {
-            preferencesDataSource.toggleGroupVideos()
+            preferencesRepository.toggleGroupVideos()
         }
     }
 }

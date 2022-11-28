@@ -11,7 +11,7 @@ interface UiPreferencesRepository {
     /**
      * Stream of [UiPreferences]
      */
-    val uiPreferencesStream: Flow<UiPreferences>
+    val preferencesFlow: Flow<UiPreferences>
 
     /**
      * Updates [UiPreferences]

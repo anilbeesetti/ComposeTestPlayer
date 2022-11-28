@@ -2,12 +2,12 @@ package com.arcticoss.nextplayer.feature.media.screens.media
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.nextplayer.core.datastore.datasource.UiPreferencesDataSource
+import com.arcticoss.nextplayer.core.data.repository.UiPreferencesRepository
 import com.arcticoss.nextplayer.core.domain.GetSortedFoldersStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
 import com.arcticoss.nextplayer.core.domain.models.Folder
-import com.arcticoss.nextplayer.core.model.UiPreferences
 import com.arcticoss.nextplayer.core.model.Media
+import com.arcticoss.nextplayer.core.model.UiPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,13 +18,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MediaScreenViewModel @Inject constructor(
-    preferencesDataSource: UiPreferencesDataSource,
+    preferencesRepository: UiPreferencesRepository,
     getSortedFoldersStream: GetSortedFoldersStreamUseCase,
     getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase
 ) : ViewModel() {
 
-    val preferencesStateFlow = preferencesDataSource
-        .uiPreferencesFlow
+    val preferencesStateFlow = preferencesRepository.preferencesFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
