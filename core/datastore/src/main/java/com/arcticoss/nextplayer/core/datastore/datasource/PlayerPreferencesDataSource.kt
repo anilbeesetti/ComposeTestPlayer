@@ -1,9 +1,11 @@
 package com.arcticoss.nextplayer.core.datastore.datasource
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import com.arcticoss.nextplayer.core.model.PlayerPreferences
 import com.arcticoss.nextplayer.core.model.ResizeMode
 import com.arcticoss.nextplayer.core.model.next
+import java.io.IOException
 import javax.inject.Inject
 
 class PlayerPreferencesDataSource @Inject constructor(
@@ -13,42 +15,54 @@ class PlayerPreferencesDataSource @Inject constructor(
     val playerPreferencesFlow = playerPreferences.data
 
     suspend fun updatePreferences(preferences: PlayerPreferences) {
-        playerPreferences.updateData { preferences }
+        try {
+            playerPreferences.updateData { preferences }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update player preferences", ioException)
+        }
     }
 
     suspend fun toggleSaveBrightness() {
-        playerPreferences.updateData {
-            it.copy(saveBrightnessLevel = !it.saveBrightnessLevel)
+        try {
+            playerPreferences.updateData { it.copy(saveBrightnessLevel = !it.saveBrightnessLevel) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update player preferences", ioException)
         }
     }
 
     suspend fun toggleSavePlayBackSpeed() {
-        playerPreferences.updateData {
-            it.copy(savePlayBackSpeed = !it.savePlayBackSpeed)
-        }
+        playerPreferences.updateData { it.copy(savePlayBackSpeed = !it.savePlayBackSpeed) }
     }
 
     suspend fun toggleFastSeeking() {
-        playerPreferences.updateData {
-            it.copy(fastSeeking = !it.fastSeeking)
+        try {
+            playerPreferences.updateData { it.copy(fastSeeking = !it.fastSeeking) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update player preferences", ioException)
         }
     }
 
     suspend fun updateBrightnessLevel(brightnessLevel: Int) {
-        playerPreferences.updateData {
-            it.copy(brightnessLevel = brightnessLevel)
+        try {
+            playerPreferences.updateData { it.copy(brightnessLevel = brightnessLevel) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update player preferences", ioException)
         }
     }
 
     suspend fun switchAspectRatio() {
-        playerPreferences.updateData {
-            it.copy(resizeMode = it.resizeMode.next())
+        try {
+            playerPreferences.updateData { it.copy(resizeMode = it.resizeMode.next()) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update player preferences", ioException)
         }
     }
 
     suspend fun changeAspectRatio(resizeMode: ResizeMode) {
-        playerPreferences.updateData {
-            it.copy(resizeMode = resizeMode)
+        try {
+            playerPreferences.updateData { it.copy(resizeMode = resizeMode) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update player preferences", ioException)
         }
     }
 }

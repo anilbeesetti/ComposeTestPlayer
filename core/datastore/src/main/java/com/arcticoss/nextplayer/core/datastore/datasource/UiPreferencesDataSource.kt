@@ -1,10 +1,12 @@
 package com.arcticoss.nextplayer.core.datastore.datasource
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import com.arcticoss.nextplayer.core.model.UiPreferences
 import com.arcticoss.nextplayer.core.model.SortBy
 import com.arcticoss.nextplayer.core.model.SortOrder
 import com.arcticoss.nextplayer.core.model.Theme
+import java.io.IOException
 import javax.inject.Inject
 
 class UiPreferencesDataSource @Inject constructor(
@@ -14,42 +16,58 @@ class UiPreferencesDataSource @Inject constructor(
     val uiPreferencesFlow = uiPreferences.data
 
     suspend fun updatePreferences(preferences: UiPreferences) {
-        uiPreferences.updateData { preferences }
+        try {
+            uiPreferences.updateData { preferences }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update ui preferences", ioException)
+        }
     }
 
     suspend fun updateTheme(theme: Theme) {
-        uiPreferences.updateData {
-            it.copy(theme = theme)
+        try {
+            uiPreferences.updateData { it.copy(theme = theme) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update ui preferences", ioException)
         }
     }
 
     suspend fun updateSortBy(sortBy: SortBy) {
-        uiPreferences.updateData {
-            it.copy(sortBy = sortBy)
+        try {
+            uiPreferences.updateData { it.copy(sortBy = sortBy) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update ui preferences", ioException)
         }
     }
 
     suspend fun updateSortOrder(sortOrder: SortOrder) {
-        uiPreferences.updateData {
-            it.copy(sortOrder = sortOrder)
+        try {
+            uiPreferences.updateData { it.copy(sortOrder = sortOrder) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update ui preferences", ioException)
         }
     }
 
     suspend fun toggleShowFloatingButton() {
-        uiPreferences.updateData {
-            it.copy(showFloatingButton = !it.showFloatingButton)
+        try {
+            uiPreferences.updateData { it.copy(showFloatingButton = !it.showFloatingButton) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update ui preferences", ioException)
         }
     }
 
     suspend fun toggleShowHidden() {
-        uiPreferences.updateData {
-            it.copy(showHidden = !it.showHidden)
+        try {
+            uiPreferences.updateData { it.copy(showHidden = !it.showHidden) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update ui preferences", ioException)
         }
     }
 
     suspend fun toggleGroupVideos() {
-        uiPreferences.updateData {
-            it.copy(groupVideos = !it.groupVideos)
+        try {
+            uiPreferences.updateData { it.copy(groupVideos = !it.groupVideos) }
+        } catch (ioException: IOException) {
+            Log.e("NextPlayerPreferences", "Failed to update ui preferences", ioException)
         }
     }
 }
