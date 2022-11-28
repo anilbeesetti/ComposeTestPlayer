@@ -4,8 +4,8 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
-import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
+import com.arcticoss.nextplayer.core.data.repository.MediaRepository
+import com.arcticoss.nextplayer.core.data.repository.PlayerPreferencesRepository
 import com.arcticoss.nextplayer.core.domain.GetMediaFromUriUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaItemsStreamUseCase
@@ -26,8 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
-    private val mediaRepository: IMediaRepository,
-    private val preferencesDataSource: PlayerPreferencesDataSource,
+    private val mediaRepository: MediaRepository,
+    private val preferencesRepository: PlayerPreferencesRepository,
     private val getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
     private val getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
     private val getMediaFromUri: GetMediaFromUriUseCase,
@@ -41,7 +41,7 @@ class PlayerViewModel @Inject constructor(
     val playerViewState = _playerViewState.asStateFlow()
 
 
-    val preferencesFlow = preferencesDataSource.preferencesFlow
+    val preferencesFlow = preferencesRepository.preferencesFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -99,7 +99,7 @@ class PlayerViewModel @Inject constructor(
                 state.subtitleTrackId
             )
             state.brightness?.let {
-                preferencesDataSource.updateBrightnessLevel(it)
+                preferencesRepository.setBrightnessLevel(it)
             }
         }
     }
@@ -111,7 +111,7 @@ class PlayerViewModel @Inject constructor(
     private fun switchAspectRatio(resizeMode: ResizeMode?) {
         if (resizeMode == null) {
             viewModelScope.launch {
-                preferencesDataSource.switchAspectRatio()
+                preferencesRepository.switchResizeMode()
             }
         } else {
             // TODO

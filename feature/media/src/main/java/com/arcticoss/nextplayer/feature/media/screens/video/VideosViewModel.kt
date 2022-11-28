@@ -3,10 +3,10 @@ package com.arcticoss.nextplayer.feature.media.screens.video
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
+import com.arcticoss.nextplayer.core.data.repository.UiPreferencesRepository
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
 import com.arcticoss.nextplayer.core.model.Folder
-import com.arcticoss.nextplayer.core.model.InterfacePreferences
+import com.arcticoss.nextplayer.core.model.UiPreferences
 import com.arcticoss.nextplayer.feature.media.navigation.folderIdArg
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class VideosViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    interfacePreferencesDataSource: InterfacePreferencesDataSource,
+    preferencesRepository: UiPreferencesRepository,
     getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase
 ) : ViewModel() {
 
@@ -37,12 +37,11 @@ class VideosViewModel @Inject constructor(
             )
     }
 
-    val interfacePreferences = interfacePreferencesDataSource
-        .preferencesFlow
+    val preferences = preferencesRepository.preferencesFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = InterfacePreferences()
+            initialValue = UiPreferences()
         )
 }
 

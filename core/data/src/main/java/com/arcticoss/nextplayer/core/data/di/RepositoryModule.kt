@@ -1,7 +1,11 @@
 package com.arcticoss.nextplayer.core.data.di
 
-import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
 import com.arcticoss.nextplayer.core.data.repository.MediaRepository
+import com.arcticoss.nextplayer.core.data.repository.FileMediaRepository
+import com.arcticoss.nextplayer.core.data.repository.PlayerPreferencesRepository
+import com.arcticoss.nextplayer.core.data.repository.UiPreferencesRepository
+import com.arcticoss.nextplayer.core.data.repository.UserPlayerPreferencesRepository
+import com.arcticoss.nextplayer.core.data.repository.UserUiPreferencesRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,6 +19,18 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindsMediaRepository(
-        mediaRepository: MediaRepository
-    ): IMediaRepository
+        mediaRepository: FileMediaRepository
+    ): MediaRepository
+
+
+    @Binds
+    fun bindsUiPreferencesRepository(
+        uiPreferencesRepository: UserUiPreferencesRepository
+    ): UiPreferencesRepository
+
+
+    @Binds
+    fun bindsPlayerPreferencesRepository(
+        playerPreferencesRepository: UserPlayerPreferencesRepository
+    ): PlayerPreferencesRepository
 }

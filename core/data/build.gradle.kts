@@ -9,9 +9,10 @@ android {
 
 dependencies {
 
+    implementation(project(":core:datastore"))
     implementation(project(":core:database"))
-    implementation(project(":mediainfo"))
     implementation(project(":core:model"))
+    implementation(project(":mediainfo"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.coroutines.android)

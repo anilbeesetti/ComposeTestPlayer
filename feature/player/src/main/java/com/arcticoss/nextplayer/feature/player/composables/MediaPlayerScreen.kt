@@ -21,9 +21,6 @@ import com.arcticoss.nextplayer.feature.player.PersistableState
 import com.arcticoss.nextplayer.feature.player.PlayerViewModel
 import com.arcticoss.nextplayer.feature.player.PlayerViewState
 import com.arcticoss.nextplayer.feature.player.UIEvent
-import com.arcticoss.nextplayer.feature.player.state.BrightnessState
-import com.arcticoss.nextplayer.feature.player.state.ControllerState
-import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.arcticoss.nextplayer.feature.player.state.rememberBrightnessState
 import com.arcticoss.nextplayer.feature.player.state.rememberControllerState
 import com.arcticoss.nextplayer.feature.player.state.rememberManagedExoPlayer
@@ -49,21 +46,10 @@ fun MediaPlayerScreen(
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
 
-    val context = LocalContext.current
-    val activity = context.findActivity()
-
-    val player by rememberManagedExoPlayer()
-    val mediaState = rememberMediaState(player = player)
-    val controller = rememberControllerState(mediaState = mediaState)
-    val brightnessController = rememberBrightnessState(activity = activity)
-
     val playerViewState by viewModel.playerViewState.collectAsStateWithLifecycle()
     val preferences by viewModel.preferencesFlow.collectAsStateWithLifecycle()
 
     MediaPlayerScreen(
-        mediaState = mediaState,
-        controller = controller,
-        brightnessController = brightnessController,
         viewState = playerViewState,
         preferences = preferences,
         onEvent = viewModel::onEvent
@@ -75,9 +61,6 @@ fun MediaPlayerScreen(
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
 internal fun MediaPlayerScreen(
-    mediaState: MediaState,
-    controller: ControllerState,
-    brightnessController: BrightnessState,
     viewState: PlayerViewState,
     preferences: PlayerPreferences,
     onEvent: (UIEvent) -> Unit
@@ -85,6 +68,12 @@ internal fun MediaPlayerScreen(
 
     val context = LocalContext.current
     val activity = context.findActivity()
+
+    val player by rememberManagedExoPlayer()
+    val mediaState = rememberMediaState(player = player)
+    val controller = rememberControllerState(mediaState = mediaState)
+    val brightnessController = rememberBrightnessState(activity = activity)
+
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
