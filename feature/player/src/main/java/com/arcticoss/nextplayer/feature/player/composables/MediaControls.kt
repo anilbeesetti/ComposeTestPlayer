@@ -3,6 +3,7 @@ package com.arcticoss.nextplayer.feature.player.composables
 import android.content.Context
 import android.media.AudioManager
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -188,7 +189,7 @@ fun MediaControls(
                     Controls(
                         resizeMode = preferences.resizeMode,
                         modifier = Modifier
-                            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
+                            .padding(horizontal = 5.dp),
                         onAspectRatioClick = {
                             interactingWithControllerTrigger++
                             onSwitchAspectClick()
@@ -257,12 +258,12 @@ fun Controls(
                 onClick = onLockClick,
                 icon = Icons.Rounded.LockOpen
             )
-        }
-        Row {
             ControlButton(
                 onClick = onRotationClick,
                 icon = Icons.Rounded.ScreenRotation
             )
+        }
+        Row {
             ControlButton(
                 onClick = onAspectRatioClick,
                 icon = resizeModeIcon
@@ -276,7 +277,11 @@ fun ControlButton(
     onClick: () -> Unit,
     icon: ImageVector
 ) {
-    IconButton(onClick = onClick) {
+    Box(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(15.dp)
+    ) {
         Icon(imageVector = icon, contentDescription = icon.name)
     }
 }

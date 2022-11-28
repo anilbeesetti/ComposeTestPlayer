@@ -34,9 +34,9 @@ fun PlayerUIHeader(
         }
         Text(
             text = title,
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         IconButton(onClick = onSubtitleIconClick) {
             Icon(
