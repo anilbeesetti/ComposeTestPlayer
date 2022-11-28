@@ -15,7 +15,7 @@ dependencies {
     implementation(project(":core:domain"))
 
     implementation(libs.accompanist.permissions)
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation(libs.kotlinx.datetime)
 
     testImplementation(libs.junit4)
 
