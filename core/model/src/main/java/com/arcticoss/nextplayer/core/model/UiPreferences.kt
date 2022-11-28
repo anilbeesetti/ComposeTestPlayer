@@ -3,7 +3,7 @@ package com.arcticoss.nextplayer.core.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class InterfacePreferences(
+data class UiPreferences(
     val theme: Theme = Theme.FollowSystem,
     val showFloatingButton: Boolean = false,
     val groupVideos: Boolean = true,

@@ -2,8 +2,8 @@ package com.arcticoss.nextplayer.feature.settings.screens.display
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
-import com.arcticoss.nextplayer.core.model.InterfacePreferences
+import com.arcticoss.nextplayer.core.datastore.datasource.UiPreferencesDataSource
+import com.arcticoss.nextplayer.core.model.UiPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -12,15 +12,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InterfacePreferencesViewModel @Inject constructor(
-    private val preferencesDataSource: InterfacePreferencesDataSource
+    private val preferencesDataSource: UiPreferencesDataSource
 ) : ViewModel() {
 
     val preferencesFlow = preferencesDataSource
-        .preferencesFlow
+        .uiPreferencesFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = InterfacePreferences()
+            initialValue = UiPreferences()
         )
 
     fun toggleFloatingButton() {

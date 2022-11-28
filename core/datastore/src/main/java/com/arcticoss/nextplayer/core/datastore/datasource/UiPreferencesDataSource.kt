@@ -1,54 +1,54 @@
 package com.arcticoss.nextplayer.core.datastore.datasource
 
 import androidx.datastore.core.DataStore
-import com.arcticoss.nextplayer.core.model.InterfacePreferences
+import com.arcticoss.nextplayer.core.model.UiPreferences
 import com.arcticoss.nextplayer.core.model.SortBy
 import com.arcticoss.nextplayer.core.model.SortOrder
 import com.arcticoss.nextplayer.core.model.Theme
 import javax.inject.Inject
 
-class InterfacePreferencesDataSource @Inject constructor(
-    private val interfacePreferences: DataStore<InterfacePreferences>
+class UiPreferencesDataSource @Inject constructor(
+    private val uiPreferences: DataStore<UiPreferences>
 ) {
 
-    val preferencesFlow = interfacePreferences.data
+    val uiPreferencesFlow = uiPreferences.data
 
-    suspend fun updatePreferences(preferences: InterfacePreferences) {
-        interfacePreferences.updateData { preferences }
+    suspend fun updatePreferences(preferences: UiPreferences) {
+        uiPreferences.updateData { preferences }
     }
 
     suspend fun updateTheme(theme: Theme) {
-        interfacePreferences.updateData {
+        uiPreferences.updateData {
             it.copy(theme = theme)
         }
     }
 
     suspend fun updateSortBy(sortBy: SortBy) {
-        interfacePreferences.updateData {
+        uiPreferences.updateData {
             it.copy(sortBy = sortBy)
         }
     }
 
     suspend fun updateSortOrder(sortOrder: SortOrder) {
-        interfacePreferences.updateData {
+        uiPreferences.updateData {
             it.copy(sortOrder = sortOrder)
         }
     }
 
     suspend fun toggleShowFloatingButton() {
-        interfacePreferences.updateData {
+        uiPreferences.updateData {
             it.copy(showFloatingButton = !it.showFloatingButton)
         }
     }
 
     suspend fun toggleShowHidden() {
-        interfacePreferences.updateData {
+        uiPreferences.updateData {
             it.copy(showHidden = !it.showHidden)
         }
     }
 
     suspend fun toggleGroupVideos() {
-        interfacePreferences.updateData {
+        uiPreferences.updateData {
             it.copy(groupVideos = !it.groupVideos)
         }
     }

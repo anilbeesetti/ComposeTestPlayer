@@ -10,7 +10,7 @@ class PlayerPreferencesDataSource @Inject constructor(
     private val playerPreferences: DataStore<PlayerPreferences>
 ) {
 
-    val preferencesFlow = playerPreferences.data
+    val playerPreferencesFlow = playerPreferences.data
 
     suspend fun updatePreferences(preferences: PlayerPreferences) {
         playerPreferences.updateData { preferences }

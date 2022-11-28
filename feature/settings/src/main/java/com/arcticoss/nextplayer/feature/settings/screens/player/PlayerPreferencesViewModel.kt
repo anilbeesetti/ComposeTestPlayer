@@ -16,7 +16,7 @@ class PlayerPreferencesViewModel @Inject constructor(
 ) : ViewModel() {
 
     val preferencesFlow = preferencesDataSource
-        .preferencesFlow
+        .playerPreferencesFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
