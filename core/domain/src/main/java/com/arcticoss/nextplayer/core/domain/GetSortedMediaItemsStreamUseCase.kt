@@ -1,6 +1,6 @@
 package com.arcticoss.nextplayer.core.domain
 
-import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
+import com.arcticoss.nextplayer.core.data.repository.MediaRepository
 import com.arcticoss.nextplayer.core.datastore.datasource.InterfacePreferencesDataSource
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.core.model.SortBy
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class GetSortedMediaItemsStreamUseCase @Inject constructor(
-    private val mediaRepository: IMediaRepository,
+    private val mediaRepository: MediaRepository,
     private val preferencesDataSource: InterfacePreferencesDataSource
 ) {
 

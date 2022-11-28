@@ -1,7 +1,7 @@
 package com.arcticoss.nextplayer.core.data.di
 
-import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
 import com.arcticoss.nextplayer.core.data.repository.MediaRepository
+import com.arcticoss.nextplayer.core.data.repository.FileMediaRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,6 +15,6 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindsMediaRepository(
-        mediaRepository: MediaRepository
-    ): IMediaRepository
+        fileMediaRepository: FileMediaRepository
+    ): MediaRepository
 }

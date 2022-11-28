@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arcticoss.nextplayer.core.data.repository.IMediaRepository
+import com.arcticoss.nextplayer.core.data.repository.MediaRepository
 import com.arcticoss.nextplayer.core.datastore.datasource.PlayerPreferencesDataSource
 import com.arcticoss.nextplayer.core.domain.GetMediaFromUriUseCase
 import com.arcticoss.nextplayer.core.domain.GetSortedMediaFolderStreamUseCase
@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
-    private val mediaRepository: IMediaRepository,
+    private val mediaRepository: MediaRepository,
     private val preferencesDataSource: PlayerPreferencesDataSource,
     private val getSortedMediaItemsStream: GetSortedMediaItemsStreamUseCase,
     private val getSortedMediaFolderStream: GetSortedMediaFolderStreamUseCase,
