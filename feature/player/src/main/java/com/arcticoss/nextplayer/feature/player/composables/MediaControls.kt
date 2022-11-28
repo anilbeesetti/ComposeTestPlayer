@@ -20,8 +20,10 @@ import androidx.compose.material.icons.rounded.AspectRatio
 import androidx.compose.material.icons.rounded.Crop
 import androidx.compose.material.icons.rounded.FitScreen
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.LockOpen
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.ScreenRotation
 import androidx.compose.material.icons.rounded.ZoomOutMap
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -36,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
@@ -62,8 +65,9 @@ fun MediaControls(
     controller: ControllerState,
     preferences: PlayerPreferences,
     brightnessState: BrightnessState,
-    onLockClick: () -> Unit,
     showDialog: (Dialog) -> Unit,
+    onLockClick: () -> Unit,
+    onRotationClick: () -> Unit,
     onSwitchAspectClick: () -> Unit
 ) {
 
@@ -192,6 +196,10 @@ fun MediaControls(
                         onLockClick = {
                             interactingWithControllerTrigger++
                             onLockClick()
+                        },
+                        onRotationClick = {
+                            interactingWithControllerTrigger++
+                            onRotationClick()
                         }
                     )
                 }
@@ -228,7 +236,8 @@ fun Controls(
     resizeMode: ResizeMode,
     modifier: Modifier = Modifier,
     onAspectRatioClick: () -> Unit,
-    onLockClick: () -> Unit
+    onLockClick: () -> Unit,
+    onRotationClick: () -> Unit
 ) {
     val resizeModeIcon = when (resizeMode) {
         ResizeMode.FitScreen -> Icons.Rounded.FitScreen
@@ -244,15 +253,31 @@ fun Controls(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row {
-            IconButton(onClick = onLockClick) {
-                Icon(imageVector = Icons.Rounded.Lock, contentDescription = "")
-            }
+            ControlButton(
+                onClick = onLockClick,
+                icon = Icons.Rounded.LockOpen
+            )
         }
         Row {
-            IconButton(onClick = onAspectRatioClick) {
-                Icon(imageVector = resizeModeIcon, contentDescription = resizeMode.title)
-            }
+            ControlButton(
+                onClick = onRotationClick,
+                icon = Icons.Rounded.ScreenRotation
+            )
+            ControlButton(
+                onClick = onAspectRatioClick,
+                icon = resizeModeIcon
+            )
         }
+    }
+}
+
+@Composable
+fun ControlButton(
+    onClick: () -> Unit,
+    icon: ImageVector
+) {
+    IconButton(onClick = onClick) {
+        Icon(imageVector = icon, contentDescription = icon.name)
     }
 }
 
