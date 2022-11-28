@@ -5,6 +5,7 @@ data class MediaInfo(
     val title: String,
     val duration: Long,
     val filePath: String,
+    val lastModified: Long,
     val width: Int,
     val height: Int,
     val frameRate: FrameRate,

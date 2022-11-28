@@ -20,6 +20,7 @@ fun MediaInfo.asMediaItemEntity(id: Long = 0, folderId: Long) =
         duration = this.duration,
         height = this.height,
         frameRate = this.frameRate,
+        addedOn = this.lastModified,
         folderId = folderId
     )
 

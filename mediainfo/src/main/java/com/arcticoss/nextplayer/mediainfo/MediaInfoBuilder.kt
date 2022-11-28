@@ -37,6 +37,7 @@ class MediaInfoBuilder {
             title = fromFile?.name ?: "",
             filePath = fromFile?.path ?: "",
             size = fromFile?.length() ?: 0,
+            lastModified = fromFile?.lastModified() ?: 0,
             width = videoStreams.firstOrNull()?.frameWidth ?: 0,
             height = videoStreams.firstOrNull()?.frameHeight ?: 0,
             frameRate = videoStreams.firstOrNull()?.frameRate ?: 0.0,

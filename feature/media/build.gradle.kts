@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":core:domain"))
 
     implementation(libs.accompanist.permissions)
+    implementation(libs.kotlinx.datetime)
 
     testImplementation(libs.junit4)
 

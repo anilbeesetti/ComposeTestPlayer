@@ -3,7 +3,6 @@ package com.arcticoss.nextplayer.core.data.repository
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
-import android.util.Log
 import com.arcticoss.nextplayer.core.data.utils.asAudioTrackEntity
 import com.arcticoss.nextplayer.core.data.utils.asMediaItemEntity
 import com.arcticoss.nextplayer.core.data.utils.asSubtitleTrackEntity
@@ -77,7 +76,6 @@ class FileMediaRepository @Inject constructor(
         if (subtitleTrackId != null) {
             mediaEntity = mediaEntity.copy(subtitleTrackId = subtitleTrackId)
         }
-        Log.d("TAG", "updateMedia: $mediaEntity")
         mediaDao.update(mediaEntity)
     }
 
