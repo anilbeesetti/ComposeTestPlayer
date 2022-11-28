@@ -27,22 +27,22 @@ object DataStoreModule {
     @Provides
     @Singleton
     fun provideInterfacePreferencesDataStore(
-        @ApplicationContext appContext: Context
+        @ApplicationContext applicationContext: Context
     ): DataStore<InterfacePreferences> {
         return DataStoreFactory.create(
             serializer = InterfacePreferencesSerializer,
-            produceFile = { appContext.dataStoreFile(INTERFACE_PREFERENCES_DATASTORE_FILE) }
+            produceFile = { applicationContext.dataStoreFile(INTERFACE_PREFERENCES_DATASTORE_FILE) }
         )
     }
 
     @Provides
     @Singleton
     fun providePlayerPreferencesDataStore(
-        @ApplicationContext appContext: Context
+        @ApplicationContext applicationContext: Context
     ): DataStore<PlayerPreferences> {
         return DataStoreFactory.create(
             serializer = PlayerPreferencesSerializer,
-            produceFile = { appContext.dataStoreFile(PLAYER_PREFERENCES_DATASTORE_FILE) }
+            produceFile = { applicationContext.dataStoreFile(PLAYER_PREFERENCES_DATASTORE_FILE) }
         )
     }
 
