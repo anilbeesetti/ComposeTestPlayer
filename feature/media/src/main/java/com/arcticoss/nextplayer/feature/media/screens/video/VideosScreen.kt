@@ -2,6 +2,7 @@ package com.arcticoss.nextplayer.feature.media.screens.video
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -68,15 +69,7 @@ fun VideosScreen(
     ) { innerPadding ->
         when (mediaFolderState) {
             is VideoUiState.Error -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
-                }
+                ErrorContent(innerPadding)
             }
             VideoUiState.Loading -> {
                 Column(
@@ -90,22 +83,39 @@ fun VideosScreen(
                 }
             }
             is VideoUiState.Success -> {
-                LazyColumn(
-                    contentPadding = innerPadding,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    item {
-                        Spacer(modifier = Modifier.height(5.dp))
-                    }
-                    val mediaFolder = (mediaFolderState as VideoUiState.Success).folder
-                    items(mediaFolder.mediaList, key = { it.id }) { mediaItem ->
-                        MediaListItem(
-                            media = mediaItem,
-                            onClick = { onMediaItemClick(mediaItem.id, mediaFolder.id) }
-                        )
+                val mediaFolder = (mediaFolderState as VideoUiState.Success).folder
+                if (mediaFolder.mediaList.isEmpty()) {
+                    ErrorContent(innerPadding)
+                } else {
+                    LazyColumn(
+                        contentPadding = innerPadding,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item {
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        items(mediaFolder.mediaList, key = { it.id }) { mediaItem ->
+                            MediaListItem(
+                                media = mediaItem,
+                                onClick = { onMediaItemClick(mediaItem.id, mediaFolder.id) }
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ErrorContent(innerPadding: PaddingValues) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = "No videos found.", style = MaterialTheme.typography.labelLarge)
     }
 }

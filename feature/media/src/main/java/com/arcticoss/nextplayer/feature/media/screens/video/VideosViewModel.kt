@@ -26,7 +26,7 @@ class VideosViewModel @Inject constructor(
     private val folderId = savedStateHandle.get<Long>(folderIdArg)
 
     val videoUiState: StateFlow<VideoUiState> = if (folderId == null) {
-        MutableStateFlow(VideoUiState.Error(""))
+        MutableStateFlow(VideoUiState.Error("Not Found"))
     } else {
         getSortedMediaFolderStream(folderId)
             .map { VideoUiState.Success(it) }
@@ -45,8 +45,8 @@ class VideosViewModel @Inject constructor(
         )
 }
 
-sealed class VideoUiState {
-    object Loading : VideoUiState()
-    data class Success(val folder: Folder) : VideoUiState()
-    data class Error(val error: String) : VideoUiState()
+sealed interface VideoUiState {
+    object Loading : VideoUiState
+    data class Success(val folder: Folder) : VideoUiState
+    data class Error(val error: String) : VideoUiState
 }
