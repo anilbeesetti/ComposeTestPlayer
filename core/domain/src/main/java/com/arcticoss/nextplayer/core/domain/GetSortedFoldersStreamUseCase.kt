@@ -1,6 +1,6 @@
 package com.arcticoss.nextplayer.core.domain
 
-import com.arcticoss.nextplayer.core.data.repository.FileMediaRepository
+import com.arcticoss.nextplayer.core.data.repository.MediaRepository
 import com.arcticoss.nextplayer.core.data.repository.UiPreferencesRepository
 import com.arcticoss.nextplayer.core.domain.models.Folder
 import com.arcticoss.nextplayer.core.model.SortBy
@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class GetSortedFoldersStreamUseCase @Inject constructor(
-    private val fileMediaRepository: FileMediaRepository,
+    private val mediaRepository: MediaRepository,
     private val preferencesRepository: UiPreferencesRepository
 ) {
 
     operator fun invoke(): Flow<List<Folder>> {
         return combine(
-            fileMediaRepository.getFolderMediaStream(),
+            mediaRepository.getFolderMediaStream(),
             preferencesRepository.preferencesFlow
         ) { mediaFolders, preferences ->
             val folders = mediaFolders.map { mediaFolder ->
