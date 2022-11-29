@@ -44,6 +44,7 @@ fun MediaInfoRelation.asExternalModel() = Media(
     frameRate = mediaEntity.frameRate,
     duration = mediaEntity.duration,
     addedOn = mediaEntity.addedOn,
+    lastPlayedOn = mediaEntity.lastPlayedOn,
     lastPlayedPosition = mediaEntity.lastPlayedPosition,
     audioTrackId = mediaEntity.audioTrackId,
     subtitleTrackId = mediaEntity.subtitleTrackId,

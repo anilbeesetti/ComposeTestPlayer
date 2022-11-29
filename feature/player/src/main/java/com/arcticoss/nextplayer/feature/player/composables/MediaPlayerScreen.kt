@@ -36,6 +36,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Player.STATE_ENDED
 import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import kotlinx.datetime.Clock
 import java.io.File
 import java.util.*
 
@@ -182,6 +183,7 @@ internal fun MediaPlayerScreen(
                     index = playerState.mediaItemIndex,
                     position = controller.positionMs,
                     playWhenReady = playerState.playWhenReady,
+                    playedOn = Clock.System.now().toEpochMilliseconds(),
                     brightness = brightnessController.currentBrightness,
                 )
                 onEvent(UIEvent.SaveState(state))
@@ -209,6 +211,7 @@ internal fun MediaPlayerScreen(
                         val state = PersistableState(
                             index = it.mediaItemIndex,
                             position = it.positionMs,
+                            playedOn = Clock.System.now().toEpochMilliseconds(),
                             playWhenReady = mediaState.player?.playWhenReady == true
                         )
                         onEvent(UIEvent.SaveState(state))

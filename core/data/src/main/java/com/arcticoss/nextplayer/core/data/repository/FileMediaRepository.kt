@@ -64,11 +64,13 @@ class FileMediaRepository @Inject constructor(
         id: Long,
         lastPlayedPosition: Long,
         audioTrackId: String?,
-        subtitleTrackId: String?
+        subtitleTrackId: String?,
+        playedOn: Long?
     ) {
         var mediaEntity = mediaDao.get(id)
         mediaEntity = mediaEntity.copy(
-            lastPlayedPosition = lastPlayedPosition
+            lastPlayedPosition = lastPlayedPosition,
+            lastPlayedOn = playedOn
         )
         if (audioTrackId != null) {
             mediaEntity = mediaEntity.copy(audioTrackId = audioTrackId)

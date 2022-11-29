@@ -29,7 +29,8 @@ interface MediaRepository {
         id: Long,
         lastPlayedPosition: Long,
         audioTrackId: String?,
-        subtitleTrackId: String?
+        subtitleTrackId: String?,
+        playedOn: Long?
     )
 
     /**

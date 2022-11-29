@@ -27,6 +27,7 @@ import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.google.android.exoplayer2.video.VideoSize
+import kotlinx.datetime.Clock
 
 @Composable
 fun MediaPlayerScreenContent(
@@ -91,6 +92,7 @@ fun MediaPlayerScreenContent(
                                     position = controller.positionMs,
                                     playWhenReady = playerState.playWhenReady,
                                     brightness = brightnessController.currentBrightness,
+                                    playedOn = Clock.System.now().toEpochMilliseconds(),
                                     audioTrackId = it.getTrackFormat(0).id
                                 )
                                 onEvent(UIEvent.SaveState(persistableState))
@@ -116,6 +118,7 @@ fun MediaPlayerScreenContent(
                                     position = controller.positionMs,
                                     playWhenReady = playerState.playWhenReady,
                                     brightness = brightnessController.currentBrightness,
+                                    playedOn = Clock.System.now().toEpochMilliseconds(),
                                     subtitleTrackId = it.getTrackFormat(0).id
                                 )
                                 onEvent(UIEvent.SaveState(persistableState))
