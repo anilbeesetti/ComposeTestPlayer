@@ -1,7 +1,6 @@
 package com.arcticoss.nextplayer.feature.media.composables
 
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -55,36 +54,23 @@ fun MediaListItem(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
-            Box() {
-                Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier
-                        .widthIn(max = 420.dp)
-                        .fillMaxWidth(0.45f)
-                        .aspectRatio(16f / 10f)
-                ) {
-                    if (media.thumbnailPath.isNotEmpty()) {
-                        Image(
-                            bitmap = remember {
-                                BitmapFactory.decodeFile(media.thumbnailPath).asImageBitmap()
-                            },
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-                val instant = Instant.fromEpochMilliseconds(media.addedOn)
-                val noOfDayUntil = instant.daysUntil(Clock.System.now(), TimeZone.currentSystemDefault())
-                if (noOfDayUntil <= 7) {
-                    FieldChip(
-                        text = "NEW",
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .align(Alignment.TopStart),
-                        backgroundColor = Color.Red,
-                        color = MaterialTheme.colorScheme.onError
+
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier
+                    .widthIn(max = 420.dp)
+                    .fillMaxWidth(0.45f)
+                    .aspectRatio(16f / 10f)
+            ) {
+                if (media.thumbnailPath.isNotEmpty()) {
+                    Image(
+                        bitmap = remember {
+                            BitmapFactory.decodeFile(media.thumbnailPath).asImageBitmap()
+                        },
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
@@ -94,13 +80,14 @@ fun MediaListItem(
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.Top
             ) {
-                Log.d("TAG", "MediaListItem: $media")
                 Text(
                     text = media.title,
                     maxLines = 2,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
                     overflow = TextOverflow.Ellipsis,
-                    color = if (media.lastPlayedPosition >= media.duration) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) else Color.Unspecified
+                    color = if (media.lastPlayedPosition >= media.duration) MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = 0.6f
+                    ) else Color.Unspecified
                 )
                 Row(
                     modifier = Modifier
@@ -112,6 +99,16 @@ fun MediaListItem(
                     FieldChip(text = TimeUtils.formatTime(context, media.duration))
                     if (media.subtitleTracks.isNotEmpty()) {
                         FieldChip(text = "SRT")
+                    }
+                    val instant = Instant.fromEpochMilliseconds(media.addedOn)
+                    val noOfDayUntil =
+                        instant.daysUntil(Clock.System.now(), TimeZone.currentSystemDefault())
+                    if (noOfDayUntil <= 7) {
+                        FieldChip(
+                            text = "NEW",
+                            backgroundColor = Color.Red,
+                            color = MaterialTheme.colorScheme.onError
+                        )
                     }
                 }
             }
