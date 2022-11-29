@@ -15,10 +15,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.sp
 import com.google.android.exoplayer2.text.CueGroup
 import kotlin.math.roundToInt
 
@@ -51,7 +57,15 @@ fun Subtitle(
             cueGroup.cues.forEach {
                 Text(
                     text = it.text.toString(),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 24.sp,
+                        shadow = Shadow(
+                            color = Color.Black,
+                            offset = Offset(5.0f, 5.0f)
+                        )
+                    )
                 )
             }
         }
