@@ -27,10 +27,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.model.Media
 import com.arcticoss.nextplayer.feature.media.utils.TimeUtils
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.daysUntil
 import java.util.*
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -85,7 +81,7 @@ fun MediaListItem(
                     maxLines = 2,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
                     overflow = TextOverflow.Ellipsis,
-                    color = if (media.lastPlayedPosition >= media.duration) MaterialTheme.colorScheme.onSurface.copy(
+                    color = if (media.isWatchingCompleted) MaterialTheme.colorScheme.onSurface.copy(
                         alpha = 0.6f
                     ) else Color.Unspecified
                 )
@@ -100,10 +96,7 @@ fun MediaListItem(
                     if (media.subtitleTracks.isNotEmpty()) {
                         FieldChip(text = "SRT")
                     }
-                    val instant = Instant.fromEpochMilliseconds(media.addedOn)
-                    val noOfDayUntil =
-                        instant.daysUntil(Clock.System.now(), TimeZone.currentSystemDefault())
-                    if (noOfDayUntil <= 7) {
+                    if (media.noOfDaysSinceAdded <= 7 && media.lastPlayedOn == null) {
                         FieldChip(
                             text = "NEW",
                             backgroundColor = Color.Red,

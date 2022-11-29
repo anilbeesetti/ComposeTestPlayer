@@ -25,10 +25,14 @@ data class Media(
     val subtitleTracks: List<SubtitleTrack> = emptyList()
 ) {
 
-    fun noOfDaysSinceAdded(): Int {
-        val instant = Instant.fromEpochMilliseconds(addedOn)
-        return instant.daysUntil(Clock.System.now(), TimeZone.currentSystemDefault())
-    }
+    val noOfDaysSinceAdded: Int
+        get() {
+            val instant = Instant.fromEpochMilliseconds(addedOn)
+            return instant.daysUntil(Clock.System.now(), TimeZone.currentSystemDefault())
+        }
+
+    val isWatchingCompleted: Boolean
+        get() = lastPlayedPosition >= duration && lastPlayedOn != null
 }
 
 
