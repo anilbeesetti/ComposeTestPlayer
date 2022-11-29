@@ -1,5 +1,10 @@
 package com.arcticoss.nextplayer.core.model
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+
 data class Media(
     val id: Long = 0,
     val size: Long = 0,
@@ -10,14 +15,21 @@ data class Media(
     val duration: Long = 0,
     val frameRate: Double = 0.0,
     val thumbnailPath: String = "",
-    val lastPlayedPosition: Long = 0,
     val addedOn: Long = 0,
+    val lastPlayedOn: Long? = null,
+    val lastPlayedPosition: Long = 0,
     val audioTrackId: String? = null,
     val subtitleTrackId: String? = null,
     val videoTracks: List<VideoTrack> = emptyList(),
     val audioTracks: List<AudioTrack> = emptyList(),
     val subtitleTracks: List<SubtitleTrack> = emptyList()
-)
+) {
+
+    fun noOfDaysSinceAdded(): Int {
+        val instant = Instant.fromEpochMilliseconds(addedOn)
+        return instant.daysUntil(Clock.System.now(), TimeZone.currentSystemDefault())
+    }
+}
 
 
 data class VideoTrack(

@@ -96,7 +96,8 @@ class PlayerViewModel @Inject constructor(
                 media.id,
                 state.position,
                 state.audioTrackId,
-                state.subtitleTrackId
+                state.subtitleTrackId,
+                state.playedOn
             )
             state.brightness?.let {
                 preferencesRepository.setBrightnessLevel(it)
@@ -152,6 +153,7 @@ data class PersistableState(
     val index: Int,
     val position: Long,
     val playWhenReady: Boolean,
+    val playedOn: Long?,
     val brightness: Int? = null,
     val audioTrackId: String? = null,
     val subtitleTrackId: String? = null
