@@ -4,13 +4,13 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.loader.content.CursorLoader
-import com.arcticoss.nextplayer.core.data.repository.FileMediaRepository
+import com.arcticoss.nextplayer.core.data.repository.MediaRepository
 import com.arcticoss.nextplayer.core.model.Media
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class GetMediaFromUriUseCase @Inject constructor(
-    private val fileMediaRepository: FileMediaRepository,
+    private val mediaRepository: MediaRepository,
     @ApplicationContext private val context: Context
 ) {
 
@@ -23,7 +23,7 @@ class GetMediaFromUriUseCase @Inject constructor(
             it.moveToFirst()
             val result = it.getString(columnIndex)
             it.close()
-            fileMediaRepository.getMedia(result)
+            mediaRepository.getMedia(result)
         }
     }
 }
