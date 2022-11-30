@@ -59,12 +59,10 @@ fun MediaPlayerScreenContent(
             controller = controller,
             brightnessState = brightnessController,
         )
-        mediaState.playerState?.let {
-            Subtitle(
-                cueGroup = it.cueGroup,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
-        }
+        Subtitle(
+            mediaState = mediaState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
         MediaControls(
             mediaState = mediaState,
             currentMedia = currentMedia,
@@ -171,7 +169,7 @@ private fun Activity.setNextOrientation() {
     if (isLandscape) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
     } else {
-        requestedOrientation =ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
     }
 
     Log.d("TAG", "setNextOrientation: $requestedOrientation")

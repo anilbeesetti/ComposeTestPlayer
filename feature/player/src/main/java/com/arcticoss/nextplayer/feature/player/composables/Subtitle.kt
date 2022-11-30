@@ -5,9 +5,7 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,14 +21,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.sp
-import com.google.android.exoplayer2.text.CueGroup
-import kotlin.math.roundToInt
+import com.arcticoss.nextplayer.feature.player.state.MediaState
 
 @Composable
 fun Subtitle(
-    cueGroup: CueGroup,
+    mediaState: MediaState,
     modifier: Modifier = Modifier
 ) {
     var offsetY by remember { mutableStateOf(-20f) }
@@ -39,27 +35,32 @@ fun Subtitle(
         scale *= zoomChange
     }
 
-    Box(
-        modifier = modifier
-            .offset { IntOffset(0, offsetY.roundToInt()) }
-            .draggable(
-                orientation = Orientation.Vertical,
-                state = rememberDraggableState { delta ->
-                    if (offsetY + delta < 0) {
-                        offsetY += delta
-                    }
-                }
-            )
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .transformable(state = state),
-    ) {
+    mediaState.playerState?.let {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    translationY = offsetY
+                }
+                .then(
+                    if (mediaState.isControllerLocked)
+                        Modifier
+                    else
+                        Modifier
+                            .draggable(
+                                orientation = Orientation.Vertical,
+                                state = rememberDraggableState { delta ->
+                                    if (offsetY + delta < 0) {
+                                        offsetY += delta
+                                    }
+                                }
+                            )
+                            .transformable(state = state)
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            cueGroup.cues.forEach {
+            it.cueGroup.cues.forEach {
                 Text(
                     text = it.text.toString(),
                     textAlign = TextAlign.Center,
