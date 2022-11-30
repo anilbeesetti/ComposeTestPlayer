@@ -18,23 +18,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.arcticoss.nextplayer.core.ui.CenterDialog
-import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.Tracks
-import java.util.*
 
 
 /***
  * Dialog to select Track
  * @param onDismiss The callback to handle dismiss dialog
- * @param tracks The list of [Tracks.Group]
+ * @param tracks The list of [Track]
  * @param onTrackClick Then callback to handle on track item click
  */
 @Composable
 fun TrackSelectorDialog(
     onDismiss: () -> Unit,
     title: @Composable () -> Unit,
-    tracks: List<Tracks.Group>,
-    onTrackClick: (Tracks.Group) -> Unit
+    tracks: List<Track>,
+    onTrackClick: (Track) -> Unit
 ) {
     CenterDialog(
         onDismiss = onDismiss,
@@ -47,7 +44,7 @@ fun TrackSelectorDialog(
                 Column(Modifier.selectableGroup()) {
                     tracks.forEach { track ->
                         TrackChooser(
-                            text = track.getTrackFormat(0).displayName(),
+                            text = track.name,
                             selected = track.isSelected,
                             onClick = { onTrackClick(track) }
                         )
@@ -57,6 +54,14 @@ fun TrackSelectorDialog(
         }
     )
 }
+
+
+data class Track(
+    val id: String?,
+    val name: String,
+    val isSelected: Boolean,
+    val isSupported: Boolean
+)
 
 
 /***
@@ -89,20 +94,4 @@ fun TrackChooser(
         Spacer(Modifier.width(8.dp))
         Text(text)
     }
-}
-
-
-private fun Format.displayName(): String {
-    var displayName = ""
-    this.language?.let {
-        displayName += if (this.language != "und") {
-            Locale(this.language.toString()).displayLanguage
-        } else {
-            this.sampleMimeType
-        }
-    }
-    this.label?.let {
-        displayName += "," + this.label
-    }
-    return displayName
 }
