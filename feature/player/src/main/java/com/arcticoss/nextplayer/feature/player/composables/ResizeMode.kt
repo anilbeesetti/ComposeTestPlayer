@@ -59,21 +59,34 @@ private fun Modifier.zoom(
         val maxWidth = constraints.maxWidth
         val maxHeight = constraints.maxHeight
         if (aspectRatio > maxWidth.toFloat() / maxHeight) {
+
             // wrap width unbounded
             val modifiedConstraints = constraints.copy(maxWidth = Constraints.Infinity)
+
             val placeable = measurable.measure(modifiedConstraints)
+
             layout(constraints.maxWidth, placeable.height) {
                 val offsetX = Alignment.CenterHorizontally
-                    .align(0, constraints.maxWidth - placeable.width, layoutDirection)
+                    .align(
+                        size = 0,
+                        space = constraints.maxWidth - placeable.width,
+                        layoutDirection = layoutDirection
+                    )
                 placeable.place(IntOffset(offsetX, 0))
             }
         } else {
+
             // wrap height unbounded
             val modifiedConstraints = constraints.copy(maxHeight = Constraints.Infinity)
+
             val placeable = measurable.measure(modifiedConstraints)
+
             layout(placeable.width, constraints.maxHeight) {
                 val offsetY = Alignment.CenterVertically
-                    .align(0, constraints.maxHeight - placeable.height)
+                    .align(
+                        size = 0,
+                        space = constraints.maxHeight - placeable.height
+                    )
                 placeable.place(IntOffset(0, offsetY))
             }
         }

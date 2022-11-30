@@ -96,6 +96,9 @@ fun MediaListItem(
                     if (media.subtitleTracks.isNotEmpty()) {
                         FieldChip(text = "SRT")
                     }
+                    if (media.localSubtitleTracks.isNotEmpty()) {
+                        FieldChip(text = "SRT")
+                    }
                     if (media.noOfDaysSinceAdded <= 7 && media.lastPlayedOn == null) {
                         FieldChip(
                             text = "NEW",

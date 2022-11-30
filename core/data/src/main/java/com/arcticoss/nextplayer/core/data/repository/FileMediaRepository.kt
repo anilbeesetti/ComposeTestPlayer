@@ -12,11 +12,13 @@ import com.arcticoss.nextplayer.core.data.utils.notExists
 import com.arcticoss.nextplayer.core.data.utils.saveThumbnail
 import com.arcticoss.nextplayer.core.database.daos.AudioTrackDao
 import com.arcticoss.nextplayer.core.database.daos.FolderDao
+import com.arcticoss.nextplayer.core.database.daos.LocalSubtitleDao
 import com.arcticoss.nextplayer.core.database.daos.MediaDao
 import com.arcticoss.nextplayer.core.database.daos.SubtitleTrackDao
 import com.arcticoss.nextplayer.core.database.daos.ThumbnailDao
 import com.arcticoss.nextplayer.core.database.daos.VideoTrackDao
 import com.arcticoss.nextplayer.core.database.entities.FolderEntity
+import com.arcticoss.nextplayer.core.database.entities.LocalSubtitleEntity
 import com.arcticoss.nextplayer.core.database.entities.ThumbnailEntity
 import com.arcticoss.nextplayer.core.database.relations.FolderAndMediaRelation
 import com.arcticoss.nextplayer.core.database.relations.asExternalModel
@@ -40,6 +42,7 @@ class FileMediaRepository @Inject constructor(
     private val audioTrackDao: AudioTrackDao,
     private val subtitleTrackDao: SubtitleTrackDao,
     private val thumbnailDao: ThumbnailDao,
+    private val localSubtitleDao: LocalSubtitleDao,
     @ApplicationContext private val context: Context
 ) : MediaRepository {
 
@@ -86,9 +89,11 @@ class FileMediaRepository @Inject constructor(
         deleteUnavailableFolderEntities()
         deleteUnavailableMediaEntities()
         deleteUnusedThumbnailEntities()
+        deleteUnavailableLocalSubtitles()
 
         // sync for new media
         syncFoldersAndVideos()
+        syncLocalSubtitles()
         syncThumbnails()
     }
 
@@ -176,6 +181,27 @@ class FileMediaRepository @Inject constructor(
         }
     }
 
+    private suspend fun syncLocalSubtitles() {
+        mediaDao.getMediaEntities().forEach { mediaEntity ->
+            val videoFile = File(mediaEntity.path)
+            videoFile.parentFile?.listFiles()?.forEach {
+                if (it.name.contains(videoFile.nameWithoutExtension) && it.extension == "srt") {
+                    if (!localSubtitleDao.isExist(it.path)) {
+                        localSubtitleDao.insert(
+                            LocalSubtitleEntity(
+                                path = it.path,
+                                language = null,
+                                selected = false,
+                                mediaId = mediaEntity.id
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+
     // clean up function to delete unavailable directories in storage
     private suspend fun deleteUnavailableFolderEntities() {
         folderDao.getFolderEntities().forEach { folderEntity ->
@@ -199,6 +225,15 @@ class FileMediaRepository @Inject constructor(
         thumbnailDao.getThumbnailEntities().forEach { thumbnailEntity ->
             if (thumbnailEntity.mediaId == null) {
                 File(thumbnailEntity.path).delete()
+            }
+        }
+    }
+
+    // clean up function to delete unavailable local subtitles
+    private suspend fun deleteUnavailableLocalSubtitles() {
+        localSubtitleDao.getLocalSubtitleEntities().forEach { localSubtitleEntity ->
+            if (File(localSubtitleEntity.path).notExists()) {
+                localSubtitleDao.delete(localSubtitleEntity)
             }
         }
     }

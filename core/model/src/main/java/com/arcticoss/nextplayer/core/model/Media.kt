@@ -20,6 +20,7 @@ data class Media(
     val lastPlayedPosition: Long = 0,
     val audioTrackId: String? = null,
     val subtitleTrackId: String? = null,
+    val localSubtitleTracks: List<LocalSub> = emptyList(),
     val videoTracks: List<VideoTrack> = emptyList(),
     val audioTracks: List<AudioTrack> = emptyList(),
     val subtitleTracks: List<SubtitleTrack> = emptyList()
@@ -58,4 +59,10 @@ data class AudioTrack(
     val channels: Int,
     val bitrate: Long,
     val language: String?,
+)
+
+data class LocalSub(
+    val path: String,
+    val language: String?,
+    val selected: Boolean
 )

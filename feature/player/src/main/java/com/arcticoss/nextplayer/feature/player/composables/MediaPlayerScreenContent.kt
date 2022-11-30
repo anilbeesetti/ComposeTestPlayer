@@ -26,8 +26,11 @@ import com.arcticoss.nextplayer.feature.player.state.BrightnessState
 import com.arcticoss.nextplayer.feature.player.state.ControllerState
 import com.arcticoss.nextplayer.feature.player.state.MediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
+import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.datetime.Clock
+import java.util.*
 
 @Composable
 fun MediaPlayerScreenContent(
@@ -81,7 +84,7 @@ fun MediaPlayerScreenContent(
                 TrackSelectorDialog(
                     title = { Text(text = stringResource(R.string.select_audio_track)) },
                     onDismiss = { onEvent(UIEvent.ShowDialog(Dialog.None)) },
-                    tracks = state.audioTracks,
+                    tracks = state.audioTracks.map(Tracks.Group::toTrack),
                     onTrackClick = {
                         if (!it.isSelected && it.isSupported) {
                             mediaState.playerState?.let { playerState ->
@@ -91,7 +94,7 @@ fun MediaPlayerScreenContent(
                                     playWhenReady = playerState.playWhenReady,
                                     brightness = brightnessController.currentBrightness,
                                     playedOn = Clock.System.now().toEpochMilliseconds(),
-                                    audioTrackId = it.getTrackFormat(0).id
+                                    audioTrackId = it.id
                                 )
                                 onEvent(UIEvent.SaveState(persistableState))
                             }
@@ -107,7 +110,7 @@ fun MediaPlayerScreenContent(
                 TrackSelectorDialog(
                     title = { Text(text = stringResource(R.string.select_subtitle_track)) },
                     onDismiss = { onEvent(UIEvent.ShowDialog(Dialog.None)) },
-                    tracks = state.subtitleTracks,
+                    tracks = state.subtitleTracks.map(Tracks.Group::toTrack),
                     onTrackClick = {
                         if (!it.isSelected && it.isSupported) {
                             mediaState.playerState?.let { playerState ->
@@ -117,7 +120,7 @@ fun MediaPlayerScreenContent(
                                     playWhenReady = playerState.playWhenReady,
                                     brightness = brightnessController.currentBrightness,
                                     playedOn = Clock.System.now().toEpochMilliseconds(),
-                                    subtitleTrackId = it.getTrackFormat(0).id
+                                    subtitleTrackId = it.id
                                 )
                                 onEvent(UIEvent.SaveState(persistableState))
                             }
@@ -128,7 +131,6 @@ fun MediaPlayerScreenContent(
         }
     }
 }
-
 
 @Composable
 private fun MediaPlayer(
@@ -166,11 +168,35 @@ private fun Activity.setNextOrientation() {
     val isLandscape = requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             || requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-    if (isLandscape) {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+    requestedOrientation = if (isLandscape) {
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
     } else {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
     }
 
     Log.d("TAG", "setNextOrientation: $requestedOrientation")
+}
+
+fun Tracks.Group.toTrack() = Track(
+    id = getTrackFormat(0).id,
+    name = getTrackFormat(0).displayName(),
+    isSelected = isSelected,
+    isSupported = isSupported
+)
+
+
+private fun Format.displayName(): String {
+    var displayName = ""
+    this.language?.let {
+        displayName += if (this.language != "und") {
+            Locale(this.language.toString()).displayLanguage
+        } else {
+            this.sampleMimeType
+        }
+    }
+    this.label?.let {
+        if (displayName.isNotEmpty()) displayName += ","
+        displayName += this.label
+    }
+    return displayName
 }
