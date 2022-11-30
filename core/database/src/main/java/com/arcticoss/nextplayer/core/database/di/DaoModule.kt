@@ -28,4 +28,7 @@ object DaoModule {
     @Provides
     fun provideSubtitleTrackDao(db: MediaDatabase) = db.subtitleTrackDao()
 
+    @Provides
+    fun provideLocalSubtitleDao(db: MediaDatabase) = db.localSubtitleDao()
+
 }

@@ -195,7 +195,8 @@ private fun Format.displayName(): String {
         }
     }
     this.label?.let {
-        displayName += "," + this.label
+        if (displayName.isNotEmpty()) displayName += ","
+        displayName += this.label
     }
     return displayName
 }

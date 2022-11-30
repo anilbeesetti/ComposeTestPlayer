@@ -12,11 +12,13 @@ import com.arcticoss.nextplayer.core.data.utils.notExists
 import com.arcticoss.nextplayer.core.data.utils.saveThumbnail
 import com.arcticoss.nextplayer.core.database.daos.AudioTrackDao
 import com.arcticoss.nextplayer.core.database.daos.FolderDao
+import com.arcticoss.nextplayer.core.database.daos.LocalSubtitleDao
 import com.arcticoss.nextplayer.core.database.daos.MediaDao
 import com.arcticoss.nextplayer.core.database.daos.SubtitleTrackDao
 import com.arcticoss.nextplayer.core.database.daos.ThumbnailDao
 import com.arcticoss.nextplayer.core.database.daos.VideoTrackDao
 import com.arcticoss.nextplayer.core.database.entities.FolderEntity
+import com.arcticoss.nextplayer.core.database.entities.LocalSubtitleEntity
 import com.arcticoss.nextplayer.core.database.entities.ThumbnailEntity
 import com.arcticoss.nextplayer.core.database.relations.FolderAndMediaRelation
 import com.arcticoss.nextplayer.core.database.relations.asExternalModel
@@ -40,6 +42,7 @@ class FileMediaRepository @Inject constructor(
     private val audioTrackDao: AudioTrackDao,
     private val subtitleTrackDao: SubtitleTrackDao,
     private val thumbnailDao: ThumbnailDao,
+    private val localSubtitleDao: LocalSubtitleDao,
     @ApplicationContext private val context: Context
 ) : MediaRepository {
 
@@ -155,6 +158,20 @@ class FileMediaRepository @Inject constructor(
         // Syncing subtitle streams
         mediaInfo.subtitleStreams.forEach {
             subtitleTrackDao.insert(it.asSubtitleTrackEntity(mediaItemId))
+        }
+
+        // Syncing local subs
+        videoFile.parentFile?.listFiles()?.forEach {
+            if (it.name.contains(videoFile.nameWithoutExtension) && it.extension == "srt") {
+                localSubtitleDao.insert(
+                    LocalSubtitleEntity(
+                        path = it.path,
+                        language = null,
+                        selected = false,
+                        mediaId = mediaItemId
+                    )
+                )
+            }
         }
     }
 

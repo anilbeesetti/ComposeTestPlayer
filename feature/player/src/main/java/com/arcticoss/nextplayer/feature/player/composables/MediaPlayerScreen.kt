@@ -27,6 +27,7 @@ import com.arcticoss.nextplayer.feature.player.state.rememberManagedExoPlayer
 import com.arcticoss.nextplayer.feature.player.state.rememberMediaState
 import com.arcticoss.nextplayer.feature.player.utils.findActivity
 import com.arcticoss.nextplayer.feature.player.utils.keepScreenOn
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO
 import com.google.android.exoplayer2.C.TRACK_TYPE_TEXT
 import com.google.android.exoplayer2.C.TrackType
@@ -36,6 +37,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Player.STATE_ENDED
 import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import com.google.android.exoplayer2.util.MimeTypes
 import kotlinx.datetime.Clock
 import java.io.File
 import java.util.*
@@ -149,10 +151,22 @@ internal fun MediaPlayerScreen(
      */
     LaunchedEffect(mediaState.player, viewState.mediaList.size) {
         mediaState.player?.run {
-            val mediaItems = viewState.mediaList.map {
+            val mediaItems = viewState.mediaList.map { media ->
+
+                val subConfig = media.localSubtitleTracks.map {
+                    val file = File(it.path)
+                    MediaItem.SubtitleConfiguration
+                        .Builder(file.toUri())
+                        .setMimeType(MimeTypes.APPLICATION_SUBRIP)
+                        .setLabel(file.nameWithoutExtension)
+                        .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                        .build()
+                }
+
                 MediaItem.Builder()
-                    .setUri(File(it.path).toUri())
-                    .setMediaId(it.id.toString())
+                    .setUri(File(media.path).toUri())
+                    .setMediaId(media.id.toString())
+                    .setSubtitleConfigurations(subConfig)
                     .build()
             }
             if (mediaItems.isNotEmpty()) {
