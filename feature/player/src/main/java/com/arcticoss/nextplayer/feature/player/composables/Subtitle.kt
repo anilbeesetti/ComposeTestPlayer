@@ -5,9 +5,7 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,10 +21,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.sp
 import com.arcticoss.nextplayer.feature.player.state.MediaState
-import kotlin.math.roundToInt
 
 @Composable
 fun Subtitle(
@@ -40,13 +36,12 @@ fun Subtitle(
     }
 
     mediaState.playerState?.let {
-
-        Box(
+        Column(
             modifier = modifier
-                .offset { IntOffset(0, offsetY.roundToInt()) }
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
+                    translationY = offsetY
                 }
                 .then(
                     if (mediaState.isControllerLocked)
@@ -63,24 +58,21 @@ fun Subtitle(
                             )
                             .transformable(state = state)
                 ),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                it.cueGroup.cues.forEach {
-                    Text(
-                        text = it.text.toString(),
-                        textAlign = TextAlign.Center,
-                        style = TextStyle(
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 24.sp,
-                            shadow = Shadow(
-                                color = Color.Black,
-                                offset = Offset(5.0f, 5.0f)
-                            )
+            it.cueGroup.cues.forEach {
+                Text(
+                    text = it.text.toString(),
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 24.sp,
+                        shadow = Shadow(
+                            color = Color.Black,
+                            offset = Offset(5.0f, 5.0f)
                         )
                     )
-                }
+                )
             }
         }
     }
