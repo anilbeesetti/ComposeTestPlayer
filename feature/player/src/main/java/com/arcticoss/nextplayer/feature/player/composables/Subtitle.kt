@@ -25,12 +25,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.sp
-import com.google.android.exoplayer2.text.CueGroup
+import com.arcticoss.nextplayer.feature.player.state.MediaState
 import kotlin.math.roundToInt
 
 @Composable
 fun Subtitle(
-    cueGroup: CueGroup,
+    mediaState: MediaState,
     modifier: Modifier = Modifier
 ) {
     var offsetY by remember { mutableStateOf(-20f) }
@@ -39,39 +39,48 @@ fun Subtitle(
         scale *= zoomChange
     }
 
-    Box(
-        modifier = modifier
-            .offset { IntOffset(0, offsetY.roundToInt()) }
-            .draggable(
-                orientation = Orientation.Vertical,
-                state = rememberDraggableState { delta ->
-                    if (offsetY + delta < 0) {
-                        offsetY += delta
-                    }
+    mediaState.playerState?.let {
+
+        Box(
+            modifier = modifier
+                .offset { IntOffset(0, offsetY.roundToInt()) }
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
                 }
-            )
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .transformable(state = state),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+                .then(
+                    if (mediaState.isControllerLocked)
+                        Modifier
+                    else
+                        Modifier
+                            .draggable(
+                                orientation = Orientation.Vertical,
+                                state = rememberDraggableState { delta ->
+                                    if (offsetY + delta < 0) {
+                                        offsetY += delta
+                                    }
+                                }
+                            )
+                            .transformable(state = state)
+                ),
         ) {
-            cueGroup.cues.forEach {
-                Text(
-                    text = it.text.toString(),
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 24.sp,
-                        shadow = Shadow(
-                            color = Color.Black,
-                            offset = Offset(5.0f, 5.0f)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                it.cueGroup.cues.forEach {
+                    Text(
+                        text = it.text.toString(),
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 24.sp,
+                            shadow = Shadow(
+                                color = Color.Black,
+                                offset = Offset(5.0f, 5.0f)
+                            )
                         )
                     )
-                )
+                }
             }
         }
     }
