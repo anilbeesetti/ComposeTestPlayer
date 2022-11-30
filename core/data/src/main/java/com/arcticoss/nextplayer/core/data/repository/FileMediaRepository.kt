@@ -89,9 +89,11 @@ class FileMediaRepository @Inject constructor(
         deleteUnavailableFolderEntities()
         deleteUnavailableMediaEntities()
         deleteUnusedThumbnailEntities()
+        deleteUnavailableLocalSubtitles()
 
         // sync for new media
         syncFoldersAndVideos()
+        syncLocalSubtitles()
         syncThumbnails()
     }
 
@@ -159,20 +161,6 @@ class FileMediaRepository @Inject constructor(
         mediaInfo.subtitleStreams.forEach {
             subtitleTrackDao.insert(it.asSubtitleTrackEntity(mediaItemId))
         }
-
-        // Syncing local subs
-        videoFile.parentFile?.listFiles()?.forEach {
-            if (it.name.contains(videoFile.nameWithoutExtension) && it.extension == "srt") {
-                localSubtitleDao.insert(
-                    LocalSubtitleEntity(
-                        path = it.path,
-                        language = null,
-                        selected = false,
-                        mediaId = mediaItemId
-                    )
-                )
-            }
-        }
     }
 
     private suspend fun syncThumbnails() {
@@ -192,6 +180,27 @@ class FileMediaRepository @Inject constructor(
             }
         }
     }
+
+    private suspend fun syncLocalSubtitles() {
+        mediaDao.getMediaEntities().forEach { mediaEntity ->
+            val videoFile = File(mediaEntity.path)
+            videoFile.parentFile?.listFiles()?.forEach {
+                if (it.name.contains(videoFile.nameWithoutExtension) && it.extension == "srt") {
+                    if (!localSubtitleDao.isExist(it.path)) {
+                        localSubtitleDao.insert(
+                            LocalSubtitleEntity(
+                                path = it.path,
+                                language = null,
+                                selected = false,
+                                mediaId = mediaEntity.id
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 
     // clean up function to delete unavailable directories in storage
     private suspend fun deleteUnavailableFolderEntities() {
@@ -216,6 +225,15 @@ class FileMediaRepository @Inject constructor(
         thumbnailDao.getThumbnailEntities().forEach { thumbnailEntity ->
             if (thumbnailEntity.mediaId == null) {
                 File(thumbnailEntity.path).delete()
+            }
+        }
+    }
+
+    // clean up function to delete unavailable local subtitles
+    private suspend fun deleteUnavailableLocalSubtitles() {
+        localSubtitleDao.getLocalSubtitleEntities().forEach { localSubtitleEntity ->
+            if (File(localSubtitleEntity.path).notExists()) {
+                localSubtitleDao.delete(localSubtitleEntity)
             }
         }
     }
