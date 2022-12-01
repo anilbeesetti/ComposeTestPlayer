@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.arcticoss.nextplayer.extensions.ffmpeg"
+    namespace = "com.google.android.exoplayer2.ext.ffmpeg"
     compileSdk = 33
 
     defaultConfig {

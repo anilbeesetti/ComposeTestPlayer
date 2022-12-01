@@ -66,6 +66,8 @@ DEP_LD_FLAGS="-L${BUILD_DIR_EXTERNAL}/${ANDROID_ABI}/lib $FFMPEG_EXTRA_LD_FLAGS"
   --enable-encoder=png \
   --enable-swresample \
   --enable-decoder=eac3 \
+  --enable-decoder=ac3 \
+  --enable-decoder=mp3 \
   --enable-protocol=file,http,https,mmsh,mmst,pipe,rtmp,rtmps,rtmpt,rtmpts,rtp,tls \
   --disable-debug \
   --disable-asm \

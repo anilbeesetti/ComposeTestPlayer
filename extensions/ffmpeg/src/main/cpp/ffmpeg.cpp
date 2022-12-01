@@ -272,7 +272,7 @@ void releaseContext(AVCodecContext *context) {
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegInitialize(JNIEnv *env,
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_ffmpegInitialize(JNIEnv *env,
                                                                                     jobject thiz,
                                                                                     jstring codec_name,
                                                                                     jbyteArray extra_data,
@@ -289,7 +289,7 @@ Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegInitial
 }
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegDecode(JNIEnv *env,
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_ffmpegDecode(JNIEnv *env,
                                                                                 jobject thiz,
                                                                                 jlong context,
                                                                                 jobject input_data,
@@ -323,7 +323,7 @@ Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegDecode(
 }
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegGetChannelCount(
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_ffmpegGetChannelCount(
         JNIEnv *env, jobject thiz, jlong context) {
     if (!context) {
         LOGE("Context must be non-NULL.");
@@ -333,7 +333,7 @@ Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegGetChan
 }
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegGetSampleRate(JNIEnv *env,
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_ffmpegGetSampleRate(JNIEnv *env,
                                                                                        jobject thiz,
                                                                                        jlong context) {
     if (!context) {
@@ -344,7 +344,7 @@ Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegGetSamp
 }
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegReset(JNIEnv *env,
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_ffmpegReset(JNIEnv *env,
                                                                                jobject thiz,
                                                                                jlong jContext,
                                                                                jbyteArray extra_data) {
@@ -376,7 +376,7 @@ Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegReset(J
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegRelease(JNIEnv *env,
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_ffmpegRelease(JNIEnv *env,
                                                                                  jobject thiz,
                                                                                  jlong context) {
     if (context) {
@@ -385,21 +385,20 @@ Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegAudioDecoder_ffmpegRelease
 }
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegLibrary_ffmpegGetVersion(JNIEnv *env,
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegLibrary_ffmpegGetVersion(JNIEnv *env,
                                                                                jclass clazz) {
     return env->NewStringUTF(LIBAVCODEC_IDENT);
 }
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegLibrary_ffmpegGetInputBufferPaddingSize(
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegLibrary_ffmpegGetInputBufferPaddingSize(
         JNIEnv *env, jclass clazz) {
     return (jint)AV_INPUT_BUFFER_PADDING_SIZE;
 }
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_arcticoss_nextplayer_extensions_ffmpeg_FfmpegLibrary_ffmpegHasDecoder(JNIEnv *env,
+Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegLibrary_ffmpegHasDecoder(JNIEnv *env,
                                                                                jclass clazz,
                                                                                jstring codec_name) {
-    LOGE("has decoder %s", codec_name);
     return getCodecByName(env, codec_name) != nullptr;
 }
