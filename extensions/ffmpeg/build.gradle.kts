@@ -27,9 +27,7 @@ android {
 
 
 dependencies {
-
-    implementation("androidx.core:core-ktx:1.9.0")
-
-    implementation("com.google.android.exoplayer:exoplayer-core:2.18.1")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.exoplayer.core)
     compileOnly("org.checkerframework:checker-qual:3.27.0")
 }
