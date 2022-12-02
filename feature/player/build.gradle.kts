@@ -12,10 +12,11 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
+    implementation(project(":extensions:ffmpeg"))
 
     implementation(libs.kotlinx.datetime)
-    implementation("com.google.android.exoplayer:exoplayer-core:2.18.1")
-    implementation("com.google.android.exoplayer:exoplayer-ui:2.18.1")
+    implementation(libs.exoplayer.core)
+    implementation(libs.exoplayer.ui)
 
     testImplementation(libs.junit4)
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 
@@ -73,5 +74,9 @@ internal class PlayerManager(
 
 @Composable
 fun rememberManagedExoPlayer(): State<Player?> = rememberManagedPlayer { context ->
-    ExoPlayer.Builder(context).build()
+    val renderFactory = DefaultRenderersFactory(context)
+        .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
+    ExoPlayer.Builder(context)
+        .setRenderersFactory(renderFactory)
+        .build()
 }
