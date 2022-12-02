@@ -15,7 +15,7 @@
  */
 #include <android/log.h>
 #include <jni.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 extern "C" {
 #ifdef __cplusplus
@@ -23,7 +23,7 @@ extern "C" {
 #ifdef _STDINT_H
 #undef _STDINT_H
 #endif
-#include <stdint.h>
+#include <cstdint>
 #endif
 #include <libavcodec/avcodec.h>
 #include <libavutil/channel_layout.h>
@@ -35,26 +35,6 @@ extern "C" {
 #define LOG_TAG "ffmpeg_jni"
 #define LOGE(...) \
   ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
-
-#define LIBRARY_FUNC(RETURN_TYPE, NAME, ...)                              \
-  extern "C" {                                                            \
-  JNIEXPORT RETURN_TYPE                                                   \
-      Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegLibrary_##NAME( \
-          JNIEnv *env, jobject thiz, ##__VA_ARGS__);                      \
-  }                                                                       \
-  JNIEXPORT RETURN_TYPE                                                   \
-      Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegLibrary_##NAME( \
-          JNIEnv *env, jobject thiz, ##__VA_ARGS__)
-
-#define AUDIO_DECODER_FUNC(RETURN_TYPE, NAME, ...)                             \
-  extern "C" {                                                                 \
-  JNIEXPORT RETURN_TYPE                                                        \
-      Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_##NAME( \
-          JNIEnv *env, jobject thiz, ##__VA_ARGS__);                           \
-  }                                                                            \
-  JNIEXPORT RETURN_TYPE                                                        \
-      Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_##NAME( \
-          JNIEnv *env, jobject thiz, ##__VA_ARGS__)
 
 #define ERROR_STRING_BUFFER_LENGTH 256
 
@@ -108,7 +88,6 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
         return -1;
     }
-    avcodec_register_all();
     return JNI_VERSION_1_6;
 }
 
@@ -191,10 +170,10 @@ int decodePacket(AVCodecContext *context, AVPacket *packet,
         // Resample output.
         AVSampleFormat sampleFormat = context->sample_fmt;
         int channelCount = context->channels;
-        int channelLayout = context->channel_layout;
+        int channelLayout = (int)context->channel_layout;
         int sampleRate = context->sample_rate;
         int sampleCount = frame->nb_samples;
-        int dataSize = av_samples_get_buffer_size(NULL, channelCount, sampleCount,
+        int dataSize = av_samples_get_buffer_size(nullptr, channelCount, sampleCount,
                                                   sampleFormat, 1);
         SwrContext *resampleContext;
         if (context->opaque) {
@@ -314,12 +293,20 @@ Java_com_google_android_exoplayer2_ext_ffmpeg_FfmpegAudioDecoder_ffmpegDecode(JN
     }
     auto *inputBuffer = (uint8_t *)env->GetDirectBufferAddress(input_data);
     auto *outputBuffer = (uint8_t *)env->GetDirectBufferAddress(output_data);
-    AVPacket packet;
-    av_init_packet(&packet);
-    packet.data = inputBuffer;
-    packet.size = input_size;
-    return decodePacket((AVCodecContext *)context, &packet, outputBuffer,
+    AVPacket *packet;
+    packet = av_packet_alloc();
+
+    if (packet == nullptr) {
+        LOGE("audio_decoder_decode_frame: av_packet_alloc failed");
+        return -1;
+    }
+
+    packet->data = inputBuffer;
+    packet->size = input_size;
+    int decodedPacket = decodePacket((AVCodecContext *)context, packet, outputBuffer,
                         output_size);
+    av_packet_free(&packet);
+    return decodedPacket;
 }
 extern "C"
 JNIEXPORT jint JNICALL
