@@ -92,7 +92,10 @@ fun MediaListItem(
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    FieldChip(text = TimeUtils.formatTime(context, media.duration))
+                    media.duration?.let {
+                        FieldChip(text = TimeUtils.formatTime(context, it))
+                    }
+
                     if (media.subtitleTracks.isNotEmpty()) {
                         FieldChip(text = "SRT")
                     }

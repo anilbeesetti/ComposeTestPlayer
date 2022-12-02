@@ -3,7 +3,6 @@ package com.arcticoss.nextplayer.core.database.daos
 import androidx.room.*
 import com.arcticoss.nextplayer.core.database.entities.MediaEntity
 import com.arcticoss.nextplayer.core.database.relations.MediaInfoRelation
-import com.arcticoss.nextplayer.core.database.relations.MediaItemAndThumbnailRelation
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,9 +20,12 @@ interface MediaDao {
     @Query("SELECT * FROM media WHERE id = :id")
     suspend fun get(id: Long): MediaEntity
 
+    @Query("SELECT * FROM media WHERE path = :path")
+    suspend fun get(path: String): MediaEntity
+
     @Transaction
     @Query("SELECT * FROM media WHERE path = :path")
-    suspend fun get(path: String): MediaItemAndThumbnailRelation
+    suspend fun getWithInfo(path: String): MediaInfoRelation
 
     @Query("SELECT EXISTS(SELECT * FROM media WHERE path = :path )")
     suspend fun isExist(path: String): Boolean
@@ -33,6 +35,6 @@ interface MediaDao {
 
     @Transaction
     @Query("SELECT * FROM media")
-    fun getMediaInfoRelationEntitiesStream(): Flow<List<MediaInfoRelation>>
+    fun getMediaWithInfoListStream(): Flow<List<MediaInfoRelation>>
 
 }
