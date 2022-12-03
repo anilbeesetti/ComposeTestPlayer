@@ -12,7 +12,7 @@ data class Media(
     val height: Int = 0,
     val path: String = "",
     val title: String = "",
-    val duration: Long = 0,
+    val duration: Long? = 0,
     val frameRate: Double = 0.0,
     val thumbnailPath: String = "",
     val addedOn: Long = 0,
@@ -33,7 +33,7 @@ data class Media(
         }
 
     val isWatchingCompleted: Boolean
-        get() = lastPlayedPosition >= duration && lastPlayedOn != null
+        get() = duration != null && lastPlayedPosition >= duration && lastPlayedOn != null
 }
 
 

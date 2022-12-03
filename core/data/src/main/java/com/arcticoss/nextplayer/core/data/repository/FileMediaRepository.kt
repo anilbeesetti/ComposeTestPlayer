@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
 import com.arcticoss.nextplayer.core.data.utils.asAudioTrackEntity
-import com.arcticoss.nextplayer.core.data.utils.asMediaItemEntity
 import com.arcticoss.nextplayer.core.data.utils.asSubtitleTrackEntity
 import com.arcticoss.nextplayer.core.data.utils.asVideoTrackEntity
 import com.arcticoss.nextplayer.core.data.utils.getFoldersAndVideos
@@ -19,6 +18,7 @@ import com.arcticoss.nextplayer.core.database.daos.ThumbnailDao
 import com.arcticoss.nextplayer.core.database.daos.VideoTrackDao
 import com.arcticoss.nextplayer.core.database.entities.FolderEntity
 import com.arcticoss.nextplayer.core.database.entities.LocalSubtitleEntity
+import com.arcticoss.nextplayer.core.database.entities.MediaEntity
 import com.arcticoss.nextplayer.core.database.entities.ThumbnailEntity
 import com.arcticoss.nextplayer.core.database.relations.FolderAndMediaRelation
 import com.arcticoss.nextplayer.core.database.relations.asExternalModel
@@ -60,7 +60,7 @@ class FileMediaRepository @Inject constructor(
 
 
     override suspend fun getMedia(path: String): Media {
-        return mediaDao.get(path).asExternalModel()
+        return mediaDao.getWithInfo(path).asExternalModel()
     }
 
     override suspend fun updateMedia(
@@ -93,89 +93,112 @@ class FileMediaRepository @Inject constructor(
 
         // sync for new media
         syncFoldersAndVideos()
+        syncMediaInfo()
         syncLocalSubtitles()
         syncThumbnails()
     }
 
-    private suspend fun syncFoldersAndVideos() {
-        withContext(Dispatchers.IO) {
-            launch {
-                storageDir.getFoldersAndVideos().collect { file ->
-                    if (file.isDirectory) {
-                        syncFolder(file)
-                    } else {
-                        launch { syncVideoFile(file) }
-                    }
-                }
-            }.join()
+    private suspend fun syncFoldersAndVideos() = withContext(Dispatchers.IO) {
+        storageDir.getFoldersAndVideos().collect { file ->
+            if (file.isDirectory) syncFolder(file) else launch { syncVideo(file) }
         }
     }
 
     private suspend fun syncFolder(folder: File) {
         if (!folderDao.isExist(folder.path)) {
             val folderEntity = FolderEntity(
-                name = if (folder.name == "0") "Internal Storage" else folder.name,
+                name = if (folder.path == "/emulated/storage/0") "Internal Storage" else folder.name,
                 path = folder.path
             )
             folderDao.insert(folderEntity)
         }
     }
 
-    private suspend fun syncVideoFile(videoFile: File) {
+    private suspend fun syncVideo(videoFile: File) {
         if (!mediaDao.isExist(videoFile.path)) {
+
             // If media does not exist in add media to database
-            syncMediaItem(videoFile = videoFile)
+            val mediaEntity = MediaEntity(
+                title = videoFile.name,
+                path = videoFile.path,
+                size = videoFile.length(),
+                folderId = folderDao.id(videoFile.parentFile!!.path)
+            )
+            mediaDao.insert(mediaEntity)
         } else {
             // Sometimes like while downloading a file it will not be synced properly
             // this ensures it will synced properly by checking file size
-            val mediaItem = mediaDao.get(videoFile.path)
-            if (mediaItem.mediaEntity.size != videoFile.length()) {
-                syncMediaItem(mediaId = mediaItem.mediaEntity.id, videoFile = videoFile)
+            val mediaEntity = mediaDao.get(videoFile.path)
+            if (mediaEntity.size != videoFile.length()) {
+                syncMediaItem(mediaEntity)
             }
         }
     }
 
-    private suspend fun syncMediaItem(mediaId: Long = 0, videoFile: File) {
+    private suspend fun syncMediaItem(mediaEntity: MediaEntity) {
+        val videoFile = File(mediaEntity.path)
         val mediaInfoBuilder = MediaInfoBuilder()
         val mediaInfo = mediaInfoBuilder.from(videoFile).build()
 
         // Syncing media item
-        val mediaItemId = mediaDao.insert(
-            mediaInfo.asMediaItemEntity(
-                id = mediaId,
-                folderId = folderDao.id(videoFile.parentFile!!.path)
+        mediaDao.update(
+            mediaEntity.copy(
+                width = mediaInfo.width,
+                duration = mediaInfo.duration,
+                height = mediaInfo.height,
+                frameRate = mediaInfo.frameRate,
+                addedOn = mediaInfo.lastModified,
             )
         )
 
         // Syncing video streams
         mediaInfo.videoStreams.forEach {
-            videoTrackDao.insert(it.asVideoTrackEntity(mediaItemId))
+            videoTrackDao.insert(it.asVideoTrackEntity(mediaEntity.id))
         }
 
         // Syncing audio streams
         mediaInfo.audioStreams.forEach {
-            audioTrackDao.insert(it.asAudioTrackEntity(mediaItemId))
+            audioTrackDao.insert(it.asAudioTrackEntity(mediaEntity.id))
         }
 
         // Syncing subtitle streams
         mediaInfo.subtitleStreams.forEach {
-            subtitleTrackDao.insert(it.asSubtitleTrackEntity(mediaItemId))
+            subtitleTrackDao.insert(it.asSubtitleTrackEntity(mediaEntity.id))
         }
     }
+
+    private suspend fun syncMediaInfo() = withContext(Dispatchers.IO) {
+        mediaDao.getMediaEntities().forEach { mediaEntity ->
+            if (mediaEntity.duration == null) {
+                launch {
+                    syncMediaItem(mediaEntity)
+                }
+            }
+        }
+    }
+
 
     private suspend fun syncThumbnails() {
         val frameLoader = FrameLoader()
         mediaDao.getMediaEntities().forEach {
-            if (!thumbnailDao.isExist(it.id) && it.width > 0 && it.height > 0) {
-                val bitmap = Bitmap.createBitmap(it.width, it.height, Bitmap.Config.ARGB_8888)
-                val result = frameLoader.loadFrame(it.path, bitmap)
-                if (result) {
-                    dataDir?.let { dir ->
-                        val thumbnailPath = bitmap.saveThumbnail(dir.path, 50)
-                        thumbnailDao.insert(
-                            ThumbnailEntity(path = thumbnailPath, mediaId = it.id)
-                        )
-                    }
+            val heightAndWidthNotNull = it.width != 0 && it.height != 0
+
+            if (!thumbnailDao.isExist(it.id) && heightAndWidthNotNull && it.width!! > 0 && it.height!! > 0) {
+
+                // create a bitmap to hold frame
+                val bitmap = Bitmap.createBitmap(it.width!!, it.height!!, Bitmap.Config.ARGB_8888)
+
+                // load frame into bitmap
+                val isFrameLoadedIntoBitmap = frameLoader.loadFrame(it.path, bitmap)
+
+                if (isFrameLoadedIntoBitmap && dataDir != null) {
+
+                    // save and get bitmap path
+                    val thumbnailPath = bitmap.saveThumbnail(dataDir.path, 50)
+
+                    // insert thumbnail entity into database
+                    val thumbnailEntity = ThumbnailEntity(path = thumbnailPath, mediaId = it.id)
+                    thumbnailDao.insert(thumbnailEntity)
                 }
             }
         }

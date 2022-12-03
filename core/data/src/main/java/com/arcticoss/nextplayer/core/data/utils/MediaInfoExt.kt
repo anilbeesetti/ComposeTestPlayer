@@ -1,28 +1,12 @@
 package com.arcticoss.nextplayer.core.data.utils
 
 import com.arcticoss.nextplayer.core.database.entities.AudioTrackEntity
-import com.arcticoss.nextplayer.core.database.entities.MediaEntity
 import com.arcticoss.nextplayer.core.database.entities.SubtitleTrackEntity
 import com.arcticoss.nextplayer.core.database.entities.VideoTrackEntity
 import com.arcticoss.nextplayer.mediainfo.models.AudioStream
-import com.arcticoss.nextplayer.mediainfo.models.MediaInfo
 import com.arcticoss.nextplayer.mediainfo.models.SubtitleStream
 import com.arcticoss.nextplayer.mediainfo.models.VideoStream
 
-
-fun MediaInfo.asMediaItemEntity(id: Long = 0, folderId: Long) =
-    MediaEntity(
-        id = id,
-        title = this.title,
-        size = this.size,
-        path = this.filePath,
-        width = this.width,
-        duration = this.duration,
-        height = this.height,
-        frameRate = this.frameRate,
-        addedOn = this.lastModified,
-        folderId = folderId
-    )
 
 fun VideoStream.asVideoTrackEntity(mediaItemId: Long) =
     VideoTrackEntity(

@@ -167,7 +167,7 @@ fun MediaControls(
                     .align(Alignment.BottomCenter),
             ) {
                 val duration =
-                    if (controller.durationMs == C.TIME_UNSET) currentMedia.duration else controller.durationMs
+                    if (controller.durationMs == C.TIME_UNSET) currentMedia.duration ?: 0 else controller.durationMs
                 TimeAndSeekbar(
                     positionMs = controller.positionMs,
                     durationMs = duration,
