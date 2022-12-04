@@ -1,11 +1,13 @@
 package com.arcticoss.nextplayer.feature.media.composables
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -46,16 +48,15 @@ fun CheckPermissionAndSetContent(
     var hasPermission by remember { mutableStateOf(false) }
     val multiplePermissionsState = rememberMultiplePermissionsState(permissions = permissions)
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
-            if (event == Lifecycle.Event.ON_START) {
-                hasPermission = Environment.isExternalStorageManager()
-            }
-        }
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
-            if (event == Lifecycle.Event.ON_START) {
-                multiplePermissionsState.launchMultiplePermissionRequest()
+    AddLifecycleEventObserver(lifecycleOwner = lifecycleOwner) { event ->
+        if (event == Lifecycle.Event.ON_START) {
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                    hasPermission = Environment.isExternalStorageManager()
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                    multiplePermissionsState.launchMultiplePermissionRequest()
+                }
             }
         }
     }
@@ -73,13 +74,7 @@ fun CheckPermissionAndSetContent(
                     IconTextButton(
                         title = stringResource(id = R.string.open_settings),
                         icon = Icons.Rounded.Settings,
-                        onClick = {
-                            val intent = Intent(
-                                Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                                Uri.fromParts("package", context.packageName, null)
-                            )
-                            context.startActivity(intent)
-                        }
+                        onClick = { context.launchApplicationAllFilesAccessPermission() }
                     )
                 }
             )
@@ -100,13 +95,7 @@ fun CheckPermissionAndSetContent(
                         IconTextButton(
                             title = stringResource(id = R.string.open_settings),
                             icon = Icons.Rounded.Settings,
-                            onClick = {
-                                val intent = Intent(
-                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                    Uri.fromParts("package", context.packageName, null)
-                                )
-                                context.startActivity(intent)
-                            }
+                            onClick = { context.launchApplicationDetailSettings() }
                         )
                     }
                 }
@@ -120,4 +109,22 @@ fun CheckPermissionAndSetContent(
             content(innerPadding)
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.R)
+fun Context.launchApplicationAllFilesAccessPermission() {
+    val intent = Intent(
+        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+        Uri.fromParts("package", packageName, null)
+    )
+    startActivity(intent)
+}
+
+
+fun Context.launchApplicationDetailSettings() {
+    val intent = Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    )
+    startActivity(intent)
 }
