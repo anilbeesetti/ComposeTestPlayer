@@ -19,8 +19,8 @@ cd NextPlayer
 ```bash
 ./mediainfo/src/main/ffmpeg/ffmpeg-android-maker.sh
 ```
-4. To build the project, run the following command from the root of the project:
+3. To build the project, run the following command:
 ```bash
 ./gradlew assembleDebug
 ```
-6. Enjoy
+4. Enjoy
